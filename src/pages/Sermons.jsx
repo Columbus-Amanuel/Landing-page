@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getSermons, getSermonsByCategory } from '../services/sermonsService';
+import { useLanguage } from '../contexts/LanguageContext';
 import SermonCard from '../components/ui/SermonCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
@@ -10,6 +11,7 @@ export default function Sermons() {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState('All');
   const [search, setSearch] = useState('');
+  const { language, t } = useLanguage();
 
   useEffect(() => {
     setLoading(true);
@@ -28,17 +30,16 @@ export default function Sermons() {
   return (
     <div className="page-sermons">
       <section className="page-hero">
-        <h1>Sermons</h1>
-        <p>Dive into messages that challenge, encourage, and transform.</p>
+        <h1>{t('nav.sermons')}</h1>
+        <p>{language === 'am' ? 'የሚያበረታቱ መልዕክቶችን ይመልከቱ።' : 'Dive into messages that challenge, encourage, and transform.'}</p>
       </section>
 
       <section className="section">
         <div className="container">
-          {/* Filters */}
           <div className="sermon-filters">
             <input
               type="search"
-              placeholder="Search sermons, speakers, scripture..."
+              placeholder={language === 'am' ? 'ስብከቶችን ፈልግ...' : 'Search sermons, speakers, scripture...'}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="sermon-search"
@@ -57,9 +58,7 @@ export default function Sermons() {
           </div>
 
           {loading && <LoadingSpinner center size="lg" />}
-          {!loading && filtered.length === 0 && (
-            <p className="empty-state">No sermons found. Try a different search or category.</p>
-          )}
+          {!loading && filtered.length === 0 && <p className="empty-state">{language === 'am' ? 'ምንም ስብከት አልተገኘም።' : 'No sermons found. Try a different search or category.'}</p>}
           {!loading && filtered.length > 0 && (
             <div className="sermons-grid">
               {filtered.map((s) => <SermonCard key={s.id} sermon={s} />)}

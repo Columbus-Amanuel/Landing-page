@@ -1,4 +1,7 @@
+import { useLanguage } from '../contexts/LanguageContext';
+
 export default function About() {
+  const { language, t } = useLanguage();
   const staff = [
     { name: 'Pastor John Smith', role: 'Lead Pastor', bio: 'John has served our community for over 15 years with a passion for biblical teaching and community outreach.' },
     { name: 'Pastor Sarah Johnson', role: 'Worship Pastor', bio: 'Sarah leads our worship ministry with a heart to help people encounter God through music.' },
@@ -19,8 +22,8 @@ export default function About() {
     <div className="page-about">
       {/* Hero */}
       <section className="page-hero">
-        <h1>About Us</h1>
-        <p>Rooted in faith. Growing in community. Serving the world.</p>
+        <h1>{t('nav.about')}</h1>
+        <p>{language === 'am' ? 'በእምነት የተመሠረተ፣ በማህበረሰብ የሚያድግ፣ ዓለምን የሚያገለግል።' : 'Rooted in faith. Growing in community. Serving the world.'}</p>
       </section>
 
       {/* Our Story */}
