@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null &&
+        firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Sermon audio & thumbnails — public read, admin write
+    match /sermons/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Event images — public read, admin write
+    match /events/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // User profile photos — owner or admin can write
+    match /profiles/{uid}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && (request.auth.uid == uid || isAdmin());
+    }
+  }
+}

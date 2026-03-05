@@ -1,0 +1,50 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isAdmin() {
+      return isAuthenticated() &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    function isOwner(uid) {
+      return isAuthenticated() && request.auth.uid == uid;
+    }
+
+    // Users — read own profile; admin reads all
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isAuthenticated() && request.auth.uid == uid;
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Events — public read; admin write
+    match /events/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Sermons — public read; admin write
+    match /sermons/{sermonId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Contact messages — authenticated users create; admin reads/updates
+    match /contactMessages/{msgId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Prayer requests — anyone can submit; admin reads/updates
+    match /prayerRequests/{reqId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+  }
+}
