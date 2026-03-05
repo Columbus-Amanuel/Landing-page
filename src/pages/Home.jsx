@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { getUpcomingEvents } from '../services/eventsService';
 import { getSermons } from '../services/sermonsService';
+import { useLanguage } from '../contexts/LanguageContext';
 import EventCard from '../components/ui/EventCard';
 import SermonCard from '../components/ui/SermonCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
@@ -10,6 +11,7 @@ export default function Home() {
   const [events, setEvents] = useState([]);
   const [sermons, setSermons] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     Promise.all([getUpcomingEvents(3), getSermons(3)])
@@ -20,57 +22,53 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
+  const serviceTimes = useMemo(
+    () => [
+      { day: t('home.sunday'), times: ['9:00 AM', '11:00 AM'], note: t('home.inPerson') },
+      { day: t('home.wednesday'), times: ['7:00 PM'], note: t('home.bibleStudy') },
+    ],
+    [t],
+  );
+
   return (
     <div className="page-home">
-      {/* Hero */}
       <section className="hero">
         <div className="hero-overlay" />
         <div className="hero-content">
-          <h1 className="hero-title">Welcome Home</h1>
-          <p className="hero-subtitle">
-            A place to belong, believe, and become. Join us every Sunday as we worship together.
-          </p>
+          <h1 className="hero-title">{t('home.title')}</h1>
+          <p className="hero-subtitle">{t('home.subtitle')}</p>
           <div className="hero-actions">
-            <Link to="/about" className="btn btn-primary btn-lg">Learn About Us</Link>
-            <Link to="/sermons" className="btn btn-outline-light btn-lg">Watch Sermons</Link>
+            <Link to="/about" className="btn btn-primary btn-lg">{t('home.aboutBtn')}</Link>
+            <Link to="/sermons" className="btn btn-outline-light btn-lg">{t('home.sermonsBtn')}</Link>
           </div>
         </div>
       </section>
 
-      {/* Service Times */}
       <section className="section section-alt">
         <div className="container">
-          <h2 className="section-title">Join Us for Worship</h2>
+          <h2 className="section-title">{t('home.joinTitle')}</h2>
           <div className="service-times-grid">
-            {[
-              { day: 'Sunday', times: ['9:00 AM', '11:00 AM'], note: 'In-person & Online' },
-              { day: 'Wednesday', times: ['7:00 PM'], note: 'Midweek Bible Study' },
-            ].map((s) => (
+            {serviceTimes.map((s) => (
               <div key={s.day} className="service-time-card">
                 <h3>{s.day}</h3>
-                {s.times.map((t) => <p key={t} className="service-time">{t}</p>)}
+                {s.times.map((time) => <p key={time} className="service-time">{time}</p>)}
                 <p className="service-note">{s.note}</p>
               </div>
             ))}
           </div>
           <div className="section-cta">
-            <Link to="/contact" className="btn btn-primary">Plan Your Visit</Link>
+            <Link to="/contact" className="btn btn-primary">{t('home.planVisit')}</Link>
           </div>
         </div>
       </section>
 
-      {/* Mission */}
       <section className="section">
         <div className="container">
           <div className="mission-grid">
             <div className="mission-text">
-              <h2 className="section-title text-left">Our Mission</h2>
-              <p>
-                We exist to glorify God by making disciples of Jesus Christ who love God, love
-                others, and serve the world. Every person who walks through our doors matters —
-                and every life has eternal purpose.
-              </p>
-              <Link to="/about" className="btn btn-outline mt-4">Read Our Story</Link>
+              <h2 className="section-title text-left">{t('home.missionTitle')}</h2>
+              <p>{t('home.missionBody')}</p>
+              <Link to="/about" className="btn btn-outline mt-4">{t('home.readStory')}</Link>
             </div>
             <div className="mission-values">
               {[
@@ -92,50 +90,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Upcoming Events */}
       <section className="section section-alt">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Upcoming Events</h2>
-            <Link to="/events" className="btn btn-ghost">View All Events →</Link>
+            <h2 className="section-title">{t('home.upcomingEvents')}</h2>
+            <Link to="/events" className="btn btn-ghost">{t('home.viewAllEvents')}</Link>
           </div>
           {loading ? (
             <LoadingSpinner center />
           ) : events.length > 0 ? (
             <div className="events-grid">
-              {events.map((e) => <EventCard key={e.id} event={e} />)}
+              {events.map((event) => <EventCard key={event.id} event={event} />)}
             </div>
           ) : (
-            <p className="empty-state">No upcoming events. Check back soon!</p>
+            <p className="empty-state">{t('home.noEvents')}</p>
           )}
         </div>
       </section>
 
-      {/* Recent Sermons */}
       <section className="section">
         <div className="container">
           <div className="section-header">
-            <h2 className="section-title">Recent Sermons</h2>
-            <Link to="/sermons" className="btn btn-ghost">View All Sermons →</Link>
+            <h2 className="section-title">{t('home.recentSermons')}</h2>
+            <Link to="/sermons" className="btn btn-ghost">{t('home.viewAllSermons')}</Link>
           </div>
           {loading ? (
             <LoadingSpinner center />
           ) : sermons.length > 0 ? (
             <div className="sermons-grid">
-              {sermons.map((s) => <SermonCard key={s.id} sermon={s} />)}
+              {sermons.map((sermon) => <SermonCard key={sermon.id} sermon={sermon} />)}
             </div>
           ) : (
-            <p className="empty-state">Sermons coming soon!</p>
+            <p className="empty-state">{t('home.noSermons')}</p>
           )}
         </div>
       </section>
 
-      {/* CTA Banner */}
       <section className="cta-banner">
         <div className="container">
-          <h2>Ready to take the next step?</h2>
-          <p>We'd love to connect with you and answer any questions you have.</p>
-          <Link to="/contact" className="btn btn-primary btn-lg">Get In Touch</Link>
+          <h2>{t('home.ctaTitle')}</h2>
+          <p>{t('home.ctaText')}</p>
+          <Link to="/contact" className="btn btn-primary btn-lg">{t('home.ctaButton')}</Link>
         </div>
       </section>
     </div>
