@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "Loading",
+    "signIn": "Sign In",
+    "logout": "Logout",
+    "send": "Send",
+    "submit": "Submit",
+    "back": "Back",
+    "required": "Required",
+    "churchName": "Grace Community Church",
+    "english": "English",
+    "amharic": "አማርኛ",
+    "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "sermons": "Sermons",
+    "events": "Events",
+    "contact": "Contact",
+    "give": "Give",
+    "admin": "Admin",
+    "hi": "Hi"
+  },
+  "home": {
+    "title": "Welcome Home",
+    "subtitle": "A place to belong, believe, and become. Join us every Sunday as we worship together.",
+    "aboutBtn": "Learn About Us",
+    "sermonsBtn": "Watch Sermons",
+    "joinTitle": "Join Us for Worship",
+    "sunday": "Sunday",
+    "wednesday": "Wednesday",
+    "inPerson": "In-person & Online",
+    "bibleStudy": "Midweek Bible Study",
+    "planVisit": "Plan Your Visit",
+    "missionTitle": "Our Mission",
+    "missionBody": "We exist to glorify God by making disciples of Jesus Christ who love God, love others, and serve the world. Every person who walks through our doors matters — and every life has eternal purpose.",
+    "readStory": "Read Our Story",
+    "upcomingEvents": "Upcoming Events",
+    "viewAllEvents": "View All Events →",
+    "noEvents": "No upcoming events. Check back soon!",
+    "recentSermons": "Recent Sermons",
+    "viewAllSermons": "View All Sermons →",
+    "noSermons": "Sermons coming soon!",
+    "ctaTitle": "Ready to take the next step?",
+    "ctaText": "We'd love to connect with you and answer any questions you have.",
+    "ctaButton": "Get In Touch"
+  },
+  "notFound": {
+    "message": "Page not found.",
+    "goHome": "Go Home"
+  }
+}

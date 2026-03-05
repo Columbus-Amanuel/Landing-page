@@ -1,0 +1,53 @@
+{
+  "common": {
+    "loading": "በመጫን ላይ",
+    "signIn": "ግባ",
+    "logout": "ውጣ",
+    "send": "ላክ",
+    "submit": "አስገባ",
+    "back": "ተመለስ",
+    "required": "ያስፈልጋል",
+    "churchName": "ግሬስ ኮሚዩኒቲ ቸርች",
+    "english": "English",
+    "amharic": "አማርኛ",
+    "language": "ቋንቋ"
+  },
+  "nav": {
+    "home": "መነሻ",
+    "about": "ስለ እኛ",
+    "sermons": "ስብከቶች",
+    "events": "ዝግጅቶች",
+    "contact": "ያግኙን",
+    "give": "ስጦታ",
+    "admin": "አስተዳዳሪ",
+    "hi": "ሰላም"
+  },
+  "home": {
+    "title": "እንኳን ደህና መጡ",
+    "subtitle": "የመኖር፣ የማመን እና የማደግ ቦታ። በእሁድ ከእኛ ጋር በአምልኮ ይቀላቀሉ።",
+    "aboutBtn": "ስለ እኛ ይወቁ",
+    "sermonsBtn": "ስብከቶችን ይመልከቱ",
+    "joinTitle": "ለአምልኮ ይቀላቀሉን",
+    "sunday": "እሁድ",
+    "wednesday": "ረቡዕ",
+    "inPerson": "በቦታ እና በመስመር ላይ",
+    "bibleStudy": "የመካከለኛ ሳምንት መጽሐፍ ቅዱስ ጥናት",
+    "planVisit": "ጉብኝትዎን ያቅዱ",
+    "missionTitle": "ተልዕኮአችን",
+    "missionBody": "እግዚአብሔርን ለማክበር የኢየሱስ ክርስቶስ ደቀመዛሙርትን እንፈጥራለን። ሁሉም ሰው ዋጋ አለው።",
+    "readStory": "ታሪካችንን ያንብቡ",
+    "upcomingEvents": "የሚመጡ ዝግጅቶች",
+    "viewAllEvents": "ሁሉንም ዝግጅቶች ይመልከቱ →",
+    "noEvents": "ምንም የሚመጡ ዝግጅቶች የሉም።",
+    "recentSermons": "የቅርብ ጊዜ ስብከቶች",
+    "viewAllSermons": "ሁሉንም ስብከቶች ይመልከቱ →",
+    "noSermons": "ስብከቶች በቅርቡ ይመጣሉ!",
+    "ctaTitle": "ቀጣይ እርምጃ ለመውሰድ ዝግጁ ነዎት?",
+    "ctaText": "ከእርስዎ ጋር ለመገናኘት እና ጥያቄዎችዎን ለመመለስ እንፈልጋለን።",
+    "ctaButton": "ያግኙን"
+  },
+  "notFound": {
+    "message": "ገፁ አልተገኘም።",
+    "goHome": "ወደ መነሻ ይሂዱ"
+  }
+}
