@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting on Pull Request
+name: Deploy to Dev
 
 on:
   pull_request:
