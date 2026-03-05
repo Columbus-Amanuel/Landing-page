@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting on Pull Request
+name: Deploy to Dev
 
 on: pull_request
 
@@ -40,5 +40,5 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-       env:
+        env:
           FIREBASE_CLI_EXPERIMENTS: webframeworks
