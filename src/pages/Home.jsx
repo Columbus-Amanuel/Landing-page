@@ -24,8 +24,7 @@ export default function Home() {
 
   const serviceTimes = useMemo(
     () => [
-      { day: t('home.sunday'), times: ['9:00 AM', '11:00 AM'], note: t('home.inPerson') },
-      { day: t('home.wednesday'), times: ['7:00 PM'], note: t('home.bibleStudy') },
+      { day: t('home.sunday'), times: ['4:00 PM - 7:00 PM'], note: 'Main Worship Service' },
     ],
     [t],
   );
@@ -72,10 +71,10 @@ export default function Home() {
             </div>
             <div className="mission-values">
               {[
-                { icon: '🙏', title: 'Authentic Worship', desc: 'Encountering God through Spirit-led praise' },
-                { icon: '📖', title: 'Biblical Teaching', desc: 'Grounded in the truth of Scripture' },
-                { icon: '🤝', title: 'Real Community', desc: 'Life-giving relationships that go deep' },
-                { icon: '🌍', title: 'Global Impact', desc: 'Serving locally, reaching globally' },
+                { icon: '🙏', title: 'Spirit-Filled Worship', desc: 'Worshiping Jesus Christ together as a church family' },
+                { icon: '📖', title: 'Biblical Foundation', desc: 'Built on the authority of the Holy Scriptures' },
+                { icon: '👨‍👩‍👧‍👦', title: 'Family Discipleship', desc: 'Growing families and children in Christian faith' },
+                { icon: '🌍', title: 'Ethiopian Community in Columbus', desc: 'Serving locally while connected to a global church body' },
               ].map((v) => (
                 <div key={v.title} className="value-card">
                   <span className="value-icon">{v.icon}</span>

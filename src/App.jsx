@@ -13,6 +13,8 @@ import Contact from './pages/Contact';
 import Give from './pages/Give';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProfileUpdate from './pages/ProfileUpdate';
+import ProtectedRoute from './components/ui/ProtectedRoute';
 
 function NotFound() {
   const { t } = useLanguage();
@@ -45,6 +47,14 @@ function AppRoutes() {
               <Route path="sermons/:id" element={<SermonDetail />} />
               <Route path="contact" element={<Contact />} />
               <Route path="give" element={<Give />} />
+              <Route
+                path="profile-update"
+                element={(
+                  <ProtectedRoute>
+                    <ProfileUpdate />
+                  </ProtectedRoute>
+                )}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>

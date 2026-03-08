@@ -37,7 +37,7 @@ export default function Contact() {
       await submitContactForm(data);
       setSubmitted(true);
       reset();
-    } catch (err) {
+    } catch {
       alert('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
@@ -50,7 +50,7 @@ export default function Contact() {
       await submitPrayerRequest(data);
       setSubmitted(true);
       reset();
-    } catch (err) {
+    } catch {
       alert('Something went wrong. Please try again.');
     } finally {
       setSubmitting(false);
@@ -190,28 +190,28 @@ export default function Contact() {
                 <span>📍</span>
                 <div>
                   <strong>Address</strong>
-                  <p>123 Faith Avenue<br />Your City, ST 12345</p>
+                  <p>1055 McNaughten Rd<br />Columbus, OH 43213</p>
                 </div>
               </div>
               <div className="contact-info-item">
                 <span>📞</span>
                 <div>
                   <strong>Phone</strong>
-                  <a href="tel:+15551234567">(555) 123-4567</a>
+                  <a href="tel:+16148435975">(614) 843-5975</a>
                 </div>
               </div>
               <div className="contact-info-item">
                 <span>✉️</span>
                 <div>
                   <strong>Email</strong>
-                  <a href="mailto:info@gracecommunitychurch.org">info@gracecommunitychurch.org</a>
+                  <a href="mailto:emmanuel.ohio1055@gmail.com">emmanuel.ohio1055@gmail.com</a>
                 </div>
               </div>
               <div className="contact-info-item">
                 <span>🕐</span>
                 <div>
                   <strong>Office Hours</strong>
-                  <p>Mon–Fri: 9:00 AM – 5:00 PM</p>
+                  <p>Sunday Worship: 4:00 PM – 7:00 PM</p>
                 </div>
               </div>
             </div>

@@ -11,15 +11,23 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const navLinks = useMemo(
-    () => [
-      { to: '/', label: t('nav.home') },
-      { to: '/about', label: t('nav.about') },
-      { to: '/sermons', label: t('nav.sermons') },
-      { to: '/events', label: t('nav.events') },
-      { to: '/contact', label: t('nav.contact') },
-      { to: '/give', label: t('nav.give') },
-    ],
-    [t],
+    () => {
+      const links = [
+        { to: '/', label: t('nav.home') },
+        { to: '/about', label: t('nav.about') },
+        { to: '/sermons', label: t('nav.sermons') },
+        { to: '/events', label: t('nav.events') },
+        { to: '/contact', label: t('nav.contact') },
+        { to: '/give', label: t('nav.give') },
+      ];
+
+      if (user) {
+        links.push({ to: '/profile-update', label: 'Complete Profile' });
+      }
+
+      return links;
+    },
+    [t, user],
   );
 
   const handleLogout = async () => {
