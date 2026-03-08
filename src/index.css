@@ -338,6 +338,31 @@ ul { list-style: none; }
 .success-state { text-align: center; padding: var(--space-12); }
 .success-icon { font-size: 4rem; display: block; margin-bottom: var(--space-4); }
 
+
+.client-intake-card {
+  margin-top: var(--space-12);
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-sm);
+}
+.client-intake-header h2 { color: var(--color-primary); margin-bottom: var(--space-2); }
+.client-intake-header p { color: var(--color-text-muted); margin-bottom: var(--space-4); max-width: 70ch; }
+.client-intake-grid { margin-top: var(--space-6); display: grid; grid-template-columns: 1fr 1.1fr; gap: var(--space-8); align-items: start; }
+.client-intake-list { display: grid; gap: var(--space-2); padding-left: 1.2rem; }
+.client-intake-list li { color: var(--color-text-muted); }
+.client-intake-note { margin-top: var(--space-4); color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.client-intake-note code { background: var(--color-bg-alt); padding: 0.1rem 0.35rem; border-radius: var(--radius-sm); }
+.client-intake-embed-wrapper {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-alt);
+  min-height: 640px;
+}
+.client-intake-embed { width: 100%; height: 640px; border: 0; }
+
 /* ---- Give ---- */
 .give-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); align-items: start; }
 .give-form-wrapper h2, .give-info h2 { font-size: var(--font-size-3xl); color: var(--color-primary); margin-bottom: var(--space-4); }
@@ -420,6 +445,7 @@ textarea.form-input { resize: vertical; }
   .give-grid { grid-template-columns: 1fr; }
   .mission-grid { grid-template-columns: 1fr; }
   .location-grid { grid-template-columns: 1fr; }
+  .client-intake-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 768px) {
