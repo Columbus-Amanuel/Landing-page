@@ -7,7 +7,7 @@
     "submit": "Submit",
     "back": "Back",
     "required": "Required",
-    "churchName": "Grace Community Church",
+    "churchName": "EEUCC Columbus",
     "english": "English",
     "amharic": "አማርኛ",
     "language": "Language"
@@ -23,8 +23,8 @@
     "hi": "Hi"
   },
   "home": {
-    "title": "Welcome Home",
-    "subtitle": "A place to belong, believe, and become. Join us every Sunday as we worship together.",
+    "title": "Welcome to Ethiopian Emmanuel United Church of Columbus",
+    "subtitle": "A Christ-centered Ethiopian church community in Columbus, Ohio. Join us every Sunday at 4:00 PM.",
     "aboutBtn": "Learn About Us",
     "sermonsBtn": "Watch Sermons",
     "joinTitle": "Join Us for Worship",
@@ -34,7 +34,7 @@
     "bibleStudy": "Midweek Bible Study",
     "planVisit": "Plan Your Visit",
     "missionTitle": "Our Mission",
-    "missionBody": "We exist to glorify God by making disciples of Jesus Christ who love God, love others, and serve the world. Every person who walks through our doors matters — and every life has eternal purpose.",
+    "missionBody": "We exist to glorify God through worship, prayer, biblical teaching, and discipleship in our Ethiopian and broader Columbus community.",
     "readStory": "Read Our Story",
     "upcomingEvents": "Upcoming Events",
     "viewAllEvents": "View All Events →",
