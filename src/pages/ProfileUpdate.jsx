@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { submitChurchProfileUpdate } from '../services/missingDataService';
@@ -6,7 +7,7 @@ import { submitChurchProfileUpdate } from '../services/missingDataService';
 export default function ProfileUpdate() {
   const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
 
   const {
@@ -43,7 +44,7 @@ export default function ProfileUpdate() {
 
     try {
       await submitChurchProfileUpdate(data, user);
-      setSuccess(true);
+      setShowSuccess(true);
       reset(data);
     } catch {
       setError('Unable to save the form right now. Please try again.');
@@ -54,6 +55,22 @@ export default function ProfileUpdate() {
 
   return (
     <div className="page-contact">
+      <Dialog open={showSuccess} onClose={() => setShowSuccess(false)} className="profile-dialog-overlay">
+        <div className="profile-dialog-backdrop" aria-hidden="true" />
+        <div className="profile-dialog-container">
+          <DialogPanel className="profile-dialog-panel">
+            <div className="profile-dialog-icon">&#10003;</div>
+            <DialogTitle className="profile-dialog-title">Submission Successful</DialogTitle>
+            <p className="profile-dialog-body">
+              Thank you. Your update was submitted to Firebase successfully.
+            </p>
+            <button className="btn btn-primary" onClick={() => setShowSuccess(false)}>
+              OK
+            </button>
+          </DialogPanel>
+        </div>
+      </Dialog>
+
       <section className="page-hero">
         <h1>Complete Church Profile</h1>
         <p>
@@ -64,11 +81,6 @@ export default function ProfileUpdate() {
 
       <section className="section">
         <div className="container container-narrow">
-          {success && (
-            <div className="alert alert-success">
-              Thank you. Your update was submitted to Firebase successfully.
-            </div>
-          )}
           {error && <div className="alert alert-error">{error}</div>}
 
           <form className="form" onSubmit={handleSubmit(onSubmit)}>
