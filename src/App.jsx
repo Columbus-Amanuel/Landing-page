@@ -15,6 +15,7 @@ import Give from './pages/Give';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProfileUpdate from './pages/ProfileUpdate';
+import Admin from './pages/Admin';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 
 function NotFound() {
@@ -53,6 +54,14 @@ function AppRoutes() {
                 element={(
                   <ProtectedRoute>
                     <ProfileUpdate />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                path="admin"
+                element={(
+                  <ProtectedRoute adminOnly>
+                    <Admin />
                   </ProtectedRoute>
                 )}
               />

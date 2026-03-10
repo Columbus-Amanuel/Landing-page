@@ -1,4 +1,30 @@
+import { useState } from 'react';
+import { useToast } from '../contexts/ToastContext';
+
 export default function Give() {
+  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [customAmount, setCustomAmount] = useState('');
+  const { showToast } = useToast();
+
+  const handlePreset = (amount) => {
+    setSelectedAmount(amount);
+    setCustomAmount('');
+  };
+
+  const handleCustomChange = (e) => {
+    setCustomAmount(e.target.value);
+    setSelectedAmount(null);
+  };
+
+  const handleGive = () => {
+    const amount = selectedAmount || parseFloat(customAmount);
+    if (!amount || amount <= 0) {
+      showToast('Please select or enter a giving amount.', 'error');
+      return;
+    }
+    showToast('Online giving integration coming soon. Thank you for your generosity!', 'info');
+  };
+
   const givingOptions = [
     { amount: 25, label: '$25' },
     { amount: 50, label: '$50' },
@@ -61,7 +87,13 @@ export default function Give() {
                   <label>Amount</label>
                   <div className="amount-grid">
                     {givingOptions.map((opt) => (
-                      <button key={opt.amount} className="amount-btn">{opt.label}</button>
+                      <button
+                        key={opt.amount}
+                        className={`amount-btn${selectedAmount === opt.amount ? ' selected' : ''}`}
+                        onClick={() => handlePreset(opt.amount)}
+                      >
+                        {opt.label}
+                      </button>
                     ))}
                   </div>
                   <input
@@ -70,6 +102,8 @@ export default function Give() {
                     placeholder="Or enter custom amount"
                     min="1"
                     step="1"
+                    value={customAmount}
+                    onChange={handleCustomChange}
                   />
                 </div>
 
@@ -81,7 +115,7 @@ export default function Give() {
                   </p>
                 </div>
 
-                <button className="btn btn-primary btn-full btn-lg">
+                <button className="btn btn-primary btn-full btn-lg" onClick={handleGive}>
                   Give Now
                 </button>
               </div>
