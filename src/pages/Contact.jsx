@@ -1,28 +1,13 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { submitContactForm, submitPrayerRequest } from '../services/contactService';
-
-const clientIntakeFormViewUrl = import.meta.env.VITE_CLIENT_INTAKE_FORM_URL
-  || 'https://docs.google.com/forms/d/e/REPLACE_WITH_YOUR_FORM_ID/viewform';
-const clientIntakeFormEmbedUrl = `${clientIntakeFormViewUrl}${clientIntakeFormViewUrl.includes('?') ? '&' : '?'}embedded=true`;
-
-const intakeFields = [
-  'Church name',
-  'Pastor / main contact name',
-  'Preferred phone number and email',
-  'Church mission statement',
-  'Weekly service times',
-  'Ministry list (youth, worship, outreach, etc.)',
-  'Brand assets (logo, colors, fonts)',
-  'Social media links',
-  'Donation details (if giving page is needed)',
-  'Special announcements to feature on the homepage',
-];
+import { useToast } from '../contexts/ToastContext';
 
 export default function Contact() {
   const [activeTab, setActiveTab] = useState('contact');
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const { showToast } = useToast();
 
   const {
     register,
@@ -38,7 +23,7 @@ export default function Contact() {
       setSubmitted(true);
       reset();
     } catch {
-      alert('Something went wrong. Please try again.');
+      showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -51,7 +36,7 @@ export default function Contact() {
       setSubmitted(true);
       reset();
     } catch {
-      alert('Something went wrong. Please try again.');
+      showToast('Something went wrong. Please try again.', 'error');
     } finally {
       setSubmitting(false);
     }
@@ -210,51 +195,9 @@ export default function Contact() {
               <div className="contact-info-item">
                 <span>🕐</span>
                 <div>
-                  <strong>Office Hours</strong>
-                  <p>Sunday Worship: 4:00 PM – 7:00 PM</p>
+                  <strong>Service Hours</strong>
+                  <p>Sunday Worship: 1:00 PM – 4:00 PM</p>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="client-intake-card">
-            <div className="client-intake-header">
-              <h2>Client Website Intake Form (Google Form)</h2>
-              <p>
-                To collect all website setup details from your client, share this Google Form.
-                It includes church profile, branding, and content requests.
-              </p>
-              <a
-                href={clientIntakeFormViewUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-primary"
-              >
-                Open Google Form
-              </a>
-            </div>
-
-            <div className="client-intake-grid">
-              <div>
-                <h3>Suggested Questions</h3>
-                <ul className="client-intake-list">
-                  {intakeFields.map((field) => (
-                    <li key={field}>{field}</li>
-                  ))}
-                </ul>
-                <p className="client-intake-note">
-                  Tip: set <code>VITE_CLIENT_INTAKE_FORM_URL</code> in your environment
-                  to use your real Google Form link.
-                </p>
-              </div>
-
-              <div className="client-intake-embed-wrapper">
-                <iframe
-                  title="Client Website Intake Form"
-                  src={clientIntakeFormEmbedUrl}
-                  className="client-intake-embed"
-                  loading="lazy"
-                />
               </div>
             </div>
           </div>

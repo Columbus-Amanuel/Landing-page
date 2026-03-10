@@ -1,5 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+
+function getYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url);
+    let videoId;
+    if (parsed.hostname === 'youtu.be') {
+      videoId = parsed.pathname.slice(1);
+    } else if (parsed.hostname.includes('youtube.com')) {
+      if (parsed.pathname.startsWith('/embed/')) return url;
+      videoId = parsed.searchParams.get('v');
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+}
 import { format } from 'date-fns';
 import { getSermonById } from '../services/sermonsService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -35,9 +52,9 @@ export default function SermonDetail() {
 
           {sermon.videoUrl && (
             <div className="sermon-video-wrapper">
-              {sermon.videoUrl.includes('youtube') ? (
+              {getYouTubeEmbedUrl(sermon.videoUrl) ? (
                 <iframe
-                  src={sermon.videoUrl.replace('watch?v=', 'embed/')}
+                  src={getYouTubeEmbedUrl(sermon.videoUrl)}
                   title={sermon.title}
                   allowFullScreen
                   className="sermon-video"

@@ -29,8 +29,7 @@ export default function Footer() {
           <div className="footer-section">
             <h4 className="footer-heading">{language === 'am' ? 'የአገልግሎት ሰዓቶች' : 'Service Times'}</h4>
             <ul className="footer-times">
-              <li><span>{t('home.sunday')}</span><span>9:00 AM & 11:00 AM</span></li>
-              <li><span>{t('home.wednesday')}</span><span>7:00 PM</span></li>
+              <li><span>{t('home.sunday')}</span><span>1:00 PM – 4:00 PM</span></li>
             </ul>
           </div>
         </div>
