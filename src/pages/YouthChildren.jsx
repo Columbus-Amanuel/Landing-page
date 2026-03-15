@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
-import { getYouthVideos } from '../services/youthVideosService';
+import { getYouthPageContent, getYouthVideos } from '../services/youthVideosService';
 import { useLanguage } from '../contexts/LanguageContext';
 
 function getYoutubeEmbedUrl(url = '') {
@@ -22,50 +22,85 @@ function getYoutubeEmbedUrl(url = '') {
 export default function YouthChildren() {
   const { language } = useLanguage();
   const [videos, setVideos] = useState([]);
+  const [pageContent, setPageContent] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getYouthVideos()
-      .then(setVideos)
+    Promise.all([getYouthVideos(), getYouthPageContent()])
+      .then(([videoItems, content]) => {
+        setVideos(videoItems);
+        setPageContent(content || null);
+      })
       .finally(() => setLoading(false));
   }, []);
+
+  const contentCards = useMemo(() => [
+    {
+      title: language === 'am'
+        ? (pageContent?.cardOneTitleAm || 'የህፃናት እሁድ ትምህርት')
+        : (pageContent?.cardOneTitleEn || 'Children Sunday School'),
+      description: language === 'am'
+        ? (pageContent?.cardOneDescriptionAm || 'በእድሜ ተመጣጣኝ መንገድ የመጽሐፍ ቅዱስ ትምህርት፣ ዝማሬ እና ተግባራዊ እንቅስቃሴዎች።')
+        : (pageContent?.cardOneDescriptionEn || 'Age-based Bible lessons, worship songs, and interactive activities.'),
+    },
+    {
+      title: language === 'am'
+        ? (pageContent?.cardTwoTitleAm || 'የወጣቶች ኅብረት')
+        : (pageContent?.cardTwoTitleEn || 'Youth Fellowship'),
+      description: language === 'am'
+        ? (pageContent?.cardTwoDescriptionAm || 'ሳምንታዊ የወጣቶች ስብሰባ ለጸሎት፣ ውይይት እና የክርስቲያን ሕይወት ልምድ መጋራት።')
+        : (pageContent?.cardTwoDescriptionEn || 'Weekly gathering for prayer, discussion, and practical Christian living.'),
+    },
+    {
+      title: language === 'am'
+        ? (pageContent?.cardThreeTitleAm || 'የቤተሰብ ስልጠና')
+        : (pageContent?.cardThreeTitleEn || 'Family Discipleship'),
+      description: language === 'am'
+        ? (pageContent?.cardThreeDescriptionAm || 'ወላጆችን በቤት ውስጥ ልጆቻቸውን በእምነት ለማሳደግ የሚረዱ ሀብቶችና መመሪያዎች።')
+        : (pageContent?.cardThreeDescriptionEn || 'Resources and guidance for parents to disciple children at home.'),
+    },
+  ], [language, pageContent]);
 
   return (
     <div className="page-youth-children">
       <section className="page-hero">
-        <h1>{language === 'am' ? 'የወጣቶች እና የህፃናት አገልግሎት' : 'Youth & Children Ministry'}</h1>
+        <h1>
+          {language === 'am'
+            ? (pageContent?.heroTitleAm || 'የወጣቶች እና የህፃናት አገልግሎት')
+            : (pageContent?.heroTitleEn || 'Youth & Children Ministry')}
+        </h1>
         <p>
           {language === 'am'
-            ? 'ለህፃናት እና ለወጣቶች እምነትን የሚያበረታታ፣ ማህበረሰብን የሚገነባ እና መሪነትን የሚያዳብር ፕሮግራሞች።'
-            : 'Programs that build faith, community, and leadership for children and youth.'}
+            ? (pageContent?.heroSubtitleAm || 'ለህፃናት እና ለወጣቶች እምነትን የሚያበረታታ፣ ማህበረሰብን የሚገነባ እና መሪነትን የሚያዳብር ፕሮግራሞች።')
+            : (pageContent?.heroSubtitleEn || 'Programs that build faith, community, and leadership for children and youth.')}
         </p>
       </section>
 
       <section className="section section-alt">
         <div className="container">
           <h2 className="section-title">
-            {language === 'am' ? 'የአገልግሎት ክፍሎች' : 'Ministry Areas'}
+            {language === 'am'
+              ? (pageContent?.ministrySectionTitleAm || 'የአገልግሎት ክፍሎች')
+              : (pageContent?.ministrySectionTitleEn || 'Ministry Areas')}
           </h2>
           <div className="youth-content-grid">
-            <article className="youth-card">
-              <h3>{language === 'am' ? 'የህፃናት እሁድ ትምህርት' : 'Children Sunday School'}</h3>
-              <p>{language === 'am' ? 'በእድሜ ተመጣጣኝ መንገድ የመጽሐፍ ቅዱስ ትምህርት፣ ዝማሬ እና ተግባራዊ እንቅስቃሴዎች።' : 'Age-based Bible lessons, worship songs, and interactive activities.'}</p>
-            </article>
-            <article className="youth-card">
-              <h3>{language === 'am' ? 'የወጣቶች ኅብረት' : 'Youth Fellowship'}</h3>
-              <p>{language === 'am' ? 'ሳምንታዊ የወጣቶች ስብሰባ ለጸሎት፣ ውይይት እና የክርስቲያን ሕይወት ልምድ መጋራት።' : 'Weekly gathering for prayer, discussion, and practical Christian living.'}</p>
-            </article>
-            <article className="youth-card">
-              <h3>{language === 'am' ? 'የቤተሰብ ስልጠና' : 'Family Discipleship'}</h3>
-              <p>{language === 'am' ? 'ወላጆችን በቤት ውስጥ ልጆቻቸውን በእምነት ለማሳደግ የሚረዱ ሀብቶችና መመሪያዎች።' : 'Resources and guidance for parents to disciple children at home.'}</p>
-            </article>
+            {contentCards.map((card) => (
+              <article className="youth-card" key={card.title}>
+                <h3>{card.title}</h3>
+                <p>{card.description}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
       <section className="section">
         <div className="container">
-          <h2 className="section-title">{language === 'am' ? 'የYouTube ቪዲዮዎች' : 'YouTube Videos'}</h2>
+          <h2 className="section-title">
+            {language === 'am'
+              ? (pageContent?.videosSectionTitleAm || 'የYouTube ቪዲዮዎች')
+              : (pageContent?.videosSectionTitleEn || 'YouTube Videos')}
+          </h2>
 
           {loading ? (
             <LoadingSpinner center />
@@ -92,6 +127,7 @@ export default function YouthChildren() {
                     </div>
                     <h3>{video.title || (language === 'am' ? 'የአገልግሎት ቪዲዮ' : 'Ministry Video')}</h3>
                     {video.description && <p>{video.description}</p>}
+                    <p className="video-meta">{[video.speaker, video.category, video.duration].filter(Boolean).join(' • ')}</p>
                   </article>
                 );
               })}

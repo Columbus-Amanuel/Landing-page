@@ -43,6 +43,13 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+
+    // Youth page content — public read; admin write
+    match /youthPageContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Church profile updates — authenticated users submit; admin manages
     match /churchProfileUpdates/{docId} {
       allow create: if isAuthenticated();
