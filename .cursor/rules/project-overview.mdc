@@ -1,0 +1,118 @@
+---
+description: High-level project overview, architecture, tech stack, and domain context for the EEUCC church website
+alwaysApply: true
+---
+
+# EEUCC Columbus — Project Overview
+
+## What This Project Is
+
+A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United Church of Columbus (EEUCC)**. It is a React SPA deployed to Firebase Hosting with Firestore as the database and Firebase Auth for user management.
+
+**Live domain context:** The church is at 1055 McNaughten Rd, Columbus, OH 43213. Sunday worship is 4:00 PM – 7:00 PM.
+
+## Tech Stack
+
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Framework | React | 19.x |
+| Build tool | Vite | 7.x |
+| Routing | react-router-dom | 7.x |
+| Forms | react-hook-form | 7.x |
+| UI components | @headlessui/react | 2.x |
+| Icons | @heroicons/react | 2.x |
+| Date formatting | date-fns | 4.x |
+| Backend | Firebase (Auth, Firestore, Storage, Analytics) | 12.x |
+| Hosting | Firebase Hosting | — |
+| CI/CD | GitHub Actions | — |
+| Language | JavaScript (JSX) — **no TypeScript** | — |
+
+## Project Structure
+
+```
+├── .github/workflows/       # CI/CD: prod deploy (main) + PR preview
+├── src/
+│   ├── main.jsx             # Entry point, renders <App />
+│   ├── App.jsx              # BrowserRouter → AuthProvider → LanguageProvider → Routes
+│   ├── App.css              # App-level overrides (dialog styles)
+│   ├── index.css            # Global design system (variables, components, responsive)
+│   ├── components/
+│   │   ├── layout/          # Layout.jsx, Navbar.jsx, Footer.jsx
+│   │   └── ui/              # EventCard, SermonCard, LoadingSpinner, ProtectedRoute
+│   ├── contexts/            # AuthContext.jsx, LanguageContext.jsx
+│   ├── hooks/               # useFirestoreCollection, useFirestoreDoc (real-time)
+│   ├── i18n/
+│   │   ├── en/translations.json
+│   │   └── am/translations.json
+│   ├── pages/               # Home, About, Events, EventDetail, Sermons, SermonDetail,
+│   │                        # Contact, Give, Login, Register, ProfileUpdate
+│   └── services/            # firebase.js, authService, eventsService, sermonsService,
+│                            # contactService, missingDataService
+├── firebase.json            # Hosting + Firestore + Storage config
+├── firestore.rules          # Security rules
+├── firestore.indexes.json   # Composite indexes
+├── storage.rules            # Storage security rules
+├── .env.example             # Required VITE_FIREBASE_* variables
+└── index.html               # SPA shell
+```
+
+## Context Providers (wrapping order)
+
+`BrowserRouter` → `AuthProvider` → `LanguageProvider` → `AppRoutes`
+
+## Routing
+
+| Path | Component | Auth? |
+|------|-----------|-------|
+| `/` | Home | No |
+| `/about` | About | No |
+| `/events` | Events | No |
+| `/events/:id` | EventDetail | No |
+| `/sermons` | Sermons | No |
+| `/sermons/:id` | SermonDetail | No |
+| `/contact` | Contact | No |
+| `/give` | Give | No |
+| `/login` | Login (no Layout) | No |
+| `/register` | Register (no Layout) | No |
+| `/profile-update` | ProfileUpdate | Yes (ProtectedRoute) |
+| `*` | NotFound (404) | No |
+
+Login and Register render **outside** the Layout (no Navbar/Footer).
+
+## Firestore Collections
+
+| Collection | Public Read | Write |
+|-----------|------------|-------|
+| `users` | Own profile only | Owner creates; owner or admin updates |
+| `events` | Yes | Admin only |
+| `sermons` | Yes | Admin only |
+| `contactMessages` | No | Anyone creates; admin manages |
+| `prayerRequests` | No | Anyone creates; admin manages |
+| `churchProfileUpdates` | No | Auth users create; admin manages |
+
+## User Roles
+
+- `member` — default role on registration, stored in `users/{uid}.role`
+- `admin` — can write events/sermons, manage all collections, access admin panel
+
+## Environment Variables
+
+All prefixed with `VITE_FIREBASE_` and accessed via `import.meta.env`:
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+- `VITE_FIREBASE_MEASUREMENT_ID`
+
+Optional: `VITE_CLIENT_INTAKE_FORM_URL` (Google Form embed on Contact page).
+
+## Key Commands
+
+```bash
+npm run dev      # Start Vite dev server
+npm run build    # Production build → dist/
+npm run preview  # Preview production build
+npm run lint     # ESLint check
+```

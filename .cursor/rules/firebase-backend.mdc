@@ -1,0 +1,153 @@
+---
+description: Firebase configuration, Firestore data models, security rules, and storage structure
+globs: "{src/services/**,firestore.rules,storage.rules,firestore.indexes.json,firebase.json}"
+alwaysApply: false
+---
+
+# Firebase Backend
+
+## Firebase Services Used
+
+- **Auth** — email/password authentication
+- **Firestore** — document database (all app data)
+- **Storage** — sermon audio files, event images, profile photos
+- **Analytics** — initialized in `services/firebase.js`
+- **Hosting** — SPA deployment from `dist/`
+
+## Firestore Data Models
+
+### `users/{uid}`
+```
+{
+  uid: string,
+  email: string,
+  displayName: string,
+  role: "member" | "admin",
+  createdAt: Timestamp
+}
+```
+
+### `events/{eventId}`
+```
+{
+  title: string,
+  description: string,
+  details?: string,
+  date: Timestamp,
+  location: string,
+  imageUrl?: string,
+  registrationUrl?: string,
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### `sermons/{sermonId}`
+```
+{
+  title: string,
+  speaker: string,
+  date: Timestamp,
+  category: "Sunday Message" | "Bible Study" | "Special Series" | "Guest Speaker",
+  scripture?: string,
+  description?: string,
+  videoUrl?: string,          // YouTube or direct video URL
+  audioUrl?: string,          // Firebase Storage URL
+  thumbnailUrl?: string,
+  notesUrl?: string,
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+### `contactMessages/{msgId}`
+```
+{
+  firstName: string,
+  lastName: string,
+  email: string,
+  phone?: string,
+  subject: string,
+  message: string,
+  status: "unread",
+  createdAt: Timestamp
+}
+```
+
+### `prayerRequests/{reqId}`
+```
+{
+  name?: string,
+  email?: string,
+  request: string,
+  isPrivate?: boolean,
+  status: "active",
+  createdAt: Timestamp
+}
+```
+
+### `churchProfileUpdates/{docId}`
+```
+{
+  officialName: string,
+  amharicName?: string,
+  address: string,
+  phone?: string,
+  email?: string,
+  serviceTimes: string,
+  foundedYear?: string,
+  pastorName?: string,
+  leadershipTeam?: string,
+  attendanceEstimate?: string,
+  languagesUsed?: string,
+  ministryPrograms?: string,
+  socialLinks?: string,
+  legalNameOrEntity?: string,
+  ownershipOrLeaseInfo?: string,
+  announcements?: string,
+  prayerNeeds?: string,
+  additionalNotes?: string,
+  submittedByUid: string,
+  submittedByEmail: string | null,
+  submittedAt: Timestamp,
+  status: "new"
+}
+```
+
+## Security Rules Summary
+
+| Collection | Read | Create | Update/Delete |
+|-----------|------|--------|---------------|
+| `users/{uid}` | Owner or admin | Auth user (own doc) | Owner or admin |
+| `events` | Public | Admin | Admin |
+| `sermons` | Public | Admin | Admin |
+| `contactMessages` | Admin | Anyone (public) | Admin |
+| `prayerRequests` | Admin | Anyone (public) | Admin |
+| `churchProfileUpdates` | Admin | Any auth user | Admin |
+
+Admin check reads from `users/{uid}.role == 'admin'`.
+
+## Storage Paths
+
+| Path | Public Read | Write |
+|------|-----------|-------|
+| `sermons/audio/{sermonId}/{filename}` | Yes | Admin |
+| `events/{allPaths}` | Yes | Admin |
+| `profiles/{uid}/{allPaths}` | Yes | Owner or admin |
+
+## Firestore Indexes
+
+1. `events` — `date ASC`
+2. `sermons` — `category ASC, date DESC` (for category filter)
+3. `sermons` — `date DESC` (for default listing)
+
+## Service Files
+
+| File | Responsibility |
+|------|---------------|
+| `firebase.js` | Initialize app, export `auth`, `db`, `storage`, `analytics` |
+| `authService.js` | Register, login, logout, password reset, get profile, auth state listener |
+| `eventsService.js` | CRUD for events collection |
+| `sermonsService.js` | CRUD for sermons + audio upload to Storage |
+| `contactService.js` | Submit contact form and prayer requests |
+| `missingDataService.js` | Submit church profile updates |

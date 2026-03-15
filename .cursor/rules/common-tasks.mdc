@@ -1,0 +1,63 @@
+---
+description: Step-by-step guides for common development tasks in this project
+alwaysApply: true
+---
+
+# Common Tasks
+
+## Adding a New Page
+
+1. Create `src/pages/NewPage.jsx` with the standard page pattern (page-hero + section + container).
+2. Add a route in `src/App.jsx` inside the Layout `<Routes>` block.
+3. Add a nav link label to both translation files (`nav.newPage`).
+4. Add the link to `navLinks` in `src/components/layout/Navbar.jsx`.
+5. Optionally add a footer link in `src/components/layout/Footer.jsx`.
+6. Add CSS classes in `src/index.css` if needed.
+
+## Adding a New Firestore Collection
+
+1. Create a service file in `src/services/` following existing patterns (use `serverTimestamp()`).
+2. Add security rules in `firestore.rules`.
+3. Add composite indexes in `firestore.indexes.json` if queries use `where` + `orderBy`.
+4. If real-time is needed, use `useFirestoreCollection` or `useFirestoreDoc` hooks.
+
+## Adding a New Translation Key
+
+1. Add the key in `src/i18n/en/translations.json`.
+2. Add the matching key with Amharic text in `src/i18n/am/translations.json`.
+3. Access in components via `t('section.key')`.
+
+## Adding a New UI Component
+
+1. Create in `src/components/ui/ComponentName.jsx`.
+2. Use `export default function ComponentName()` pattern.
+3. Style with classes in `src/index.css`.
+4. Import and use where needed.
+
+## Protecting a Route
+
+Wrap the route element with `<ProtectedRoute>`:
+```jsx
+<Route path="path" element={<ProtectedRoute><YourPage /></ProtectedRoute>} />
+```
+For admin-only: `<ProtectedRoute adminOnly>`.
+
+## Working with Firestore Dates
+
+- Firestore stores dates as `Timestamp` objects.
+- Convert before rendering: `const jsDate = doc.date?.toDate ? doc.date.toDate() : new Date(doc.date)`.
+- Format with `date-fns`: `format(jsDate, 'MMMM d, yyyy')`.
+
+## Running Locally
+
+```bash
+npm install
+cp .env.example .env   # Fill in real Firebase credentials
+npm run dev             # http://localhost:5173
+```
+
+## Deploying
+
+- Push to `main` for production deploy.
+- Open a PR for preview deploy.
+- Both handled automatically by GitHub Actions.

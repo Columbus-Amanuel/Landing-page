@@ -1,0 +1,117 @@
+---
+description: React component patterns, page structure, hooks, and context usage
+globs: "src/**/*.jsx"
+alwaysApply: false
+---
+
+# React Component Guide
+
+## Page Component Pattern
+
+Every page follows this structure:
+
+```jsx
+import { useEffect, useState } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+
+export default function PageName() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { language, t } = useLanguage();
+
+  useEffect(() => {
+    fetchData()
+      .then(setData)
+      .catch(setError)
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div className="page-pagename">
+      <section className="page-hero">
+        <h1>{t('nav.pageName')}</h1>
+        <p>Subtitle text</p>
+      </section>
+      <section className="section">
+        <div className="container">
+          {loading && <LoadingSpinner center size="lg" />}
+          {error && <div className="error-state">...</div>}
+          {!loading && !error && data.length === 0 && <p className="empty-state">...</p>}
+          {!loading && !error && data.length > 0 && (/* render data */)}
+        </div>
+      </section>
+    </div>
+  );
+}
+```
+
+## Layout Structure
+
+- `Layout.jsx` wraps `Navbar` + `<main>` + `Footer`.
+- Login and Register pages render **outside** Layout (no shared nav/footer).
+- All other routes render inside Layout.
+
+## Available Contexts
+
+### `useAuth()` (from `AuthContext`)
+Returns `{ user, profile, loading }`.
+- `user` — Firebase Auth user object or null.
+- `profile` — Firestore `users/{uid}` document or null.
+- `loading` — true until initial auth state resolves.
+
+### `useLanguage()` (from `LanguageContext`)
+Returns `{ language, changeLanguage, t }`.
+- `language` — `"en"` or `"am"`.
+- `changeLanguage(lang)` — switch language, persists to localStorage.
+- `t(key)` — resolve translation key with fallback.
+
+## Reusable UI Components
+
+### `EventCard` — `src/components/ui/EventCard.jsx`
+Props: `{ event }` — renders event card with date badge, title, time, location, description, link.
+
+### `SermonCard` — `src/components/ui/SermonCard.jsx`
+Props: `{ sermon }` — renders sermon card with thumbnail, category badge, title, speaker, date, actions.
+
+### `LoadingSpinner` — `src/components/ui/LoadingSpinner.jsx`
+Props: `{ size = 'md', center = false }` — sizes: `sm`, `md`, `lg`.
+
+### `ProtectedRoute` — `src/components/ui/ProtectedRoute.jsx`
+Props: `{ children, adminOnly = false }` — redirects to `/login` if not authenticated, to `/` if not admin (when `adminOnly`).
+
+## Custom Hooks
+
+### `useFirestoreCollection(collectionName, queryConstraints)`
+Real-time listener on a Firestore collection. Returns `{ data, loading, error }`.
+
+### `useFirestoreDoc(collectionName, docId)`
+Real-time listener on a single Firestore document. Returns `{ data, loading, error }`.
+
+## Form Pattern (react-hook-form)
+
+```jsx
+const { register, handleSubmit, reset, formState: { errors } } = useForm();
+
+<form onSubmit={handleSubmit(onSubmit)} className="form">
+  <div className="form-group">
+    <label>Field Name *</label>
+    <input {...register('fieldName', { required: 'Required' })} className="form-input" />
+    {errors.fieldName && <span className="form-error">{errors.fieldName.message}</span>}
+  </div>
+  <button type="submit" className="btn btn-primary btn-full">Submit</button>
+</form>
+```
+
+## Button Classes
+
+| Class | Style |
+|-------|-------|
+| `.btn-primary` | Gold background (`--color-accent`) |
+| `.btn-outline` | Transparent with navy border |
+| `.btn-outline-light` | White border (for dark backgrounds) |
+| `.btn-ghost` | Transparent, no border |
+| `.btn-sm` | Small size |
+| `.btn-lg` | Large size |
+| `.btn-full` | Full width |

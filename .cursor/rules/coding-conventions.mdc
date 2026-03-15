@@ -1,0 +1,92 @@
+---
+description: Coding conventions, patterns, and style rules used throughout the EEUCC codebase
+alwaysApply: true
+---
+
+# Coding Conventions
+
+## Language & Syntax
+
+- **JavaScript only** — no TypeScript. All source files are `.js` or `.jsx`.
+- ES Modules (`import` / `export`), no CommonJS.
+- Use `export default function ComponentName()` for page and component files.
+- Service functions use named exports: `export const functionName = ...`.
+
+## Component Patterns
+
+- **Functional components only** — no class components.
+- Hooks for state management: `useState`, `useEffect`, `useMemo`.
+- Forms use `react-hook-form` (`useForm`, `register`, `handleSubmit`, `formState`).
+- Dialogs use `@headlessui/react` (`Dialog`, `DialogPanel`, `DialogTitle`).
+
+## Styling
+
+- **Plain CSS** — no Tailwind, CSS Modules, or styled-components.
+- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, etc.).
+- App-level overrides in `src/App.css`.
+- BEM-like class naming: `.event-card`, `.event-card-body`, `.event-card-title`.
+- Responsive breakpoints: 1024px, 768px, 480px.
+- New styles go in `src/index.css` following the existing section pattern.
+
+## CSS Variable Palette
+
+```css
+--color-primary: #1a3a5c       /* deep navy */
+--color-accent: #c8922a        /* warm gold */
+--color-bg: #ffffff
+--color-bg-alt: #f5f7fa
+--color-text: #1f2937
+--color-text-muted: #6b7280
+```
+
+## File Organization
+
+- Pages: `src/pages/PageName.jsx` — one page component per file.
+- Layout: `src/components/layout/` — Navbar, Footer, Layout wrapper.
+- UI components: `src/components/ui/` — reusable cards, spinners, guards.
+- Services: `src/services/` — Firebase interactions, one file per domain.
+- Hooks: `src/hooks/` — custom hooks for Firestore real-time subscriptions.
+- i18n: `src/i18n/{lang}/translations.json` — flat-ish JSON with dot-path keys.
+
+## Internationalization (i18n)
+
+- Custom lightweight system in `LanguageContext.jsx` — no external i18n library.
+- Access translations via `const { t, language } = useLanguage()`.
+- `t('key.path')` resolves dot-separated keys from the JSON files.
+- Fallback: Amharic → English → raw key string.
+- Some components use inline `language === 'am' ? '...' : '...'` for one-off strings.
+- When adding new user-facing text, add keys to both `en/translations.json` and `am/translations.json`.
+
+## Firebase Service Pattern
+
+```javascript
+// Pattern for read services
+export const getItemById = async (id) => {
+  const snap = await getDoc(doc(db, 'collectionName', id));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+};
+
+// Pattern for write services
+export const createItem = (data) =>
+  addDoc(collection(db, 'collectionName'), {
+    ...data,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+```
+
+## Date Handling
+
+- Firestore Timestamps are converted to JS Dates: `event.date?.toDate ? event.date.toDate() : new Date(event.date)`.
+- Formatted with `date-fns` `format()` function.
+
+## Error Handling
+
+- Services throw on failure; page components catch and display via local `error` state or `alert()`.
+- Loading/error/empty states pattern: check `loading` → `error` → `data.length === 0` → render data.
+
+## ESLint
+
+- Flat config in `eslint.config.js`.
+- Unused variables error except those matching `^[A-Z_]`.
+- React Hooks and React Refresh plugins enabled.

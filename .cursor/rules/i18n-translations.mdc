@@ -1,0 +1,55 @@
+---
+description: Internationalization patterns — how to add and use English/Amharic translations
+globs: "src/i18n/**"
+alwaysApply: false
+---
+
+# Internationalization (i18n)
+
+## System
+
+Custom lightweight i18n built into `LanguageContext.jsx`. No external library.
+
+## Supported Languages
+
+- `en` — English (default, fallback)
+- `am` — Amharic (አማርኛ)
+
+## Translation Files
+
+- `src/i18n/en/translations.json`
+- `src/i18n/am/translations.json`
+
+## Key Structure (dot-separated)
+
+```json
+{
+  "common": { "loading": "Loading", "signIn": "Sign In" },
+  "nav": { "home": "Home", "about": "About" },
+  "home": { "title": "Welcome to..." }
+}
+```
+
+Access: `t('common.signIn')`, `t('home.title')`, `t('nav.about')`.
+
+## Adding New Translations
+
+1. Add the key to **both** `en/translations.json` and `am/translations.json`.
+2. Use the `t()` function in components: `const { t } = useLanguage()`.
+3. For one-off strings that don't justify a key, inline conditionals are acceptable:
+   `language === 'am' ? 'አማርኛ text' : 'English text'`
+
+## Fallback Behavior
+
+`t(key)` resolves in order:
+1. Current language translation
+2. English (`en`) translation
+3. Raw key string (for debugging missing keys)
+
+## Language Persistence
+
+Stored in `localStorage` under key `site-language`. Survives page reloads.
+
+## Switching Language
+
+Navbar has a `<select>` dropdown calling `changeLanguage('en' | 'am')`.
