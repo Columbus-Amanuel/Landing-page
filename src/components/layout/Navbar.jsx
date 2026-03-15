@@ -19,6 +19,7 @@ export default function Navbar() {
         { to: '/events', label: t('nav.events') },
         { to: '/contact', label: t('nav.contact') },
         { to: '/give', label: t('nav.give') },
+        { to: '/youth-children', label: t('nav.youthChildren') },
       ];
 
       if (user) {
@@ -98,7 +99,12 @@ export default function Navbar() {
             </NavLink>
           ))}
           {user ? (
-            <button onClick={handleLogout} className="mobile-nav-link">{t('common.logout')}</button>
+            <>
+              {profile?.role === 'admin' && (
+                <Link to="/admin" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>{t('nav.admin')}</Link>
+              )}
+              <button onClick={handleLogout} className="mobile-nav-link">{t('common.logout')}</button>
+            </>
           ) : (
             <Link to="/login" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>
               {t('common.signIn')}

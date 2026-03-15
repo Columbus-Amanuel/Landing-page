@@ -471,3 +471,24 @@ textarea.form-input { resize: vertical; }
   .amount-grid { grid-template-columns: repeat(2, 1fr); }
   .radio-group { flex-direction: column; gap: var(--space-2); }
 }
+
+/* ---- Youth & Admin ---- */
+.youth-content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-6); }
+.youth-card { background: white; border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
+.youth-card h3 { color: var(--color-primary); margin-bottom: var(--space-3); }
+.youth-card p { color: var(--color-text-muted); }
+.youth-videos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-6); }
+.video-card { border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow: hidden; background: white; box-shadow: var(--shadow-sm); }
+.video-card h3 { color: var(--color-primary); font-size: var(--font-size-lg); padding: var(--space-4) var(--space-4) 0; }
+.video-card p { color: var(--color-text-muted); font-size: var(--font-size-sm); padding: 0 var(--space-4) var(--space-4); }
+.video-embed-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+.video-embed-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+.admin-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); padding: var(--space-8); }
+.admin-card h2 { color: var(--color-primary); margin-bottom: var(--space-6); }
+.admin-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.admin-form label { font-weight: 600; font-size: var(--font-size-sm); display: flex; flex-direction: column; gap: var(--space-2); }
+.admin-video-list { display: flex; flex-direction: column; gap: var(--space-4); }
+.admin-video-item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); background: white; }
+.admin-video-item h3 { color: var(--color-primary); margin-bottom: var(--space-1); }
+.error-text { color: var(--color-error); font-size: var(--font-size-sm); }

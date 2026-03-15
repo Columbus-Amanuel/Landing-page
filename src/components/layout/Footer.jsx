@@ -23,6 +23,7 @@ export default function Footer() {
               <li><Link to="/sermons">{t('nav.sermons')}</Link></li>
               <li><Link to="/events">{t('nav.events')}</Link></li>
               <li><Link to="/give">{t('nav.give')}</Link></li>
+              <li><Link to="/youth-children">{t('nav.youthChildren')}</Link></li>
             </ul>
           </div>
 

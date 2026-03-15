@@ -11,9 +11,11 @@ import Sermons from './pages/Sermons';
 import SermonDetail from './pages/SermonDetail';
 import Contact from './pages/Contact';
 import Give from './pages/Give';
+import YouthChildren from './pages/YouthChildren';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProfileUpdate from './pages/ProfileUpdate';
+import Admin from './pages/Admin';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 
 function NotFound() {
@@ -47,11 +49,20 @@ function AppRoutes() {
               <Route path="sermons/:id" element={<SermonDetail />} />
               <Route path="contact" element={<Contact />} />
               <Route path="give" element={<Give />} />
+              <Route path="youth-children" element={<YouthChildren />} />
               <Route
                 path="profile-update"
                 element={(
                   <ProtectedRoute>
                     <ProfileUpdate />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                path="admin"
+                element={(
+                  <ProtectedRoute adminOnly>
+                    <Admin />
                   </ProtectedRoute>
                 )}
               />
