@@ -26,9 +26,13 @@ export default function Navbar() {
         links.push({ to: '/profile-update', label: 'Complete Profile' });
       }
 
+      if (profile?.role === 'admin') {
+        links.push({ to: '/admin', label: t('nav.admin') });
+      }
+
       return links;
     },
-    [t, user],
+    [profile?.role, t, user],
   );
 
   const handleLogout = async () => {
@@ -70,9 +74,6 @@ export default function Navbar() {
           {user ? (
             <div className="user-menu">
               <span className="user-greeting">{t('nav.hi')}, {profile?.displayName || user.email}</span>
-              {profile?.role === 'admin' && (
-                <Link to="/admin" className="btn btn-outline btn-sm">{t('nav.admin')}</Link>
-              )}
               <button onClick={handleLogout} className="btn btn-ghost btn-sm">{t('common.logout')}</button>
             </div>
           ) : (
@@ -100,9 +101,6 @@ export default function Navbar() {
           ))}
           {user ? (
             <>
-              {profile?.role === 'admin' && (
-                <Link to="/admin" className="mobile-nav-link" onClick={() => setMobileOpen(false)}>{t('nav.admin')}</Link>
-              )}
               <button onClick={handleLogout} className="mobile-nav-link">{t('common.logout')}</button>
             </>
           ) : (
