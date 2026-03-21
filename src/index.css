@@ -225,11 +225,11 @@ ul { list-style: none; }
   text-decoration: none;
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   letter-spacing: 0.03em;
   flex-shrink: 0;
   line-height: 1.15;
-  width: 244px;
+  width: 285px;
 }
 .navbar-brand:hover { color: var(--color-primary); }
 .brand-mark {
@@ -639,6 +639,251 @@ ul { list-style: none; }
 .service-time-card h3 { color: var(--color-primary); font-size: var(--font-size-xl); margin-bottom: var(--space-3); }
 .service-time { font-size: var(--font-size-2xl); font-weight: 700; color: var(--color-accent); }
 .service-note { font-size: var(--font-size-sm); color: var(--color-text-muted); margin-top: var(--space-2); }
+
+/* ---- Home — Contact lab (modern / high-contrast strip) ---- */
+.home-contact-lab {
+  --home-lab-bg: #060a12;
+  --home-lab-accent: #5eead4;
+  --home-lab-accent-dim: rgba(94, 234, 212, 0.45);
+  --home-lab-line: rgba(255, 255, 255, 0.06);
+  --home-lab-text: rgba(255, 255, 255, 0.92);
+  --home-lab-muted: rgba(255, 255, 255, 0.58);
+  position: relative;
+  overflow: hidden;
+  padding: clamp(var(--space-12), 7vw, var(--space-20)) 0;
+  background: var(--home-lab-bg);
+  color: var(--home-lab-text);
+  border-top: 1px solid var(--home-lab-line);
+  border-bottom: 1px solid var(--home-lab-line);
+}
+.home-contact-lab a {
+  color: var(--home-lab-accent);
+  transition: color var(--transition), border-color var(--transition), background var(--transition);
+}
+.home-contact-lab a:hover { color: #fff; }
+
+.home-contact-lab-grid-bg {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 20%, transparent 75%);
+  pointer-events: none;
+}
+
+.home-contact-lab-glow {
+  position: absolute;
+  width: min(90vw, 720px);
+  height: min(90vw, 720px);
+  top: -35%;
+  right: -15%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(28, 82, 157, 0.45) 0%, transparent 62%);
+  filter: blur(40px);
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.home-contact-lab .container { position: relative; z-index: 1; }
+
+.home-contact-lab-eyebrow {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--home-lab-accent);
+  margin-bottom: var(--space-3);
+  text-align: center;
+}
+
+.home-contact-lab-title {
+  font-family: var(--font-display);
+  font-size: clamp(var(--font-size-2xl), 3.5vw, var(--font-size-4xl));
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.02em;
+  background: linear-gradient(105deg, #fff 0%, rgba(255, 255, 255, 0.82) 45%, var(--home-lab-accent) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.home-contact-lab-lead {
+  text-align: center;
+  max-width: 38rem;
+  margin: 0 auto var(--space-12);
+  color: var(--home-lab-muted);
+  font-size: var(--font-size-lg);
+  line-height: 1.55;
+}
+
+.home-contact-lab-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-6);
+  align-items: stretch;
+}
+
+.home-contact-panel {
+  position: relative;
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(0, 0, 0, 0.2);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .home-contact-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(94, 234, 212, 0.35) 0%,
+      transparent 42%,
+      rgba(28, 82, 157, 0.35) 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.75;
+  }
+}
+
+.home-contact-panel-header {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  margin-bottom: var(--space-6);
+}
+
+.home-contact-panel-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  background: rgba(94, 234, 212, 0.1);
+  border: 1px solid rgba(94, 234, 212, 0.25);
+  color: var(--home-lab-accent);
+}
+.home-contact-panel-icon svg { width: 1.5rem; height: 1.5rem; }
+
+.home-contact-panel-label {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--home-lab-muted);
+  margin-bottom: var(--space-2);
+}
+
+.home-contact-panel-value {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--home-lab-text);
+  margin: 0;
+}
+
+.home-contact-panel-pastor-name {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: #fff;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.home-contact-panel-role {
+  font-size: var(--font-size-base);
+  color: var(--home-lab-muted);
+  margin: 0;
+}
+
+.home-contact-panel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--home-lab-accent-dim);
+  background: rgba(94, 234, 212, 0.06);
+  color: var(--home-lab-accent) !important;
+}
+.home-contact-panel-link:hover {
+  background: rgba(94, 234, 212, 0.14);
+  border-color: var(--home-lab-accent);
+  color: #fff !important;
+}
+.home-contact-panel-link svg { width: 1.125rem; height: 1.125rem; }
+
+.home-contact-panel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  list-style: none;
+}
+
+.home-contact-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--home-lab-text) !important;
+  word-break: break-word;
+}
+.home-contact-chip:hover {
+  border-color: rgba(94, 234, 212, 0.4);
+  background: rgba(28, 82, 157, 0.25);
+}
+.home-contact-chip svg {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--home-lab-accent);
+}
+
+.home-contact-panel-cta {
+  display: block;
+  text-align: center;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff !important;
+  background: rgba(207, 42, 39, 0.25);
+}
+.home-contact-panel-cta:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
 
 /* ---- Mission ---- */
 .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-12); align-items: center; }

@@ -13,6 +13,9 @@ export const DEFAULT_CHURCH_INFO = {
   zip: '43213',
   phone: '(614) 843-5975',
   email: 'emmanuel.ohio1055@gmail.com',
+  /** Optional; shown on Home “pastoral contact” when set */
+  pastorName: '',
+  pastorNameAm: '',
   facebookUrl: 'https://facebook.com/p/Ethiopian-Emmanuel-United-Church-of-Columbus-100067210424028/',
   youtubeUrl: 'https://youtube.com/@ethiopianemmanuelunitedchu9591',
   missionStatement:

@@ -1,5 +1,12 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import {
+  ArrowTopRightOnSquareIcon,
+  EnvelopeIcon,
+  MapPinIcon,
+  PhoneIcon,
+  UserCircleIcon,
+} from '@heroicons/react/24/outline';
 import { getUpcomingEvents } from '../services/eventsService';
 import { getSermons } from '../services/sermonsService';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -29,6 +36,23 @@ export default function Home() {
 
   const serviceTimes = churchInfo?.serviceTimes || [];
   const values = churchInfo?.values || [];
+  const {
+    address,
+    city,
+    state,
+    zip,
+    phone,
+    email,
+    pastorName,
+    pastorNameAm,
+  } = churchInfo || {};
+  const fullAddress = [address, city && state ? `${city}, ${state}` : city || state, zip]
+    .filter(Boolean)
+    .join(' ');
+  const mapsHref =
+    fullAddress &&
+    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
+  const pastorDisplay = am ? (pastorNameAm || pastorName) : (pastorName || pastorNameAm);
   const missionStatement = am
     ? (churchInfo?.missionStatementAm || churchInfo?.missionStatement || t('home.missionBody'))
     : (churchInfo?.missionStatement || t('home.missionBody'));
@@ -66,6 +90,86 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {(fullAddress || phone || email) && (
+        <section className="home-contact-lab" aria-labelledby="home-contact-lab-title">
+          <div className="home-contact-lab-grid-bg" aria-hidden />
+          <div className="home-contact-lab-glow" aria-hidden />
+          <div className="container">
+            <p className="home-contact-lab-eyebrow">{t('home.contactLabEyebrow')}</p>
+            <h2 id="home-contact-lab-title" className="home-contact-lab-title">
+              {t('home.contactLabTitle')}
+            </h2>
+            <p className="home-contact-lab-lead">{t('home.contactLabLead')}</p>
+
+            <div className="home-contact-lab-panels">
+              {fullAddress && (
+                <article className="home-contact-panel">
+                  <div className="home-contact-panel-header">
+                    <span className="home-contact-panel-icon" aria-hidden>
+                      <MapPinIcon />
+                    </span>
+                    <div>
+                      <h3 className="home-contact-panel-label">{t('home.contactLabAddressLabel')}</h3>
+                      <p className="home-contact-panel-value">{fullAddress}</p>
+                    </div>
+                  </div>
+                  {mapsHref && (
+                    <a
+                      href={mapsHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="home-contact-panel-link"
+                    >
+                      <span>{t('home.contactLabDirections')}</span>
+                      <ArrowTopRightOnSquareIcon aria-hidden />
+                    </a>
+                  )}
+                </article>
+              )}
+
+              {(phone || email) && (
+                <article className="home-contact-panel home-contact-panel--pastor">
+                  <div className="home-contact-panel-header">
+                    <span className="home-contact-panel-icon" aria-hidden>
+                      <UserCircleIcon />
+                    </span>
+                    <div>
+                      <h3 className="home-contact-panel-label">{t('home.contactLabPastorLabel')}</h3>
+                      {pastorDisplay ? (
+                        <p className="home-contact-panel-pastor-name">{pastorDisplay}</p>
+                      ) : (
+                        <p className="home-contact-panel-role">{t('home.contactLabPastorFallback')}</p>
+                      )}
+                    </div>
+                  </div>
+                  <ul className="home-contact-panel-actions">
+                    {phone && (
+                      <li>
+                        <a href={`tel:${String(phone).replace(/\D/g, '')}`} className="home-contact-chip">
+                          <PhoneIcon aria-hidden />
+                          <span>{phone}</span>
+                        </a>
+                      </li>
+                    )}
+                    {email && (
+                      <li>
+                        <a href={`mailto:${email}`} className="home-contact-chip">
+                          <EnvelopeIcon aria-hidden />
+                          <span>{email}</span>
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                  <Link to="/contact" className="home-contact-panel-cta">
+                    {t('home.contactLabMessage')}
+                  </Link>
+                </article>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="section">
         <div className="container">

@@ -134,6 +134,14 @@ export default function AdminChurchInfo() {
               <input type="email" className="form-input" value={info.email || ''} onChange={(e) => set('email', e.target.value)} />
             </label>
             <label>
+              Pastor / lead minister name (English)
+              <input className="form-input" value={info.pastorName || ''} onChange={(e) => set('pastorName', e.target.value)} placeholder="Optional — shown on Home" />
+            </label>
+            <label>
+              Pastor / lead minister name (Amharic)
+              <input className="form-input" value={info.pastorNameAm || ''} onChange={(e) => set('pastorNameAm', e.target.value)} placeholder="Optional" />
+            </label>
+            <label>
               Facebook URL
               <input className="form-input" value={info.facebookUrl || ''} onChange={(e) => set('facebookUrl', e.target.value)} />
             </label>

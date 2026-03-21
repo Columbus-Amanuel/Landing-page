@@ -122,7 +122,7 @@ All user-visible Firebase content has bilingual (EN/AM) field pairs:
 - **churchInfo.serviceTimes[]**: `day`/`dayAm`, `note`/`noteAm`
 - **churchInfo.beliefs[]**: `title`/`titleAm`, `desc`/`descAm`
 - **churchInfo.values[]**: `icon` (Heroicons key from `src/utils/valueIcons.js`; legacy emoji strings still map until admin save), `title`/`titleAm`, `desc`/`descAm`
-- **churchInfo**: `missionStatement`/`missionStatementAm`, `storyPara1`/`storyPara1Am`, `storyPara2`/`storyPara2Am`
+- **churchInfo**: `missionStatement`/`missionStatementAm`, `storyPara1`/`storyPara1Am`, `storyPara2`/`storyPara2Am`, optional `pastorName`/`pastorNameAm` (Home pastoral contact card)
 - **givingSettings.funds[]**: `label`/`labelAm`, `desc`/`descAm`
 - **givingSettings**: `scriptureText`/`scriptureTextAm`, `scriptureCite`/`scriptureCiteAm`, `plannedGivingText`/`plannedGivingTextAm`
 - **youthPageContent/main**: bilingual `*En` / `*Am` string fields for hero, intro, stats, ministry cards, section titles, CTA, empty video copy; `faqs[]` with `questionEn`/`questionAm`, `answerEn`/`answerAm`

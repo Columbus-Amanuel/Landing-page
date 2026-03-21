@@ -32,7 +32,7 @@
   },
   "home": {
     "title": "Welcome to Ethiopian Emmanuel United Church of Columbus",
-    "subtitle": "A Christ-centered Ethiopian church community in Columbus, Ohio. Join us every Sunday at 4:00 PM.",
+    "subtitle": "A Christ-centered Ethiopian church community in Columbus, Ohio. Join us every Sunday at 1:30 PM.",
     "aboutBtn": "Learn About Us",
     "sermonsBtn": "Watch Sermons",
     "joinTitle": "Join Us for Worship",
@@ -52,7 +52,15 @@
     "noSermons": "Sermons coming soon!",
     "ctaTitle": "Ready to take the next step?",
     "ctaText": "We'd love to connect with you and answer any questions you have.",
-    "ctaButton": "Get In Touch"
+    "ctaButton": "Get In Touch",
+    "contactLabEyebrow": "Visit & connect",
+    "contactLabTitle": "Find us & reach pastoral care",
+    "contactLabLead": "Our doors are open — visit in person or contact the pastoral office anytime.",
+    "contactLabAddressLabel": "Church address",
+    "contactLabDirections": "Open in Google Maps",
+    "contactLabPastorLabel": "Pastoral contact",
+    "contactLabPastorFallback": "Pastoral office",
+    "contactLabMessage": "Send a message"
   },
   "about": {
     "heroTitle": "About EEUCC",

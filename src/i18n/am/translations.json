@@ -32,7 +32,7 @@
   },
   "home": {
     "title": "ወደ ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን ኮለንበስ እንኳን ደህና መጡ",
-    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 4:00 ፒ.ኤም ይቀላቀሉን።",
+    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 1:30 ፒ.ኤም ይቀላቀሉን።",
     "aboutBtn": "ስለ እኛ ይወቁ",
     "sermonsBtn": "ስብከቶችን ይመልከቱ",
     "joinTitle": "ለአምልኮ ይቀላቀሉን",
@@ -52,7 +52,15 @@
     "noSermons": "ስብከቶች በቅርቡ ይመጣሉ!",
     "ctaTitle": "ቀጣይ እርምጃ ለመውሰድ ዝግጁ ነዎት?",
     "ctaText": "ከእርስዎ ጋር ለመገናኘት እና ጥያቄዎችዎን ለመመለስ እንፈልጋለን።",
-    "ctaButton": "ያግኙን"
+    "ctaButton": "ያግኙን",
+    "contactLabEyebrow": "ጉብኝት እና ግንኙነት",
+    "contactLabTitle": "አድራሻችን እና የፓስተር ግንኙነት",
+    "contactLabLead": "ደጃፋችን ክፍት ነው — በአካል ይምጡ ወይም የፓስተር ጽ/ቤትን በማንኛውም ጊዜ ያግኙ።",
+    "contactLabAddressLabel": "የቤተ ክርስቲያን አድራሻ",
+    "contactLabDirections": "በጉግል ካርታ ይክፈቱ",
+    "contactLabPastorLabel": "የፓስተር ግንኙነት",
+    "contactLabPastorFallback": "የፓስተር ጽ/ቤት",
+    "contactLabMessage": "መልእክት ላኩ"
   },
   "about": {
     "heroTitle": "ስለ EEUCC",
