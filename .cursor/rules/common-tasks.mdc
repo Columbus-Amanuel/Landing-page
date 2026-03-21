@@ -10,7 +10,7 @@ alwaysApply: true
 1. Create `src/pages/NewPage.jsx` with the standard page pattern (page-hero + section + container).
 2. Add a route in `src/App.jsx` inside the Layout `<Routes>` block.
 3. Add a nav link label to both translation files (`nav.newPage`).
-4. Add the link to `navLinks` in `src/components/layout/Navbar.jsx`.
+4. Add the route in `src/components/layout/Navbar.jsx` — either a top-level `NavLink`, an entry in `worshipItems` / `connectItems`, or a new dropdown group; update `worshipActive` / `connectActive` (or equivalent) if the new path belongs to a group. (Youth & Children uses a top-level desktop/mobile link, not Connect.)
 5. Optionally add a footer link in `src/components/layout/Footer.jsx`.
 6. Add CSS classes in `src/index.css` if needed.
 

@@ -72,6 +72,8 @@ Returns `{ language, changeLanguage, t }`.
 ### `EventCard` — `src/components/ui/EventCard.jsx`
 Props: `{ event }` — renders event card with date badge, title, time, location, description, link.
 
+Wrap lists in `.events-grid` (Home) or `.events-list` (Events page); both use the same CSS grid (`repeat(auto-fill, minmax(min(100%, 270px), 1fr))`) so up to four cards fit per row in the max-width container. Narrow card cells stack the date block above the info via an `@container` query on `.event-card`. Cards use column flex (`height: 100%`) so row heights match; the Learn more link uses `margin-top: auto` and `align-self: center` at the bottom of `.event-card-info`.
+
 ### `SermonCard` — `src/components/ui/SermonCard.jsx`
 Props: `{ sermon }` — renders sermon card with thumbnail, category badge, title, speaker, date, actions.
 
@@ -108,8 +110,8 @@ const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
 | Class | Style |
 |-------|-------|
-| `.btn-primary` | Gold background (`--color-accent`) |
-| `.btn-outline` | Transparent with navy border |
+| `.btn-primary` | On light: brand blue; on dark hero/CTA: accent red (`index.css` scoped) |
+| `.btn-outline` | Transparent with primary blue border |
 | `.btn-outline-light` | White border (for dark backgrounds) |
 | `.btn-ghost` | Transparent, no border |
 | `.btn-sm` | Small size |

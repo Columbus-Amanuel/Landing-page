@@ -22,21 +22,28 @@ alwaysApply: true
 ## Styling
 
 - **Plain CSS** — no Tailwind, CSS Modules, or styled-components.
-- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, etc.).
+- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, `--navbar-height`, etc.). Display type uses `--font-display` (Cormorant Garamond); UI uses `--font-sans` (DM Sans), loaded from `index.html`.
+- **Flat UI:** Prefer `1px` borders and `--shadow-flat` over heavy drop shadows on cards and nav. Primary actions on light backgrounds use solid brand blue `.btn-primary`; accent red is reserved for dark hero/CTA strips (`index.css` scoped rules).
 - App-level overrides in `src/App.css`.
 - BEM-like class naming: `.event-card`, `.event-card-body`, `.event-card-title`.
 - Responsive breakpoints: 1024px, 768px, 480px.
 - New styles go in `src/index.css` following the existing section pattern.
 
+## Icons
+
+- Use **@heroicons/react** (`24/outline` or `24/solid`) for UI affordances; avoid emoji in the interface.
+- Mission value cards on Home: `churchInfo.values[].icon` is a string key; options and normalization live in `src/utils/valueIcons.js`, rendered by `src/components/ui/ValueIcon.jsx`.
+
 ## CSS Variable Palette
 
 ```css
---color-primary: #1a3a5c       /* deep navy */
---color-accent: #c8922a        /* warm gold */
---color-bg: #ffffff
---color-bg-alt: #f5f7fa
---color-text: #1f2937
---color-text-muted: #6b7280
+--color-primary: #1c529d       /* seal royal blue */
+--color-accent: #cf2a27        /* seal red */
+--color-bg: #f7f8fb
+--color-bg-alt: #ebeef5
+--color-text: #1a2230
+--color-text-muted: #5a6578
+--navbar-bg: rgb(235, 238, 245)  /* logo canvas; navbar + mobile drawer */
 ```
 
 ## File Organization

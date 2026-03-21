@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
 import Layout from './components/layout/Layout';
 
 import Home from './pages/Home';
@@ -15,7 +16,7 @@ import YouthChildren from './pages/YouthChildren';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProfileUpdate from './pages/ProfileUpdate';
-import Admin from './pages/Admin';
+import AdminLayout from './pages/admin/AdminLayout';
 import ProtectedRoute from './components/ui/ProtectedRoute';
 
 function NotFound() {
@@ -59,10 +60,10 @@ function AppRoutes() {
                 )}
               />
               <Route
-                path="admin"
+                path="admin/*"
                 element={(
                   <ProtectedRoute adminOnly>
-                    <Admin />
+                    <AdminLayout />
                   </ProtectedRoute>
                 )}
               />
@@ -80,7 +81,9 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <LanguageProvider>
-          <AppRoutes />
+          <SiteSettingsProvider>
+            <AppRoutes />
+          </SiteSettingsProvider>
         </LanguageProvider>
       </AuthProvider>
     </BrowserRouter>

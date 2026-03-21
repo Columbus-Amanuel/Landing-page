@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { loginUser, resetPassword } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
+import { ArrowLeftIcon } from '@heroicons/react/24/outline';
+import BrandCrossIcon from '../components/ui/BrandCrossIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Login() {
@@ -51,7 +53,7 @@ export default function Login() {
     <div className="page-auth">
       <div className="auth-card">
         <div className="auth-header">
-          <span className="brand-icon large">✝</span>
+          <BrandCrossIcon className="brand-icon large" />
           <h1>{mode === 'login' ? (language === 'am' ? 'እንኳን ደህና መጡ' : 'Welcome Back') : (language === 'am' ? 'የይለፍ ቃል ዳግም ማቀናበር' : 'Reset Password')}</h1>
         </div>
 
@@ -91,7 +93,10 @@ export default function Login() {
               <Link to="/register">{language === 'am' ? 'አካውንት ይፍጠሩ' : 'Create an account'}</Link>
             </>
           ) : (
-            <button className="link-btn" onClick={() => setMode('login')}>← {language === 'am' ? 'ወደ መግቢያ ተመለስ' : 'Back to Sign In'}</button>
+            <button type="button" className="link-btn link-btn--with-icon" onClick={() => setMode('login')}>
+              <ArrowLeftIcon className="link-btn__icon" aria-hidden />
+              {language === 'am' ? 'ወደ መግቢያ ተመለስ' : 'Back to Sign In'}
+            </button>
           )}
         </div>
       </div>

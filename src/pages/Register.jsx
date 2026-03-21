@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { registerUser } from '../services/authService';
 import { useAuth } from '../contexts/AuthContext';
+import BrandCrossIcon from '../components/ui/BrandCrossIcon';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Register() {
@@ -41,7 +42,7 @@ export default function Register() {
     <div className="page-auth">
       <div className="auth-card">
         <div className="auth-header">
-          <span className="brand-icon large">✝</span>
+          <BrandCrossIcon className="brand-icon large" />
           <h1>{language === 'am' ? 'አካውንት ይፍጠሩ' : 'Create Account'}</h1>
           <p>{language === 'am' ? 'የመስመር ላይ ማህበረሰባችንን ይቀላቀሉ' : 'Join our online community'}</p>
         </div>

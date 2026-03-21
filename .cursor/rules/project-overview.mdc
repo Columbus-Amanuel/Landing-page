@@ -38,16 +38,22 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 │   ├── index.css            # Global design system (variables, components, responsive)
 │   ├── components/
 │   │   ├── layout/          # Layout.jsx, Navbar.jsx, Footer.jsx
-│   │   └── ui/              # EventCard, SermonCard, LoadingSpinner, ProtectedRoute
-│   ├── contexts/            # AuthContext.jsx, LanguageContext.jsx
+│   │   └── ui/              # EventCard, SermonCard, ValueIcon, BrandCrossIcon, BackLink,
+│   │   │                    # AdminFlashMessage, LoadingSpinner, ProtectedRoute
+│   ├── contexts/            # AuthContext.jsx, LanguageContext.jsx, SiteSettingsContext.jsx
 │   ├── hooks/               # useFirestoreCollection, useFirestoreDoc (real-time)
+│   ├── utils/               # valueIcons.js (mission value icon keys + legacy emoji map)
 │   ├── i18n/
 │   │   ├── en/translations.json
 │   │   └── am/translations.json
-│   ├── pages/               # Home, About, Events, EventDetail, Sermons, SermonDetail,
-│   │                        # Contact, Give, Login, Register, ProfileUpdate
+│   ├── pages/
+│   │   ├── (public)         # Home, About, Events, EventDetail, Sermons, SermonDetail,
+│   │   │                    # Contact, Give, YouthChildren, Login, Register, ProfileUpdate
+│   │   └── admin/           # AdminLayout, AdminDashboard, AdminChurchInfo, AdminEvents,
+│   │                        # AdminSermons, AdminGiving, AdminYouth, AdminMessages
 │   └── services/            # firebase.js, authService, eventsService, sermonsService,
-│                            # contactService, missingDataService
+│                            # contactService, missingDataService, siteSettingsService,
+│                            # youthVideosService
 ├── firebase.json            # Hosting + Firestore + Storage config
 ├── firestore.rules          # Security rules
 ├── firestore.indexes.json   # Composite indexes
@@ -58,7 +64,7 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 
 ## Context Providers (wrapping order)
 
-`BrowserRouter` → `AuthProvider` → `LanguageProvider` → `AppRoutes`
+`BrowserRouter` → `AuthProvider` → `LanguageProvider` → `SiteSettingsProvider` → `AppRoutes`
 
 ## Routing
 
@@ -75,9 +81,24 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 | `/login` | Login (no Layout) | No |
 | `/register` | Register (no Layout) | No |
 | `/profile-update` | ProfileUpdate | Yes (ProtectedRoute) |
+| `/admin` | AdminDashboard (AdminLayout) | Yes (admin) |
+| `/admin/church-info` | AdminChurchInfo | Yes (admin) |
+| `/admin/events` | AdminEvents | Yes (admin) |
+| `/admin/sermons` | AdminSermons | Yes (admin) |
+| `/admin/giving` | AdminGiving | Yes (admin) |
+| `/admin/youth` | AdminYouth | Yes (admin) |
+| `/admin/messages` | AdminMessages | Yes (admin) |
 | `*` | NotFound (404) | No |
 
 Login and Register render **outside** the Layout (no Navbar/Footer).
+Admin routes use `AdminLayout` (sidebar + `<Routes>`) inside the main Layout.
+
+## Public navigation (Navbar)
+
+- **Surface:** Light bar (`--navbar-bg`, aligned with `logo.png` canvas / `--color-bg-alt`); nav links and brand use primary/muted text; Sign In uses solid primary button.
+- **Desktop:** `Home`, `About`, **Youth & Children** (top-level link), then Headless UI **`Menu`** dropdowns **Worship** (Sermons, Events) and **Connect** (Contact, Give), then optional **Complete Profile** / **Admin** when applicable; language is a pill toggle (EN / አማ), not a `<select>`.
+- **≤1024px:** Primary nav collapses to a hamburger; the panel groups links under Main (includes Youth & Children) / Worship / Connect / Account with a backdrop and scroll lock.
+- **Typography:** Google Fonts in `index.html` — **Cormorant Garamond** (`--font-display`) for headings/brand, **DM Sans** (`--font-sans`) for UI. Layout uses `--navbar-height` (sticky admin sidebar offset matches).
 
 ## Firestore Collections
 
@@ -89,6 +110,25 @@ Login and Register render **outside** the Layout (no Navbar/Footer).
 | `contactMessages` | No | Anyone creates; admin manages |
 | `prayerRequests` | No | Anyone creates; admin manages |
 | `churchProfileUpdates` | No | Auth users create; admin manages |
+| `siteSettings` | Yes | Admin only |
+| `youthVideos` | Yes | Admin only |
+| `youthPageContent` | Yes | Admin only |
+
+## Bilingual Data Model
+
+All user-visible Firebase content has bilingual (EN/AM) field pairs:
+- **Events**: `title`/`titleAm`, `description`/`descriptionAm`, `details`/`detailsAm`, `location`/`locationAm`
+- **Sermons**: `title`/`titleAm`, `description`/`descriptionAm`
+- **churchInfo.serviceTimes[]**: `day`/`dayAm`, `note`/`noteAm`
+- **churchInfo.beliefs[]**: `title`/`titleAm`, `desc`/`descAm`
+- **churchInfo.values[]**: `icon` (Heroicons key from `src/utils/valueIcons.js`; legacy emoji strings still map until admin save), `title`/`titleAm`, `desc`/`descAm`
+- **churchInfo**: `missionStatement`/`missionStatementAm`, `storyPara1`/`storyPara1Am`, `storyPara2`/`storyPara2Am`
+- **givingSettings.funds[]**: `label`/`labelAm`, `desc`/`descAm`
+- **givingSettings**: `scriptureText`/`scriptureTextAm`, `scriptureCite`/`scriptureCiteAm`, `plannedGivingText`/`plannedGivingTextAm`
+- **youthPageContent/main**: bilingual `*En` / `*Am` string fields for hero, intro, stats, ministry cards, section titles, CTA, empty video copy; `faqs[]` with `questionEn`/`questionAm`, `answerEn`/`answerAm`
+- **youthVideos**: `title`/`titleAm`, `description`/`descriptionAm` (plus `url`, metadata, `thumbnailUrl`, `sortOrder`)
+
+Rendering pattern: `const am = language === 'am'; const display = am && item.titleAm ? item.titleAm : item.title;`
 
 ## User Roles
 
@@ -106,7 +146,7 @@ All prefixed with `VITE_FIREBASE_` and accessed via `import.meta.env`:
 - `VITE_FIREBASE_APP_ID`
 - `VITE_FIREBASE_MEASUREMENT_ID`
 
-Optional: `VITE_CLIENT_INTAKE_FORM_URL` (Google Form embed on Contact page).
+Optional: `VITE_CLIENT_INTAKE_FORM_URL` (was used on Contact page; now removed from UI).
 
 ## Key Commands
 

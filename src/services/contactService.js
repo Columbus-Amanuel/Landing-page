@@ -1,4 +1,13 @@
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+  getDocs,
+  query,
+  orderBy,
+  serverTimestamp,
+} from 'firebase/firestore';
 import { db } from './firebase';
 
 export const submitContactForm = (data) =>
@@ -14,3 +23,21 @@ export const submitPrayerRequest = (data) =>
     status: 'active',
     createdAt: serverTimestamp(),
   });
+
+export const getContactMessages = async () => {
+  const q = query(collection(db, 'contactMessages'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+};
+
+export const getPrayerRequests = async () => {
+  const q = query(collection(db, 'prayerRequests'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+};
+
+export const updateContactMessageStatus = (id, status) =>
+  updateDoc(doc(db, 'contactMessages', id), { status });
+
+export const updatePrayerRequestStatus = (id, status) =>
+  updateDoc(doc(db, 'prayerRequests', id), { status });
