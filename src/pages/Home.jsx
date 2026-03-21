@@ -16,6 +16,26 @@ import SermonCard from '../components/ui/SermonCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ValueIcon from '../components/ui/ValueIcon';
 
+/** Default hero background (serene B-roll). Override with `VITE_HERO_YOUTUBE_VIDEO_ID` (11-char ID from the watch URL). */
+const DEFAULT_HERO_YOUTUBE_VIDEO_ID = 'LXb3EKWsInQ';
+
+function buildHeroYoutubeEmbedSrc(videoId) {
+  const params = new URLSearchParams({
+    autoplay: '1',
+    mute: '1',
+    loop: '1',
+    playlist: videoId,
+    controls: '0',
+    modestbranding: '1',
+    rel: '0',
+    playsinline: '1',
+    disablekb: '1',
+    fs: '0',
+    iv_load_policy: '3',
+  });
+  return `https://www.youtube-nocookie.com/embed/${videoId}?${params.toString()}`;
+}
+
 export default function Home() {
   const [events, setEvents] = useState([]);
   const [sermons, setSermons] = useState([]);
@@ -57,9 +77,22 @@ export default function Home() {
     ? (churchInfo?.missionStatementAm || churchInfo?.missionStatement || t('home.missionBody'))
     : (churchInfo?.missionStatement || t('home.missionBody'));
 
+  const heroYoutubeVideoId =
+    (import.meta.env.VITE_HERO_YOUTUBE_VIDEO_ID || '').trim() || DEFAULT_HERO_YOUTUBE_VIDEO_ID;
+  const heroYoutubeEmbedSrc = buildHeroYoutubeEmbedSrc(heroYoutubeVideoId);
+
   return (
     <div className="page-home">
-      <section className="hero">
+      <section className="hero hero--video">
+        <div className="hero-video-wrap" aria-hidden="true">
+          <iframe
+            className="hero-video-iframe"
+            src={heroYoutubeEmbedSrc}
+            title=" "
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen={false}
+          />
+        </div>
         <div className="hero-overlay" />
         <div className="hero-content">
           <h1 className="hero-title">{t('home.title')}</h1>

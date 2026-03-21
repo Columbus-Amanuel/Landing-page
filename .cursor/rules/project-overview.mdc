@@ -148,6 +148,8 @@ All prefixed with `VITE_FIREBASE_` and accessed via `import.meta.env`:
 
 Optional: `VITE_CLIENT_INTAKE_FORM_URL` (was used on Contact page; now removed from UI).
 
+Optional: `VITE_HERO_YOUTUBE_VIDEO_ID` — 11-character YouTube video ID for the Home page hero background video (embed via `youtube-nocookie.com`). If unset, a built-in default scenic B-roll is used; override per environment or edit `DEFAULT_HERO_YOUTUBE_VIDEO_ID` in `src/pages/Home.jsx`.
+
 ## Key Commands
 
 ```bash
