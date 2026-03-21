@@ -18,6 +18,7 @@ import Register from './pages/Register';
 import ProfileUpdate from './pages/ProfileUpdate';
 import AdminLayout from './pages/admin/AdminLayout';
 import ProtectedRoute from './components/ui/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 function NotFound() {
   const { t } = useLanguage();
@@ -79,6 +80,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <LanguageProvider>
           <SiteSettingsProvider>
