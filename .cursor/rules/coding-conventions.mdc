@@ -82,6 +82,8 @@ export const createItem = (data) =>
   });
 ```
 
+- **YouTube helpers** (`getYoutubeVideoId`, `getYoutubeDefaultThumbnailUrl`) live in `src/services/youthVideosService.js` and are reused anywhere a watch URL, embed, or default still image (`hqdefault.jpg`) is needed.
+
 ## Date Handling
 
 - Firestore Timestamps are converted to JS Dates: `event.date?.toDate ? event.date.toDate() : new Date(event.date)`.

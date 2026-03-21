@@ -4,6 +4,7 @@ import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react
 import { ChevronDownIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import {
+  getYoutubeDefaultThumbnailUrl,
   getYoutubeVideoId,
   getYouthPageContent,
   getYouthVideos,
@@ -22,7 +23,7 @@ function YouthVideoCard({ video, language }) {
   const videoId = getYoutubeVideoId(video.url);
   const thumb =
     (video.thumbnailUrl && String(video.thumbnailUrl).trim())
-    || (videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '');
+    || getYoutubeDefaultThumbnailUrl(videoId);
 
   const title =
     language === 'am' && video.titleAm

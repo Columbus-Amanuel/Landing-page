@@ -17,7 +17,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ValueIcon from '../components/ui/ValueIcon';
 
 /** Default hero background (serene B-roll). Override with `VITE_HERO_YOUTUBE_VIDEO_ID` (11-char ID from the watch URL). */
-const DEFAULT_HERO_YOUTUBE_VIDEO_ID = 'LXb3EKWsInQ';
+const DEFAULT_HERO_YOUTUBE_VIDEO_ID = '9tFh_EwJWdc';
 
 function buildHeroYoutubeEmbedSrc(videoId) {
   const params = new URLSearchParams({

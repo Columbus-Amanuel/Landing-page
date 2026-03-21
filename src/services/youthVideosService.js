@@ -121,6 +121,12 @@ export function getYoutubeVideoId(url = '') {
   return '';
 }
 
+/** Default YouTube still image for a video id when no custom thumbnail is set. */
+export function getYoutubeDefaultThumbnailUrl(videoId) {
+  const id = typeof videoId === 'string' ? videoId.trim() : '';
+  return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : '';
+}
+
 export const getYouthVideos = async () => {
   const q = query(collection(db, YOUTH_VIDEOS_COLLECTION), orderBy('sortOrder', 'asc'), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);

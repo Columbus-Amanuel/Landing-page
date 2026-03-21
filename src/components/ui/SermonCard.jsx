@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { PlayCircleIcon } from '@heroicons/react/24/solid';
 import { BookOpenIcon } from '@heroicons/react/24/outline';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { getYoutubeDefaultThumbnailUrl, getYoutubeVideoId } from '../../services/youthVideosService';
 
 const CATEGORY_AM = {
   'Sunday Message': 'የእሁድ ስብከት',
@@ -22,11 +23,16 @@ export default function SermonCard({ sermon }) {
   const category = sermon.category || 'General';
   const categoryLabel = am ? (CATEGORY_AM[category] || category) : category;
 
+  const youtubeId = getYoutubeVideoId(sermon.videoUrl || '');
+  const thumbSrc =
+    (sermon.thumbnailUrl && String(sermon.thumbnailUrl).trim())
+    || getYoutubeDefaultThumbnailUrl(youtubeId);
+
   return (
     <div className="sermon-card">
-      {sermon.thumbnailUrl && (
+      {thumbSrc && (
         <div className="sermon-card-thumbnail">
-          <img src={sermon.thumbnailUrl} alt={title} />
+          <img src={thumbSrc} alt={title} />
           {sermon.videoUrl && (
             <PlayCircleIcon className="sermon-play-icon" aria-hidden />
           )}
