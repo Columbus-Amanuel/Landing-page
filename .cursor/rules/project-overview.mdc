@@ -32,9 +32,9 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 ```
 ├── .github/workflows/       # CI/CD: prod deploy (main) + PR preview
 ├── src/
-│   ├── main.jsx             # Entry point, renders <App />
+│   ├── main.jsx             # Entry point: index.css + App.css → renders <App />
 │   ├── App.jsx              # BrowserRouter → AuthProvider → LanguageProvider → Routes
-│   ├── App.css              # App-level overrides (dialog styles)
+│   ├── App.css              # App-level overrides (Headless UI dialog layout; imported from main.jsx)
 │   ├── index.css            # Global design system (variables, components, responsive)
 │   ├── components/
 │   │   ├── layout/          # Layout.jsx, Navbar.jsx, Footer.jsx
@@ -96,9 +96,9 @@ Admin routes use `AdminLayout` (sidebar + `<Routes>`) inside the main Layout.
 ## Public navigation (Navbar)
 
 - **Surface:** Light bar (`--navbar-bg`, aligned with `logo.png` canvas / `--color-bg-alt`); nav links and brand use primary/muted text; Sign In uses solid primary button.
-- **Desktop:** `Home`, `About`, **Youth & Children** (top-level link), then Headless UI **`Menu`** dropdowns **Worship** (Sermons, Events) and **Connect** (Contact, Give), then optional **Complete Profile** / **Admin** when applicable; language is a pill toggle (EN / አማ), not a `<select>`.
-- **≤1024px:** Primary nav collapses to a hamburger; the panel groups links under Main (includes Youth & Children) / Worship / Connect / Account with a backdrop and scroll lock.
-- **Typography:** Google Fonts in `index.html` — **Cormorant Garamond** (`--font-display`) for headings/brand, **DM Sans** (`--font-sans`) for UI. Layout uses `--navbar-height` (sticky admin sidebar offset matches).
+- **Desktop:** `Home`, `About`, then Headless UI **`Menu`** dropdowns **Ministries** (Youth & Children) and **Media** (Sermons, Events), then top-level **Contact** and a prominent **Give** link (`nav-link-give`), then optional **Complete Profile** / **Admin** when applicable; language is a pill toggle (EN / አማ), not a `<select>`.
+- **≤1024px:** Primary nav collapses to a hamburger; the panel groups links under Main / Ministries / Media / Connect (Contact + emphasized Give) / Account with a backdrop and scroll lock.
+- **Typography:** Google Fonts in `index.html` — **Cormorant Garamond** (`--font-display`) for brand/nav display; **Fraunces** + **Noto Serif Ethiopic** (`--font-hero`) for home hero titles, page hero `h1`, section titles, and CTA banner headlines (Ethiopic covers Amharic). **DM Sans** (`--font-sans`) for UI. Layout uses `--navbar-height` (sticky admin sidebar offset matches).
 
 ## Firestore Collections
 

@@ -74,6 +74,8 @@ alwaysApply: false
 }
 ```
 
+Home hero **Let us call you** submits here too: `email` may be the placeholder `not-provided@example.com` when the visitor only provided name and phone.
+
 ### `prayerRequests/{reqId}`
 ```
 {

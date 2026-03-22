@@ -3,22 +3,25 @@
   min-height: 100vh;
 }
 
-/* Profile update success dialog */
+/* Profile update success dialog + Home hero callback (Headless UI Dialog portal) */
 .profile-dialog-overlay {
   position: fixed;
   inset: 0;
-  z-index: 50;
+  z-index: 400;
+  isolation: isolate;
 }
 
 .profile-dialog-backdrop {
   position: fixed;
   inset: 0;
+  z-index: 0;
   background: rgba(0, 0, 0, 0.4);
 }
 
 .profile-dialog-container {
   position: fixed;
   inset: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,6 +29,8 @@
 }
 
 .profile-dialog-panel {
+  position: relative;
+  z-index: 1;
   background: #fff;
   border-radius: 0.75rem;
   padding: 2rem;

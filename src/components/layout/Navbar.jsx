@@ -49,12 +49,17 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  const worshipActive =
+  const ministriesActive = pathname.startsWith('/youth-children');
+  const mediaActive =
     pathname.startsWith('/sermons') || pathname.startsWith('/events');
-  const connectActive =
-    pathname.startsWith('/contact') || pathname.startsWith('/give');
+  const ministriesItems = useMemo(
+    () => [
+      { to: '/youth-children', label: t('nav.youthChildren'), end: true },
+    ],
+    [t],
+  );
 
-  const worshipItems = useMemo(
+  const mediaItems = useMemo(
     () => [
       { to: '/sermons', label: t('nav.sermons'), end: false },
       { to: '/events', label: t('nav.events'), end: false },
@@ -62,7 +67,7 @@ export default function Navbar() {
     [t],
   );
 
-  const connectItems = useMemo(
+  const mobileConnectItems = useMemo(
     () => [
       { to: '/contact', label: t('nav.contact'), end: true },
       { to: '/give', label: t('nav.give'), end: true },
@@ -125,22 +130,32 @@ export default function Navbar() {
           >
             {t('nav.about')}
           </NavLink>
+          <NavDropdown
+            label={t('nav.ministries')}
+            items={ministriesItems}
+            groupActive={ministriesActive}
+          />
+          <NavDropdown
+            label={t('nav.media')}
+            items={mediaItems}
+            groupActive={mediaActive}
+          />
           <NavLink
-            to="/youth-children"
+            to="/contact"
+            end
             className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
           >
-            {t('nav.youthChildren')}
+            {t('nav.contact')}
           </NavLink>
-          <NavDropdown
-            label={t('nav.worship')}
-            items={worshipItems}
-            groupActive={worshipActive}
-          />
-          <NavDropdown
-            label={t('nav.connect')}
-            items={connectItems}
-            groupActive={connectActive}
-          />
+          <NavLink
+            to="/give"
+            end
+            className={({ isActive }) =>
+              `nav-link nav-link${isActive ? ' active' : ''}`
+            }
+          >
+            {t('nav.give')}
+          </NavLink>
           {accountLinks.map(({ to, label, end }) => (
             <NavLink
               key={to}
@@ -223,18 +238,26 @@ export default function Navbar() {
               >
                 {t('nav.about')}
               </NavLink>
-              <NavLink
-                to="/youth-children"
-                className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {t('nav.youthChildren')}
-              </NavLink>
             </div>
 
             <div className="mobile-nav-section">
-              <p className="mobile-nav-label">{t('nav.worship')}</p>
-              {worshipItems.map(({ to, label, end }) => (
+              <p className="mobile-nav-label">{t('nav.ministries')}</p>
+              {ministriesItems.map(({ to, label, end }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  end={end}
+                  className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {label}
+                </NavLink>
+              ))}
+            </div>
+
+            <div className="mobile-nav-section">
+              <p className="mobile-nav-label">{t('nav.media')}</p>
+              {mediaItems.map(({ to, label, end }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -249,12 +272,14 @@ export default function Navbar() {
 
             <div className="mobile-nav-section">
               <p className="mobile-nav-label">{t('nav.connect')}</p>
-              {connectItems.map(({ to, label, end }) => (
+              {mobileConnectItems.map(({ to, label, end, emphasize }) => (
                 <NavLink
                   key={to}
                   to={to}
                   end={end}
-                  className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
+                  className={({ isActive }) =>
+                    `mobile-nav-link${emphasize ? ' mobile-nav-link-give' : ''}${isActive ? ' active' : ''}`
+                  }
                   onClick={() => setMobileOpen(false)}
                 >
                   {label}

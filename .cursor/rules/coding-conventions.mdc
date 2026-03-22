@@ -22,9 +22,9 @@ alwaysApply: true
 ## Styling
 
 - **Plain CSS** — no Tailwind, CSS Modules, or styled-components.
-- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, `--navbar-height`, etc.). Display type uses `--font-display` (Cormorant Garamond); UI uses `--font-sans` (DM Sans), loaded from `index.html`.
+- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, `--navbar-height`, etc.). Brand/nav headings use `--font-display` (Cormorant Garamond). Large hero-style headlines use `--font-hero` (**Fraunces** + **Noto Serif Ethiopic** fallback for Amharic). UI uses `--font-sans` (DM Sans), all loaded from `index.html`.
 - **Flat UI:** Prefer `1px` borders and `--shadow-flat` over heavy drop shadows on cards and nav. Primary actions on light backgrounds use solid brand blue `.btn-primary`; accent red is reserved for dark hero/CTA strips (`index.css` scoped rules).
-- App-level overrides in `src/App.css`.
+- App-level overrides in `src/App.css` (imported from `main.jsx` after `index.css`).
 - BEM-like class naming: `.event-card`, `.event-card-body`, `.event-card-title`.
 - Responsive breakpoints: 1024px, 768px, 480px.
 - New styles go in `src/index.css` following the existing section pattern.
