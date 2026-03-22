@@ -36,6 +36,26 @@ service cloud.firestore {
     }
 
 
+
+    // Site settings (church info, giving) — public read; admin write
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Youth videos — public read; admin write
+    match /youthVideos/{videoId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+
+    // Youth page content — public read; admin write
+    match /youthPageContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Church profile updates — authenticated users submit; admin manages
     match /churchProfileUpdates/{docId} {
       allow create: if isAuthenticated();

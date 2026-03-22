@@ -52,4 +52,4 @@ Stored in `localStorage` under key `site-language`. Survives page reloads.
 
 ## Switching Language
 
-Navbar has a `<select>` dropdown calling `changeLanguage('en' | 'am')`.
+Navbar uses an EN / አማ pill toggle calling `changeLanguage('en' | 'am')`.

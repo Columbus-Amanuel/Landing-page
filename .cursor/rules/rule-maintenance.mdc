@@ -1,0 +1,31 @@
+---
+description: Meta-rule requiring cursor rules to be kept in sync with project changes
+alwaysApply: true
+---
+
+# Rule Maintenance
+
+Whenever you make a change that affects the project's architecture, conventions, or structure, **update the relevant `.cursor/rules/*.mdc` file(s)** in the same response before finishing.
+
+## When to Update Rules
+
+| Change made | Rule file to update |
+|---|---|
+| New page added, route changed, or nav link added | `common-tasks.mdc`, `project-overview.mdc` |
+| New Firestore collection, service, or security rule | `firebase-backend.mdc`, `project-overview.mdc` |
+| New translation key pattern or i18n behavior | `i18n-translations.mdc` |
+| New coding convention, hook, or component pattern | `coding-conventions.mdc`, `react-components.mdc` |
+| CI/CD, deploy, or environment variable change | `deployment-ci.mdc` |
+| Tech stack, dependency, or project structure change | `project-overview.mdc` |
+
+## How to Update
+
+- Edit the specific section of the affected rule file — do **not** rewrite the whole file.
+- Keep additions concise (match the existing style and tone).
+- If a change spans multiple rules, update all affected files.
+- If a new domain emerges that has no rule file yet, create one following the `.mdc` frontmatter format.
+
+## What Not to Do
+
+- Do not skip rule updates because the task "seems small" — small drift compounds.
+- Do not create a new rule file if an existing one already covers the domain.

@@ -74,6 +74,8 @@ alwaysApply: false
 }
 ```
 
+Home hero **Let us call you** submits here too: `email` may be the placeholder `not-provided@example.com` when the visitor only provided name and phone.
+
 ### `prayerRequests/{reqId}`
 ```
 {
@@ -114,6 +116,35 @@ alwaysApply: false
 }
 ```
 
+### `siteSettings/churchInfo` (single document)
+```
+{
+  officialName: string,
+  amharicName?: string,
+  address: string, city: string, state: string, zip: string,
+  phone?: string, email?: string,
+  facebookUrl?: string, youtubeUrl?: string,
+  missionStatement?: string,
+  storyPara1?: string, storyPara2?: string,
+  serviceTimes: Array<{ day, time, note }>,
+  beliefs: Array<{ title, desc }>,
+  values: Array<{ icon, title, desc }>,  // icon: Heroicons key (see src/utils/valueIcons.js); legacy emoji supported until re-saved in admin
+  updatedAt: Timestamp
+}
+```
+
+### `siteSettings/giving` (single document)
+```
+{
+  funds: Array<{ id, label, desc }>,
+  onlineGivingUrl?: string,
+  mailPayableTo?: string, mailAddress?: string,
+  textNumber?: string, textKeyword?: string,
+  scriptureText?: string, scriptureCite?: string,
+  updatedAt: Timestamp
+}
+```
+
 ## Security Rules Summary
 
 | Collection | Read | Create | Update/Delete |
@@ -121,6 +152,9 @@ alwaysApply: false
 | `users/{uid}` | Owner or admin | Auth user (own doc) | Owner or admin |
 | `events` | Public | Admin | Admin |
 | `sermons` | Public | Admin | Admin |
+| `siteSettings` | Public | Admin | Admin |
+| `youthVideos` | Public | Admin | Admin |
+| `youthPageContent` | Public | Admin | Admin |
 | `contactMessages` | Admin | Anyone (public) | Admin |
 | `prayerRequests` | Admin | Anyone (public) | Admin |
 | `churchProfileUpdates` | Admin | Any auth user | Admin |
@@ -149,5 +183,29 @@ Admin check reads from `users/{uid}.role == 'admin'`.
 | `authService.js` | Register, login, logout, password reset, get profile, auth state listener |
 | `eventsService.js` | CRUD for events collection |
 | `sermonsService.js` | CRUD for sermons + audio upload to Storage |
-| `contactService.js` | Submit contact form and prayer requests |
+| `contactService.js` | Submit contact form and prayer requests; admin read of messages |
 | `missingDataService.js` | Submit church profile updates |
+| `siteSettingsService.js` | Read/write `siteSettings/churchInfo` and `siteSettings/giving` |
+| `youthVideosService.js` | CRUD for `youthVideos` (create/update/delete), `youthPageContent/main` (merge write with `sanitizeYouthPageContentForSave` / `normalizeYouthPageContent`), `getYoutubeVideoId` for thumbnails/embeds |
+
+### `youthPageContent/main` (single document)
+
+All public copy for the Youth & Children page is editable in **Admin → Youth & Children**. Persisted fields include bilingual strings for hero, optional intro spotlight, stats row (“At a glance”), ministry card section titles and three cards, FAQ section title, videos section titles and empty-state copy, bottom CTA (heading, button labels, `ctaHref`), plus:
+
+```
+faqs: Array<{ questionEn, questionAm, answerEn, answerAm }>
+```
+
+`updatedAt` is set on write; do not send Firestore metadata from the form — the service strips to `YOUTH_PAGE_STRING_KEYS` + `faqs`.
+
+### `youthVideos/{id}`
+
+```
+{
+  title, titleAm, description, descriptionAm, url,
+  speaker?, category?, duration?, thumbnailUrl?, sortOrder?,
+  createdAt, updatedAt
+}
+```
+
+Public page uses click-to-play embeds; thumbnail defaults to YouTube still if `thumbnailUrl` is empty.

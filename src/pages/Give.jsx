@@ -1,24 +1,51 @@
-export default function Give() {
-  const givingOptions = [
-    { amount: 25, label: '$25' },
-    { amount: 50, label: '$50' },
-    { amount: 100, label: '$100' },
-    { amount: 250, label: '$250' },
-    { amount: 500, label: '$500' },
-  ];
+import { useState } from 'react';
+import { useSiteSettings } from '../contexts/SiteSettingsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
-  const funds = [
-    { id: 'general', label: 'General Fund', desc: 'Supports all church ministries and operations' },
-    { id: 'missions', label: 'Missions Fund', desc: 'Supports global and local mission partners' },
-    { id: 'building', label: 'Building Fund', desc: 'Contributes to facility growth and maintenance' },
-    { id: 'benevolence', label: 'Benevolence Fund', desc: 'Helps families and individuals in need' },
-  ];
+export default function Give() {
+  const { givingSettings } = useSiteSettings();
+  const { t, language } = useLanguage();
+  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [customAmount, setCustomAmount] = useState('');
+
+  const am = language === 'am';
+
+  const {
+    funds, onlineGivingUrl,
+    mailPayableTo, mailAddress,
+    textNumber, textKeyword,
+    plannedGivingText, plannedGivingTextAm,
+    scriptureText, scriptureTextAm,
+    scriptureCite, scriptureCiteAm,
+  } = givingSettings;
+
+  const givingOptions = [25, 50, 100, 250, 500];
+
+  const handleGiveNow = () => {
+    if (onlineGivingUrl) {
+      window.open(onlineGivingUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      alert(t('give.comingSoon'));
+    }
+  };
+
+  const plannedText = am
+    ? plannedGivingTextAm || plannedGivingText || t('give.plannedGivingDefault')
+    : plannedGivingText || t('give.plannedGivingDefault');
+
+  const scriptureDisplay = am
+    ? scriptureTextAm || scriptureText
+    : scriptureText;
+
+  const scriptureCiteDisplay = am
+    ? scriptureCiteAm || scriptureCite
+    : scriptureCite;
 
   return (
     <div className="page-give">
       <section className="page-hero">
-        <h1>Give</h1>
-        <p>Your generosity fuels the mission. Thank you for partnering with us.</p>
+        <h1>{t('give.heroTitle')}</h1>
+        <p>{t('give.heroSubtitle')}</p>
       </section>
 
       <section className="section">
@@ -26,108 +53,128 @@ export default function Give() {
           <div className="give-grid">
             {/* Online Giving */}
             <div className="give-form-wrapper">
-              <h2>Give Online</h2>
-              <p className="give-subtitle">
-                Giving is secure, easy, and available anytime. You can give a one-time gift or set
-                up recurring giving.
-              </p>
+              <h2>{t('give.giveOnline')}</h2>
+              <p className="give-subtitle">{t('give.giveOnlineSubtitle')}</p>
 
               <div className="give-form">
-                <div className="form-group">
-                  <label>Select Fund</label>
-                  <select className="form-input">
-                    {funds.map((f) => (
-                      <option key={f.id} value={f.id}>{f.label}</option>
-                    ))}
-                  </select>
-                </div>
+                {funds && funds.length > 0 && (
+                  <div className="form-group">
+                    <label>{t('give.selectFund')}</label>
+                    <select className="form-input">
+                      {funds.map((f) => (
+                        <option key={f.id} value={f.id}>
+                          {am && f.labelAm ? f.labelAm : f.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
                 <div className="form-group">
-                  <label>Frequency</label>
+                  <label>{t('give.frequency')}</label>
                   <div className="radio-group">
                     <label className="radio-label">
-                      <input type="radio" name="frequency" value="one-time" defaultChecked /> One-Time
+                      <input type="radio" name="frequency" value="one-time" defaultChecked /> {t('give.oneTime')}
                     </label>
                     <label className="radio-label">
-                      <input type="radio" name="frequency" value="weekly" /> Weekly
+                      <input type="radio" name="frequency" value="weekly" /> {t('give.weekly')}
                     </label>
                     <label className="radio-label">
-                      <input type="radio" name="frequency" value="monthly" /> Monthly
+                      <input type="radio" name="frequency" value="monthly" /> {t('give.monthly')}
                     </label>
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Amount</label>
+                  <label>{t('give.amount')}</label>
                   <div className="amount-grid">
-                    {givingOptions.map((opt) => (
-                      <button key={opt.amount} className="amount-btn">{opt.label}</button>
+                    {givingOptions.map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        className={`amount-btn${selectedAmount === amt ? ' selected' : ''}`}
+                        onClick={() => { setSelectedAmount(amt); setCustomAmount(''); }}
+                      >
+                        ${amt}
+                      </button>
                     ))}
                   </div>
                   <input
                     type="number"
                     className="form-input mt-2"
-                    placeholder="Or enter custom amount"
+                    placeholder={t('give.customAmount')}
                     min="1"
                     step="1"
+                    value={customAmount}
+                    onChange={(e) => { setCustomAmount(e.target.value); setSelectedAmount(null); }}
                   />
                 </div>
 
-                <div className="give-notice">
-                  <p>
-                    🔒 Payments are processed securely. You'll receive a tax receipt via email.
-                    To set up online giving, integrate your preferred payment processor
-                    (e.g., Stripe, Tithe.ly, or Pushpay).
-                  </p>
-                </div>
+                {!onlineGivingUrl && (
+                  <div className="give-notice">
+                    <p>🔒 {t('give.comingSoon')}</p>
+                  </div>
+                )}
 
-                <button className="btn btn-primary btn-full btn-lg">
-                  Give Now
+                <button type="button" className="btn btn-primary btn-full btn-lg" onClick={handleGiveNow}>
+                  {t('give.giveNow')}
                 </button>
               </div>
             </div>
 
             {/* Other Ways to Give */}
             <div className="give-info">
-              <h2>Other Ways to Give</h2>
+              <h2>{t('give.otherWays')}</h2>
+
+              {(mailPayableTo || mailAddress) && (
+                <div className="give-method">
+                  <h3>📮 {t('give.byMail')}</h3>
+                  {mailPayableTo && (
+                    <p>{t('give.checksPayable')} <strong>{mailPayableTo}</strong> {t('give.mailTo')}</p>
+                  )}
+                  {mailAddress && <p style={{ whiteSpace: 'pre-line' }}>{mailAddress}</p>}
+                </div>
+              )}
+
+              {textNumber && (
+                <div className="give-method">
+                  <h3>📱 {t('give.textToGive')}</h3>
+                  <p>
+                    {am ? 'ጽሑፍ' : 'Text'} <strong>{textKeyword || 'GIVE'}</strong>{' '}
+                    {am ? 'ወደ' : 'to'} <strong>{textNumber}</strong>{' '}
+                    {t('give.textInstruction')}
+                  </p>
+                </div>
+              )}
 
               <div className="give-method">
-                <h3>📮 By Mail</h3>
-                <p>Make checks payable to <strong>Grace Community Church</strong> and mail to:</p>
-                <p>123 Faith Avenue<br />Your City, ST 12345</p>
+                <h3>💼 {t('give.plannedGiving')}</h3>
+                <p>{plannedText}</p>
               </div>
 
-              <div className="give-method">
-                <h3>📱 Text to Give</h3>
-                <p>Text <strong>GIVE</strong> to <strong>(555) 555-5555</strong> to give from your mobile device.</p>
-              </div>
+              {funds && funds.length > 0 && (
+                <div className="give-method">
+                  <h3>📊 {t('give.whereGivingGoes')}</h3>
+                  <ul className="give-breakdown">
+                    {funds.map((f) => (
+                      <li key={f.id}>
+                        <strong>{am && f.labelAm ? f.labelAm : f.label}</strong>
+                        {' '}—{' '}
+                        {am && f.descAm ? f.descAm : f.desc}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
-              <div className="give-method">
-                <h3>💼 Planned Giving</h3>
-                <p>
-                  Consider leaving a legacy gift in your estate planning. Contact our office to
-                  learn more about how your long-term giving can impact generations to come.
-                </p>
-              </div>
-
-              <div className="give-method">
-                <h3>📊 Where Your Giving Goes</h3>
-                <ul className="give-breakdown">
-                  {funds.map((f) => (
-                    <li key={f.id}>
-                      <strong>{f.label}</strong> — {f.desc}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="give-scripture">
-                <blockquote>
-                  "Each of you should give what you have decided in your heart to give, not
-                  reluctantly or under compulsion, for God loves a cheerful giver."
-                  <cite>— 2 Corinthians 9:7</cite>
-                </blockquote>
-              </div>
+              {scriptureDisplay && (
+                <div className="give-scripture">
+                  <blockquote>
+                    &ldquo;{scriptureDisplay}&rdquo;
+                    {scriptureCiteDisplay && <cite>— {scriptureCiteDisplay}</cite>}
+                  </blockquote>
+                </div>
+              )}
             </div>
           </div>
         </div>

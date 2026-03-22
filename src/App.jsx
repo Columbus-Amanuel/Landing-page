@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
+import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
 import Layout from './components/layout/Layout';
 
 import Home from './pages/Home';
@@ -11,10 +12,13 @@ import Sermons from './pages/Sermons';
 import SermonDetail from './pages/SermonDetail';
 import Contact from './pages/Contact';
 import Give from './pages/Give';
+import YouthChildren from './pages/YouthChildren';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProfileUpdate from './pages/ProfileUpdate';
+import AdminLayout from './pages/admin/AdminLayout';
 import ProtectedRoute from './components/ui/ProtectedRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 function NotFound() {
   const { t } = useLanguage();
@@ -47,11 +51,20 @@ function AppRoutes() {
               <Route path="sermons/:id" element={<SermonDetail />} />
               <Route path="contact" element={<Contact />} />
               <Route path="give" element={<Give />} />
+              <Route path="youth-children" element={<YouthChildren />} />
               <Route
                 path="profile-update"
                 element={(
                   <ProtectedRoute>
                     <ProfileUpdate />
+                  </ProtectedRoute>
+                )}
+              />
+              <Route
+                path="admin/*"
+                element={(
+                  <ProtectedRoute adminOnly>
+                    <AdminLayout />
                   </ProtectedRoute>
                 )}
               />
@@ -67,9 +80,12 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <LanguageProvider>
-          <AppRoutes />
+          <SiteSettingsProvider>
+            <AppRoutes />
+          </SiteSettingsProvider>
         </LanguageProvider>
       </AuthProvider>
     </BrowserRouter>
