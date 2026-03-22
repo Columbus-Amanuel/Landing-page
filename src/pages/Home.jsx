@@ -22,7 +22,7 @@ import SermonCard from '../components/ui/SermonCard';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import ValueIcon from '../components/ui/ValueIcon';
 
-const DEFAULT_HERO_YOUTUBE_VIDEO_ID = 'aqz-KE-bpKQ';
+const DEFAULT_HERO_YOUTUBE_VIDEO_ID = '9tFh_EwJWdc';
 
 function resolveHeroYoutubeId(value = '') {
   const trimmedValue = String(value).trim();
