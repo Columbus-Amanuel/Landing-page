@@ -23,10 +23,13 @@ import Register from '@/pages/Register';
 import ProfileUpdate from '@/pages/ProfileUpdate';
 import NotFound from '@/pages/NotFound';
 import AdminLayout from '@/pages/admin/AdminLayout';
+import ConstructionBanner from '@/components/common/ConstructionBanner';
 
 function AppRoutes() {
   return (
-    <Routes>
+    <>
+      <ConstructionBanner />
+      <Routes>
       <Route path={ROUTES.login} element={<Login />} />
       <Route path={ROUTES.register} element={<Register />} />
 
@@ -66,6 +69,7 @@ function AppRoutes() {
         )}
       />
     </Routes>
+    </>
   );
 }
 

@@ -15,6 +15,9 @@
     "amharic": "አማርኛ",
     "language": "Language"
   },
+  "site": {
+    "underConstruction": "This website is under construction. Some pages or features are not finished yet."
+  },
   "nav": {
     "home": "Home",
     "about": "About",

@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "eucc-online"
+  },
+  "targets": {
+    "eucc-online": {
+      "hosting": {
+        "default": ["eucc-online"],
+        "release": ["eucc-online-branch"]
+      }
+    }
   }
 }

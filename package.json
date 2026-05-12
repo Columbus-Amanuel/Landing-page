@@ -11,8 +11,9 @@
     "preview": "vite preview",
     "build:prod": "vite build",
     "build:dev": "vite build --mode staging",
-    "deploy:prod": "npm run build:prod && firebase deploy --only hosting",
-    "deploy:dev": "npm run build:dev && firebase hosting:channel:deploy dev --expires 30d"
+    "deploy:prod": "npm run build:prod && firebase deploy --only hosting:default",
+    "deploy:dev": "npm run build:dev && firebase hosting:channel:deploy dev --expires 30d --only default",
+    "deploy:release": "npm run build:dev && firebase deploy --only hosting:release"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
