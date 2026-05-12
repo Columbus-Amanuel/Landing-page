@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,7 @@ import { getInitials } from '@/lib/format';
 import LanguageToggle from '@/components/common/LanguageToggle';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
+import { getRoleAbbrev, isStaffRole } from '@/lib/roles';
 import NavDropdown from './NavDropdown';
 import MobileNav from './MobileNav';
 
@@ -76,7 +77,8 @@ function UserMenu() {
   const { user, profile } = useAuth();
   const { t, language } = useLanguage();
   const navigate = useNavigate();
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = isStaffRole(profile?.role);
+  const photoSrc = profile?.photoURL || user?.photoURL;
 
   const handleLogout = async () => {
     await logoutUser();
@@ -92,6 +94,7 @@ function UserMenu() {
           aria-label={`${t('nav.hi')} ${profile?.displayName || user?.email || ''}`}
         >
           <Avatar className="h-9 w-9">
+            {photoSrc ? <AvatarImage src={photoSrc} alt="" /> : null}
             <AvatarFallback>
               {getInitials(profile?.displayName || user?.email || 'EU')}
             </AvatarFallback>
@@ -103,8 +106,12 @@ function UserMenu() {
           <span className="text-xs text-muted-foreground">
             {t('nav.hi')}, {language === 'am' ? '' : ''}
           </span>
-          <p className="mt-0.5 text-sm font-semibold text-foreground">
-            {profile?.displayName || user?.email}
+          <p className="mt-0.5 flex flex-wrap items-baseline gap-2 text-sm font-semibold text-foreground">
+            <span>{profile?.displayName || user?.email}</span>
+            {/* TEMPORARY: m / a / s — remove when no longer needed */}
+            <span className="font-mono text-xs font-normal text-muted-foreground" title="m=member, a=admin, s=super-admin">
+              ({getRoleAbbrev(profile?.role)})
+            </span>
           </p>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -166,12 +173,19 @@ export default function Navbar() {
         </Link>
 
         <nav className="ml-6 hidden items-center gap-1 lg:flex">
-          {PRIMARY_NAV.map((item) => (
-            <NavItem key={item.key} {...item} />
+          {PRIMARY_NAV.map(({ key, ...item }) => (
+            <NavItem key={key} {...item} />
           ))}
           <NavDropdown label={t('nav.ministries')} items={MINISTRIES_NAV} />
           <NavDropdown label={t('nav.media')} items={MEDIA_NAV} />
-          {contactLink && <NavItem {...contactLink} />}
+          {contactLink && (
+            <NavItem
+              key={contactLink.key}
+              to={contactLink.to}
+              labelKey={contactLink.labelKey}
+              end={contactLink.end}
+            />
+          )}
         </nav>
 
         <div className="ml-auto flex items-center gap-2 lg:gap-3">

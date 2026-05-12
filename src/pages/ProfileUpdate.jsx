@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Send } from 'lucide-react';
+import { CheckCircle2, Save } from 'lucide-react';
 import PageHero from '@/components/common/PageHero';
 import Section from '@/components/common/Section';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,48 +21,62 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useSiteSettings } from '@/contexts/SiteSettingsContext';
-import { submitChurchProfileUpdate } from '@/services/missingDataService';
+import { saveMemberProfile } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
+import { getRoleAbbrev } from '@/lib/roles';
 
-/**
- * "Help us complete the church profile" — a long form members can fill out
- * with up-to-date EEUCC contact / pastoral details that an admin then reviews.
- */
 export default function ProfileUpdate() {
-  const { user } = useAuth();
-  const { t, language } = useLanguage();
-  const { churchInfo } = useSiteSettings();
+  const { user, profile, refreshProfile } = useAuth();
+  const { t } = useLanguage();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [successOpen, setSuccessOpen] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm({
     defaultValues: {
-      churchName: churchInfo.name || '',
-      address: churchInfo.address || '',
-      city: churchInfo.city || '',
-      state: churchInfo.state || '',
-      zip: churchInfo.zip || '',
-      phone: churchInfo.phone || '',
-      email: churchInfo.email || '',
-      pastorName: churchInfo.pastorName || '',
-      pastorRole: churchInfo.pastorRole || '',
-      facebookUrl: churchInfo.facebookUrl || '',
-      youtubeUrl: churchInfo.youtubeUrl || '',
-      notes: '',
+      displayName: '',
+      phone: '',
+      address: '',
+      city: '',
+      state: '',
+      zip: '',
+      dateOfBirth: '',
+      occupation: '',
+      ministryInterests: '',
+      bio: '',
+      emergencyContactName: '',
+      emergencyContactPhone: '',
     },
   });
 
+  useEffect(() => {
+    if (!user) return;
+    reset({
+      displayName: profile?.displayName || user.displayName || '',
+      phone: profile?.phone || '',
+      address: profile?.address || '',
+      city: profile?.city || '',
+      state: profile?.state || '',
+      zip: profile?.zip || '',
+      dateOfBirth: profile?.dateOfBirth || '',
+      occupation: profile?.occupation || '',
+      ministryInterests: profile?.ministryInterests || '',
+      bio: profile?.bio || '',
+      emergencyContactName: profile?.emergencyContactName || '',
+      emergencyContactPhone: profile?.emergencyContactPhone || '',
+    });
+  }, [user, profile, reset]);
+
   const onSubmit = async (values) => {
+    if (!user) return;
     setError('');
     setSubmitting(true);
     try {
-      await submitChurchProfileUpdate(values, user);
-      reset();
+      await saveMemberProfile(user, values);
+      await refreshProfile();
       setSuccessOpen(true);
     } catch (err) {
-      setError(err?.message || (language === 'am' ? 'ስህተት ተከስቷል።' : 'Could not submit your update.'));
+      setError(err?.message || t('profileUpdate.saveError'));
     } finally {
       setSubmitting(false);
     }
@@ -71,13 +85,9 @@ export default function ProfileUpdate() {
   return (
     <>
       <PageHero
-        eyebrow={language === 'am' ? 'መለያ' : 'Member'}
-        title={language === 'am' ? 'የቤተክርስቲያን ፕሮፋይል ያስተካክሉ' : 'Help us keep EEUCC up to date'}
-        subtitle={
-          language === 'am'
-            ? 'የቤተክርስቲያን መረጃ ካልታደሰ ይህን መልክት በመላክ እንዲታደስ ይረዳሉ።'
-            : 'Submit corrections to our church profile and an admin will review them.'
-        }
+        eyebrow={t('profileUpdate.eyebrow')}
+        title={t('profileUpdate.title')}
+        subtitle={t('profileUpdate.subtitle')}
       />
 
       <Section containerSize="md">
@@ -89,56 +99,88 @@ export default function ProfileUpdate() {
               </Alert>
             )}
 
-            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
-              <Fieldset legend={language === 'am' ? 'መሰረታዊ መረጃ' : 'Basic info'}>
+            {/* TEMPORARY: role letter — m member, a admin, s super-admin; remove when no longer needed */}
+            <p className="mb-6 text-xs text-muted-foreground">
+              <span className="me-2">Role</span>
+              <span
+                className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-border bg-muted/50 font-mono text-sm font-semibold text-foreground"
+                title="m = member, a = admin, s = super-admin"
+              >
+                {getRoleAbbrev(profile?.role)}
+              </span>
+            </p>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
+              <Fieldset legend={t('profileUpdate.sectionAccount')}>
                 <FieldRow>
-                  <Field label={language === 'am' ? 'የቤተክርስቲያን ስም' : 'Church name'} error={errors.churchName?.message}>
+                  <Field label={t('profileUpdate.fullName')} error={errors.displayName?.message}>
                     <Input
-                      aria-invalid={Boolean(errors.churchName)}
-                      {...register('churchName', { required: t('common.required') })}
+                      autoComplete="name"
+                      aria-invalid={Boolean(errors.displayName)}
+                      {...register('displayName', { required: t('common.required') })}
                     />
                   </Field>
                 </FieldRow>
                 <FieldRow>
-                  <Field label={language === 'am' ? 'አድራሻ' : 'Street address'}>
-                    <Input {...register('address')} />
+                  <Field label={t('profileUpdate.email')}>
+                    <Input value={user?.email || ''} disabled readOnly className="bg-muted/50" />
+                  </Field>
+                </FieldRow>
+              </Fieldset>
+
+              <Fieldset legend={t('profileUpdate.sectionContact')}>
+                <FieldRow>
+                  <Field label={t('profileUpdate.phone')}>
+                    <Input type="tel" autoComplete="tel" {...register('phone')} />
+                  </Field>
+                </FieldRow>
+                <FieldRow>
+                  <Field label={t('profileUpdate.street')}>
+                    <Input autoComplete="street-address" {...register('address')} />
                   </Field>
                 </FieldRow>
                 <FieldRow cols={3}>
-                  <Field label={language === 'am' ? 'ከተማ' : 'City'}><Input {...register('city')} /></Field>
-                  <Field label={language === 'am' ? 'ግዛት' : 'State'}><Input {...register('state')} /></Field>
-                  <Field label="ZIP"><Input {...register('zip')} /></Field>
-                </FieldRow>
-                <FieldRow cols={2}>
-                  <Field label={language === 'am' ? 'ስልክ' : 'Phone'}><Input type="tel" {...register('phone')} /></Field>
-                  <Field label="Email"><Input type="email" {...register('email')} /></Field>
+                  <Field label={t('profileUpdate.city')}><Input autoComplete="address-level2" {...register('city')} /></Field>
+                  <Field label={t('profileUpdate.state')}><Input autoComplete="address-level1" {...register('state')} /></Field>
+                  <Field label={t('profileUpdate.zip')}><Input autoComplete="postal-code" {...register('zip')} /></Field>
                 </FieldRow>
               </Fieldset>
 
-              <Fieldset legend={language === 'am' ? 'የፓስተር መረጃ' : 'Pastoral contact'}>
+              <Fieldset legend={t('profileUpdate.sectionPersonal')}>
                 <FieldRow cols={2}>
-                  <Field label={language === 'am' ? 'ስም' : 'Pastor name'}><Input {...register('pastorName')} /></Field>
-                  <Field label={language === 'am' ? 'ሚና' : 'Role / title'}><Input {...register('pastorRole')} /></Field>
+                  <Field label={t('profileUpdate.dateOfBirth')}>
+                    <Input type="date" {...register('dateOfBirth')} />
+                  </Field>
+                  <Field label={t('profileUpdate.occupation')}>
+                    <Input {...register('occupation')} />
+                  </Field>
                 </FieldRow>
+                <Field label={t('profileUpdate.bio')}>
+                  <Textarea rows={3} {...register('bio')} placeholder={t('profileUpdate.bioPlaceholder')} />
+                </Field>
+                <Field label={t('profileUpdate.ministryInterests')}>
+                  <Textarea rows={3} {...register('ministryInterests')} placeholder={t('profileUpdate.ministryPlaceholder')} />
+                </Field>
               </Fieldset>
 
-              <Fieldset legend={language === 'am' ? 'በመስመር ላይ' : 'Online'}>
+              <Fieldset legend={t('profileUpdate.sectionEmergency')}>
                 <FieldRow cols={2}>
-                  <Field label="Facebook URL"><Input type="url" {...register('facebookUrl')} /></Field>
-                  <Field label="YouTube URL"><Input type="url" {...register('youtubeUrl')} /></Field>
+                  <Field label={t('profileUpdate.emergencyName')}>
+                    <Input {...register('emergencyContactName')} />
+                  </Field>
+                  <Field label={t('profileUpdate.emergencyPhone')}>
+                    <Input type="tel" {...register('emergencyContactPhone')} />
+                  </Field>
                 </FieldRow>
               </Fieldset>
-
-              <Field label={language === 'am' ? 'ተጨማሪ ማስታወሻ' : 'Additional notes'}>
-                <Textarea rows={4} {...register('notes')} placeholder={language === 'am' ? 'ሌላ ማንኛውም ማስታወሻ…' : 'Anything else we should know…'} />
-              </Field>
 
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button asChild variant="ghost">
-                  <Link to={ROUTES.about}>{language === 'am' ? 'ይቅር' : 'Cancel'}</Link>
+                  <Link to={ROUTES.home}>{t('common.cancel')}</Link>
                 </Button>
                 <Button type="submit" size="lg" disabled={submitting}>
-                  <Send /> {submitting ? t('common.loading') : (language === 'am' ? 'መረጃ ላክ' : 'Submit update')}
+                  <Save className="h-4 w-4" />
+                  {submitting ? t('common.loading') : t('profileUpdate.save')}
                 </Button>
               </div>
             </form>
@@ -153,17 +195,15 @@ export default function ProfileUpdate() {
               <CheckCircle2 className="h-7 w-7" />
             </div>
             <AlertDialogTitle className="text-center">
-              {language === 'am' ? 'አመሰግናለሁ!' : 'Thank you!'}
+              {t('profileUpdate.successTitle')}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center">
-              {language === 'am'
-                ? 'መረጃዎ ደርሷል። አስተዳዳሪ ይገመግማል።'
-                : 'Your update was received. An admin will review it shortly.'}
+              {t('profileUpdate.successBody')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="sm:justify-center">
             <AlertDialogAction onClick={() => setSuccessOpen(false)}>
-              {language === 'am' ? 'ዝጋ' : 'Close'}
+              {t('profileUpdate.successClose')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -171,8 +211,6 @@ export default function ProfileUpdate() {
     </>
   );
 }
-
-/* ---------- Small inline form helpers (kept local; only used here) ---------- */
 
 function Fieldset({ legend, children }) {
   return (

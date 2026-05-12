@@ -23,6 +23,7 @@ export const ROUTES = {
   adminGiving: '/admin/giving',
   adminYouth: '/admin/youth',
   adminMessages: '/admin/messages',
+  adminUsers: '/admin/users',
 };
 
 /** Build a concrete detail URL ("/events/abc") from a route template + id. */

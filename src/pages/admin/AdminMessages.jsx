@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Inbox, Mail, MessageSquare, Phone, CheckCircle2 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import EmptyState from '@/components/common/EmptyState';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import {
@@ -24,7 +22,11 @@ function StatusBadge({ status }) {
       : status === 'active'
         ? 'warning'
         : 'destructive';
-  return <Badge variant={variant} className="uppercase">{status}</Badge>;
+  return (
+    <Badge variant={variant} className="shrink-0 px-1.5 py-0 text-[10px] font-semibold uppercase">
+      {status}
+    </Badge>
+  );
 }
 
 function ContactMessageCard({ message, onChanged }) {
@@ -40,47 +42,55 @@ function ContactMessageCard({ message, onChanged }) {
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="font-display text-base font-semibold text-primary">
+    <div className="bg-card px-3 py-2 hover:bg-muted/25">
+      <div className="flex min-w-0 items-start gap-2">
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <p className="truncate font-display text-sm font-semibold leading-tight text-primary">
               {message.firstName} {message.lastName}
             </p>
-            <p className="text-xs text-muted-foreground">
-              {formatDate(message.createdAt, 'MMM d, yyyy h:mm a')} — {message.subject}
-            </p>
+            <StatusBadge status={message.status} />
           </div>
-          <StatusBadge status={message.status} />
+          <p className="truncate text-[11px] leading-tight text-muted-foreground">
+            {formatDate(message.createdAt, 'MMM d, yyyy h:mm a')} — {message.subject}
+          </p>
+          <p className="line-clamp-2 whitespace-pre-line text-xs leading-snug text-foreground/90">
+            {message.message}
+          </p>
         </div>
-        <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">{message.message}</p>
-        <Separator />
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          {message.email && (
-            <Button asChild variant="ghost" size="sm">
-              <a href={toMailtoHref(message.email)}><Mail /> {message.email}</a>
+      </div>
+      <div className="mt-1.5 flex flex-wrap items-center gap-1 border-t border-border/60 pt-1.5">
+        {message.email && (
+          <Button asChild variant="ghost" size="sm" className="h-7 max-w-[min(100%,14rem)] px-2 text-[11px]">
+            <a href={toMailtoHref(message.email)} className="flex min-w-0 items-center gap-1">
+              <Mail className="h-3 w-3 shrink-0" />
+              <span className="truncate">{message.email}</span>
+            </a>
+          </Button>
+        )}
+        {message.phone && (
+          <Button asChild variant="ghost" size="sm" className="h-7 px-2 text-[11px]">
+            <a href={toTelHref(message.phone)} className="flex items-center gap-1">
+              <Phone className="h-3 w-3 shrink-0" />
+              {message.phone}
+            </a>
+          </Button>
+        )}
+        <div className="ms-auto flex shrink-0 flex-wrap justify-end gap-1">
+          {message.status !== 'read' && (
+            <Button variant="outline" size="sm" className="h-7 px-2 text-xs" onClick={() => handleStatus('read')}>
+              {t('admin.messages.markRead')}
             </Button>
           )}
-          {message.phone && (
-            <Button asChild variant="ghost" size="sm">
-              <a href={toTelHref(message.phone)}><Phone /> {message.phone}</a>
+          {message.status !== 'resolved' && (
+            <Button size="sm" className="h-7 gap-1 px-2 text-xs" onClick={() => handleStatus('resolved')}>
+              <CheckCircle2 className="h-3 w-3" />
+              {t('admin.messages.resolve')}
             </Button>
           )}
-          <div className="ms-auto flex gap-2">
-            {message.status !== 'read' && (
-              <Button variant="outline" size="sm" onClick={() => handleStatus('read')}>
-                {t('admin.messages.markRead')}
-              </Button>
-            )}
-            {message.status !== 'resolved' && (
-              <Button size="sm" onClick={() => handleStatus('resolved')}>
-                <CheckCircle2 /> {t('admin.messages.resolve')}
-              </Button>
-            )}
-          </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -97,33 +107,31 @@ function PrayerRequestCard({ request, onChanged }) {
   };
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <p className="font-display text-base font-semibold text-primary">{request.name}</p>
-            <p className="text-xs text-muted-foreground">
-              {formatDate(request.createdAt, 'MMM d, yyyy h:mm a')}
-              {request.isPrivate && (
-                <span className="ml-2 inline-flex items-center gap-1 text-accent">
-                  · {t('admin.messages.private')}
-                </span>
-              )}
-            </p>
+    <div className="bg-card px-3 py-2 hover:bg-muted/25">
+      <div className="flex min-w-0 items-start gap-2">
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+            <p className="truncate font-display text-sm font-semibold leading-tight text-primary">{request.name}</p>
+            <StatusBadge status={request.status} />
           </div>
-          <StatusBadge status={request.status} />
+          <p className="text-[11px] leading-tight text-muted-foreground">
+            {formatDate(request.createdAt, 'MMM d, yyyy h:mm a')}
+            {request.isPrivate && (
+              <span className="ms-1.5 text-accent">· {t('admin.messages.private')}</span>
+            )}
+          </p>
+          <p className="line-clamp-2 whitespace-pre-line text-xs leading-snug text-foreground/90">{request.request}</p>
         </div>
-        <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">{request.request}</p>
-        <Separator />
-        <div className="flex justify-end gap-2">
-          {request.status !== 'resolved' && (
-            <Button size="sm" onClick={() => handleStatus('resolved')}>
-              <CheckCircle2 /> {t('admin.messages.resolve')}
-            </Button>
-          )}
+      </div>
+      {request.status !== 'resolved' && (
+        <div className="mt-1.5 flex justify-end gap-1 border-t border-border/60 pt-1.5">
+          <Button size="sm" className="h-7 gap-1 px-2 text-xs" onClick={() => handleStatus('resolved')}>
+            <CheckCircle2 className="h-3 w-3" />
+            {t('admin.messages.resolve')}
+          </Button>
         </div>
-      </CardContent>
-    </Card>
+      )}
+    </div>
   );
 }
 
@@ -150,30 +158,32 @@ export default function AdminMessages() {
 
   return (
     <>
-      <header className="mb-8">
-        <h1 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+      <header className="mb-4">
+        <h1 className="font-hero text-2xl font-semibold leading-tight text-primary md:text-3xl">
           {t('admin.messages.title')}
         </h1>
-        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t('admin.messages.subtitle')}</p>
+        <p className="mt-0.5 max-w-2xl text-xs text-muted-foreground">{t('admin.messages.subtitle')}</p>
       </header>
 
       <Tabs defaultValue="contact">
-        <TabsList>
-          <TabsTrigger value="contact">
-            <Mail className="h-4 w-4" />{t('admin.messages.contactTab')} ({messages.length})
+        <TabsList className="h-8 gap-0.5 p-0.5">
+          <TabsTrigger value="contact" className="gap-1 px-2 py-1 text-xs">
+            <Mail className="h-3.5 w-3.5" />
+            {t('admin.messages.contactTab')} ({messages.length})
           </TabsTrigger>
-          <TabsTrigger value="prayer">
-            <MessageSquare className="h-4 w-4" />{t('admin.messages.prayerTab')} ({prayers.length})
+          <TabsTrigger value="prayer" className="gap-1 px-2 py-1 text-xs">
+            <MessageSquare className="h-3.5 w-3.5" />
+            {t('admin.messages.prayerTab')} ({prayers.length})
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="contact">
+        <TabsContent value="contact" className="mt-2">
           {loading ? (
             <LoadingSpinner size="lg" center />
           ) : messages.length === 0 ? (
             <EmptyState icon={Inbox} title={t('admin.messages.emptyContact')} />
           ) : (
-            <div className="space-y-4">
+            <div className="divide-y divide-border overflow-hidden rounded-md border border-border">
               {messages.map((m) => (
                 <ContactMessageCard key={m.id} message={m} onChanged={refresh} />
               ))}
@@ -181,13 +191,13 @@ export default function AdminMessages() {
           )}
         </TabsContent>
 
-        <TabsContent value="prayer">
+        <TabsContent value="prayer" className="mt-2">
           {loading ? (
             <LoadingSpinner size="lg" center />
           ) : prayers.length === 0 ? (
             <EmptyState icon={Inbox} title={t('admin.messages.emptyPrayer')} />
           ) : (
-            <div className="space-y-4">
+            <div className="divide-y divide-border overflow-hidden rounded-md border border-border">
               {prayers.map((p) => (
                 <PrayerRequestCard key={p.id} request={p} onChanged={refresh} />
               ))}

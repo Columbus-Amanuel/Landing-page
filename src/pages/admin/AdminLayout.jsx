@@ -9,6 +9,7 @@ import {
   Sparkles,
   Inbox,
   Menu,
+  Users,
 } from 'lucide-react';
 import {
   Sheet,
@@ -18,8 +19,11 @@ import {
   SheetHeader,
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
 import { ADMIN_NAV } from '@/constants/nav';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { isSuperAdminRole } from '@/lib/roles';
 import { cn } from '@/lib/utils';
 import AdminDashboard from './AdminDashboard';
 import AdminChurchInfo from './AdminChurchInfo';
@@ -28,6 +32,7 @@ import AdminSermons from './AdminSermons';
 import AdminGiving from './AdminGiving';
 import AdminYouth from './AdminYouth';
 import AdminMessages from './AdminMessages';
+import AdminUsers from './AdminUsers';
 
 const ICONS = {
   dashboard: LayoutGrid,
@@ -37,20 +42,25 @@ const ICONS = {
   giving: Heart,
   youth: Sparkles,
   messages: Inbox,
+  users: Users,
 };
 
 function SidebarLinks({ onSelect }) {
   const { t } = useLanguage();
+  const { profile } = useAuth();
+  const navItems = ADMIN_NAV.filter(
+    (item) => !item.requireSuperAdmin || isSuperAdminRole(profile?.role),
+  );
   return (
     <nav className="flex flex-col gap-1">
-      {ADMIN_NAV.map((item) => {
+      {navItems.map((item) => {
         const Icon = ICONS[item.key] ?? LayoutGrid;
         return (
           <NavLink
             key={item.key}
             to={item.to}
             end={item.end}
-            onClick={onSelect}
+            onClick={() => onSelect?.()}
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
@@ -113,7 +123,22 @@ export default function AdminLayout() {
           <Route path="sermons" element={<AdminSermons />} />
           <Route path="giving" element={<AdminGiving />} />
           <Route path="youth" element={<AdminYouth />} />
-          <Route path="messages" element={<AdminMessages />} />
+          <Route
+            path="messages"
+            element={(
+              <ProtectedRoute superAdminOnly>
+                <AdminMessages />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="users"
+            element={(
+              <ProtectedRoute superAdminOnly>
+                <AdminUsers />
+              </ProtectedRoute>
+            )}
+          />
         </Routes>
       </main>
     </div>

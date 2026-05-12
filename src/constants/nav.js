@@ -31,7 +31,18 @@ export const ADMIN_NAV = [
   { key: 'sermons', to: ROUTES.adminSermons, labelKey: 'admin.nav.sermons' },
   { key: 'giving', to: ROUTES.adminGiving, labelKey: 'admin.nav.giving' },
   { key: 'youth', to: ROUTES.adminYouth, labelKey: 'admin.nav.youth' },
-  { key: 'messages', to: ROUTES.adminMessages, labelKey: 'admin.nav.messages' },
+  {
+    key: 'messages',
+    to: ROUTES.adminMessages,
+    labelKey: 'admin.nav.messages',
+    requireSuperAdmin: true,
+  },
+  {
+    key: 'users',
+    to: ROUTES.adminUsers,
+    labelKey: 'admin.nav.users',
+    requireSuperAdmin: true,
+  },
 ];
 
 /** Returns true when `pathname` belongs to any item in `items`. */

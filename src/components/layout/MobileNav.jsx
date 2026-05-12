@@ -22,6 +22,7 @@ import {
 import LanguageToggle from '@/components/common/LanguageToggle';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
+import { isStaffRole } from '@/lib/roles';
 import { useState } from 'react';
 
 function MobileGroup({ titleKey, items, onSelect, t }) {
@@ -77,7 +78,7 @@ export default function MobileNav() {
     navigate(ROUTES.home);
   };
 
-  const isAdmin = profile?.role === 'admin';
+  const isAdmin = isStaffRole(profile?.role);
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

@@ -38,7 +38,7 @@
   "home": {
     "prewelcome": "Welcome",
     "title": "Ethiopian Emmanuel United Church of Columbus",
-    "subtitle": "A Christ-centered Ethiopian church community in Columbus, Ohio. Join us every Sunday at 4:00 PM.",
+    "subtitle": "A Christ-centered Ethiopian church community in Columbus, Ohio. Join us every Sunday at 2:00 PM.",
     "aboutBtn": "Learn About Us",
     "sermonsBtn": "Watch Sermons",
     "showVideoBtn": "Watch video",
@@ -98,9 +98,38 @@
     "online": "Online",
     "facebook": "Facebook page",
     "youtube": "YouTube channel",
-    "missingDetails": "Missing details? Logged-in members can help complete the church profile.",
-    "completeProfile": "Complete church profile",
+    "missingDetails": "Logged-in members can complete their profile with phone and other details for the church directory and pastoral care.",
+    "completeProfile": "Complete your member profile",
     "beliefsEmpty": "Beliefs coming soon."
+  },
+  "profileUpdate": {
+    "eyebrow": "Your account",
+    "title": "Complete your profile",
+    "subtitle": "Add details so we can know you better and stay in touch. You can update this anytime.",
+    "saveError": "Could not save your profile. Please try again.",
+    "sectionAccount": "Name & sign-in",
+    "sectionContact": "How we reach you",
+    "sectionPersonal": "About you",
+    "sectionEmergency": "Emergency contact",
+    "fullName": "Full name",
+    "email": "Email (sign-in)",
+    "phone": "Mobile / phone",
+    "street": "Street address",
+    "city": "City",
+    "state": "State",
+    "zip": "ZIP",
+    "dateOfBirth": "Date of birth",
+    "occupation": "Occupation",
+    "bio": "Short bio",
+    "bioPlaceholder": "A few sentences about you or your family…",
+    "ministryInterests": "Ministry interests",
+    "ministryPlaceholder": "Ways you would like to serve or ministries you care about…",
+    "emergencyName": "Emergency contact name",
+    "emergencyPhone": "Emergency contact phone",
+    "save": "Save profile",
+    "successTitle": "Profile saved",
+    "successBody": "Your information has been updated.",
+    "successClose": "Close"
   },
   "contact": {
     "heroTitle": "Contact us",
@@ -198,7 +227,8 @@
       "sermons": "Sermons",
       "giving": "Giving",
       "youth": "Youth & children",
-      "messages": "Messages"
+      "messages": "Messages",
+      "users": "Users"
     },
     "tiles": {
       "churchInfo": "Edit address, service times, beliefs, values, and pastor details.",
@@ -206,7 +236,8 @@
       "sermons": "Manage the sermon library, including videos and notes.",
       "giving": "Configure online giving, funds, and scripture text.",
       "youth": "Youth & children page content, programs, and videos.",
-      "messages": "View contact submissions and prayer requests."
+      "messages": "View contact submissions and prayer requests.",
+      "users": "View member profiles and assign admin access (super-admins only)."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -301,6 +332,41 @@
       "private": "Private",
       "emptyContact": "No contact messages yet.",
       "emptyPrayer": "No prayer requests yet."
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Browse member profiles and set access levels. Only super-admins can open this page.",
+      "loadError": "Could not load users",
+      "empty": "No user profiles found.",
+      "you": "You",
+      "profile": "Profile",
+      "accessLevel": "Access level",
+      "accessLevelHint": "Member: site and profile only. Admin: manage site content. Super-admin: full control including this user list.",
+      "saveRole": "Save access level",
+      "perPage": "members per page.",
+      "prevPage": "Previous page",
+      "nextPage": "Next page",
+      "pageLabel": "Page",
+      "syncDirectory": "Rebuild member list",
+      "syncDirectoryHint": "If this list is empty or missing people who registered before the directory was added, rebuild it once from full profiles (may take a moment).",
+      "syncDone": "Member directory updated",
+      "selectMember": "Select a member in the list to load their full profile.",
+      "detailError": "Could not load profile",
+      "field": {
+        "email": "Email",
+        "phone": "Phone",
+        "city": "City",
+        "state": "State",
+        "uid": "User ID",
+        "joined": "Joined",
+        "bio": "Bio",
+        "ministry": "Ministry interests"
+      },
+      "role": {
+        "member": "Member",
+        "admin": "Admin",
+        "superAdmin": "Super-admin"
+      }
     }
   }
 }

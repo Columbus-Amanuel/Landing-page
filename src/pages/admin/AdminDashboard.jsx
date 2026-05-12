@@ -6,6 +6,7 @@ import {
   Heart,
   Sparkles,
   Inbox,
+  Users,
   ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,6 +14,7 @@ import Container from '@/components/common/Container';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { ROUTES } from '@/constants/routes';
+import { isSuperAdminRole } from '@/lib/roles';
 
 const TILES = [
   { key: 'churchInfo', icon: Building2, to: ROUTES.adminChurchInfo },
@@ -20,7 +22,8 @@ const TILES = [
   { key: 'sermons', icon: Mic, to: ROUTES.adminSermons },
   { key: 'giving', icon: Heart, to: ROUTES.adminGiving },
   { key: 'youth', icon: Sparkles, to: ROUTES.adminYouth },
-  { key: 'messages', icon: Inbox, to: ROUTES.adminMessages },
+  { key: 'messages', icon: Inbox, to: ROUTES.adminMessages, superOnly: true },
+  { key: 'users', icon: Users, to: ROUTES.adminUsers, superOnly: true },
 ];
 
 export default function AdminDashboard() {
@@ -42,7 +45,7 @@ export default function AdminDashboard() {
       </header>
 
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {TILES.map((tile) => (
+        {TILES.filter((tile) => !tile.superOnly || isSuperAdminRole(profile?.role)).map((tile) => (
           <Link
             key={tile.key}
             to={tile.to}

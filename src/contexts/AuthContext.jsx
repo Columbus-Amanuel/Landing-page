@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { onAuthChange, getUserProfile } from '../services/authService';
+import { auth } from '../services/firebase';
 
 const AuthContext = createContext(null);
 
@@ -22,8 +23,15 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
+  const refreshProfile = useCallback(async () => {
+    const current = auth.currentUser;
+    if (!current) return;
+    const userProfile = await getUserProfile(current.uid);
+    setProfile(userProfile);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, profile, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
