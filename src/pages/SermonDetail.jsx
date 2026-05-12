@@ -1,110 +1,132 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import {
-  BookOpenIcon,
-  CalendarDaysIcon,
-  DocumentArrowDownIcon,
-  UserIcon,
-} from '@heroicons/react/24/outline';
-import { getSermonById } from '../services/sermonsService';
-import { useLanguage } from '../contexts/LanguageContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import BackLink from '../components/ui/BackLink';
-
-const CATEGORY_AM = {
-  'Sunday Message': 'የእሁድ ስብከት',
-  'Bible Study': 'የመጽሐፍ ቅዱስ ጥናት',
-  'Special Series': 'ልዩ ተከታታይ',
-  'Guest Speaker': 'የእንግዳ ተናጋሪ',
-};
+import { Link, useParams } from 'react-router-dom';
+import { User, Calendar, BookOpen, Download } from 'lucide-react';
+import Container from '@/components/common/Container';
+import BackLink from '@/components/common/BackLink';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import VideoEmbed from '@/components/common/VideoEmbed';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { getSermonById } from '@/services/sermonsService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { formatDate } from '@/lib/format';
+import { ROUTES } from '@/constants/routes';
 
 export default function SermonDetail() {
   const { id } = useParams();
+  const { t, pickLocalized } = useLanguage();
   const [sermon, setSermon] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t, language } = useLanguage();
-  const am = language === 'am';
 
   useEffect(() => {
-    getSermonById(id).then(setSermon).finally(() => setLoading(false));
+    let active = true;
+    setLoading(true);
+    getSermonById(id)
+      .then((data) => active && setSermon(data))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, [id]);
 
-  if (loading) return <LoadingSpinner center size="lg" />;
+  if (loading) return <LoadingSpinner size="lg" center />;
   if (!sermon) {
     return (
-      <div className="container section">
-        <p>{t('sermons.notFound')} <Link to="/sermons">{t('sermons.backToSermons')}</Link></p>
-      </div>
+      <Container className="py-24">
+        <EmptyState
+          title={t('sermons.notFound')}
+          action={
+            <Button asChild>
+              <Link to={ROUTES.sermons}>{t('sermons.backToSermons')}</Link>
+            </Button>
+          }
+        />
+      </Container>
     );
   }
 
-  const sermonDate = sermon.date?.toDate ? sermon.date.toDate() : new Date(sermon.date);
-  const title = am && sermon.titleAm ? sermon.titleAm : sermon.title;
-  const description = am && sermon.descriptionAm ? sermon.descriptionAm : sermon.description;
-  const category = sermon.category || '';
-  const categoryLabel = am ? (CATEGORY_AM[category] || category) : category;
+  const title = pickLocalized(sermon, 'title');
+  const description = pickLocalized(sermon, 'description');
 
   return (
-    <div className="page-sermon-detail">
-      <section className="section">
-        <div className="container container-narrow">
-          <BackLink to="/sermons">{t('sermons.backToSermons')}</BackLink>
-          {categoryLabel && <span className="sermon-category-badge">{categoryLabel}</span>}
-          <h1 className="sermon-detail-title">{title}</h1>
-          <div className="sermon-detail-meta">
-            <span className="meta-inline">
-              <UserIcon aria-hidden />
-              {sermon.speaker}
-            </span>
-            <span className="meta-inline">
-              <CalendarDaysIcon aria-hidden />
-              {format(sermonDate, 'MMMM d, yyyy')}
-            </span>
-            {sermon.scripture && (
-              <span className="meta-inline">
-                <BookOpenIcon aria-hidden />
-                {sermon.scripture}
-              </span>
-            )}
-          </div>
+    <article className="pb-24 pt-12">
+      <Container size="lg">
+        <BackLink to={ROUTES.sermons} className="mb-8">
+          {t('sermons.backToSermons')}
+        </BackLink>
 
-          {sermon.videoUrl && (
-            <div className="sermon-video-wrapper">
-              {sermon.videoUrl.includes('youtube') || sermon.videoUrl.includes('youtu.be') ? (
-                <iframe
-                  src={sermon.videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                  title={title}
-                  allowFullScreen
-                  className="sermon-video"
-                />
-              ) : (
-                <video controls src={sermon.videoUrl} className="sermon-video" />
+        <div className="grid gap-10 lg:grid-cols-[1fr_22rem]">
+          <div>
+            {sermon.videoUrl ? (
+              <VideoEmbed src={sermon.videoUrl} title={title} />
+            ) : sermon.audioUrl ? (
+              <Card className="bg-muted/50">
+                <CardContent className="flex flex-col items-center gap-4 p-8">
+                  <p className="text-sm font-medium text-muted-foreground">{t('sermons.watchListen')}</p>
+                  <audio controls className="w-full" src={sermon.audioUrl}>
+                    Your browser does not support audio playback.
+                  </audio>
+                </CardContent>
+              </Card>
+            ) : null}
+
+            <div className="mt-8">
+              {sermon.category && (
+                <Badge variant="accent" className="mb-4 uppercase tracking-wider">
+                  {sermon.category}
+                </Badge>
+              )}
+              <h1 className="font-hero text-4xl font-semibold text-primary md:text-5xl">
+                {title}
+              </h1>
+
+              <div className="mt-6 flex flex-wrap gap-3 text-sm text-muted-foreground">
+                {sermon.speaker && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <User className="h-4 w-4 text-accent" />
+                    {sermon.speaker}
+                  </span>
+                )}
+                {sermon.date && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-accent" />
+                    {formatDate(sermon.date)}
+                  </span>
+                )}
+                {sermon.scripture && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <BookOpen className="h-4 w-4 text-accent" />
+                    {sermon.scripture}
+                  </span>
+                )}
+              </div>
+
+              {description && (
+                <p className="mt-8 text-lg leading-relaxed text-foreground/90">{description}</p>
               )}
             </div>
-          )}
+          </div>
 
-          {sermon.audioUrl && !sermon.videoUrl && (
-            <div className="sermon-audio-wrapper">
-              <audio controls src={sermon.audioUrl} className="sermon-audio" />
-            </div>
-          )}
-
-          {description && <div className="sermon-description"><p>{description}</p></div>}
-
-          {sermon.notesUrl && (
-            <a
-              href={sermon.notesUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline"
-            >
-              <DocumentArrowDownIcon className="btn-inline-icon" aria-hidden />
-              {t('sermons.downloadNotes')}
-            </a>
-          )}
+          <aside className="space-y-4">
+            {sermon.notesUrl && (
+              <Card>
+                <CardContent className="flex flex-col gap-3 p-6">
+                  <h2 className="font-display text-lg font-semibold text-primary">
+                    {t('sermons.notes')}
+                  </h2>
+                  <Button asChild variant="outline" className="w-full">
+                    <a href={sermon.notesUrl} target="_blank" rel="noopener noreferrer">
+                      <Download /> {t('sermons.downloadNotes')}
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </aside>
         </div>
-      </section>
-    </div>
+      </Container>
+    </article>
   );
 }

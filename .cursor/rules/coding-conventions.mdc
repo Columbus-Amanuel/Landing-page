@@ -11,69 +11,90 @@ alwaysApply: true
 - ES Modules (`import` / `export`), no CommonJS.
 - Use `export default function ComponentName()` for page and component files.
 - Service functions use named exports: `export const functionName = ...`.
+- Use the `@/` path alias (configured in `jsconfig.json` + `vite.config.js`) to import from `src/` instead of long relative paths.
 
 ## Component Patterns
 
 - **Functional components only** — no class components.
 - Hooks for state management: `useState`, `useEffect`, `useMemo`.
-- Forms use `react-hook-form` (`useForm`, `register`, `handleSubmit`, `formState`).
-- Dialogs use `@headlessui/react` (`Dialog`, `DialogPanel`, `DialogTitle`).
+- Forms use `react-hook-form` (`useForm`, `register`, `handleSubmit`, `formState`, `useFieldArray`, `Controller`).
+- Dialogs / popovers / dropdowns use the **shadcn/ui primitives** in `src/components/ui/*` (built on Radix UI). Never reach for `@headlessui/react` — it has been removed.
+- Toast notifications: `toast.success(...)` / `toast.error(...)` from `sonner`, mounted once via `<Toaster />` in `App.jsx`.
 
 ## Styling
 
-- **Plain CSS** — no Tailwind, CSS Modules, or styled-components.
-- Global design system in `src/index.css` with CSS custom properties (`--color-*`, `--space-*`, `--font-*`, `--navbar-height`, etc.). Brand/nav headings use `--font-display` (Cormorant Garamond). Large hero-style headlines use `--font-hero` (**Fraunces** + **Noto Serif Ethiopic** fallback for Amharic). UI uses `--font-sans` (DM Sans), all loaded from `index.html`.
-- **Flat UI:** Prefer `1px` borders and `--shadow-flat` over heavy drop shadows on cards and nav. Primary actions on light backgrounds use solid brand blue `.btn-primary`; accent red is reserved for dark hero/CTA strips (`index.css` scoped rules).
-- App-level overrides in `src/App.css` (imported from `main.jsx` after `index.css`).
-- BEM-like class naming: `.event-card`, `.event-card-body`, `.event-card-title`.
-- Responsive breakpoints: 1024px, 768px, 480px.
-- New styles go in `src/index.css` following the existing section pattern.
+- **Tailwind CSS v4** is the styling system, wired via the official `@tailwindcss/vite` plugin.
+- `src/index.css` is the single design-token surface: it imports Tailwind (`@import "tailwindcss"`), defines HSL custom properties on `:root` / `.dark`, and exposes them to Tailwind through `@theme inline`. **Keep it short** — no per-component CSS rules.
+- No `App.css`. Component styles live in JSX `className` props.
+- Brand tokens (use these Tailwind utilities, not hex literals):
+  - `bg-primary` / `text-primary` / `border-primary` → royal blue (`#1c529d`).
+  - `bg-accent` / `text-accent` → cross red (`#cf2a27`).
+  - `bg-background`, `bg-card`, `bg-muted`, `bg-navbar`, `bg-sidebar` for surfaces.
+  - `text-foreground`, `text-muted-foreground` for typography.
+- Fonts: utility classes `font-sans` (DM Sans, body), `font-display` (Cormorant Garamond, mid-size headings) and `font-hero` (Fraunces + Noto Serif Ethiopic fallback, hero headlines).
+- Always compose class names through `cn(...)` from `src/lib/utils.js`:
+
+  ```js
+  import { cn } from '@/lib/utils';
+  <div className={cn('rounded-xl p-4', isActive && 'bg-primary text-primary-foreground')} />
+  ```
+
+- Prefer **shadcn variants** (`<Button variant="accent" size="lg">`) over ad-hoc utility combinations for repeated patterns; add a new variant in the primitive file when a new visual is needed in 2+ places.
 
 ## Icons
 
-- Use **@heroicons/react** (`24/outline` or `24/solid`) for UI affordances; avoid emoji in the interface.
-- Mission value cards on Home: `churchInfo.values[].icon` is a string key; options and normalization live in `src/utils/valueIcons.js`, rendered by `src/components/ui/ValueIcon.jsx`.
-
-## CSS Variable Palette
-
-```css
---color-primary: #1c529d       /* seal royal blue */
---color-accent: #cf2a27        /* seal red */
---color-bg: #f7f8fb
---color-bg-alt: #ebeef5
---color-text: #1a2230
---color-text-muted: #5a6578
---navbar-bg: rgb(235, 238, 245)  /* logo canvas; navbar + mobile drawer */
-```
+- **lucide-react** is the default icon library. Import individual icons: `import { Calendar, MapPin } from 'lucide-react'`.
+- Lucide intentionally **does not** ship brand glyphs (Facebook / YouTube / Instagram, etc.). Use the inline-SVG components in `src/components/common/SocialIcons.jsx` for those.
+- `@heroicons/react` is still installed but new code should prefer Lucide for visual consistency with shadcn defaults.
+- Mission value cards on Home: `churchInfo.values[].icon` is a string key; options and normalization live in `src/utils/valueIcons.js`, rendered by `src/components/common/ValueIcon.jsx`.
 
 ## File Organization
 
-- Pages: `src/pages/PageName.jsx` — one page component per file.
-- Layout: `src/components/layout/` — Navbar, Footer, Layout wrapper.
-- UI components: `src/components/ui/` — reusable cards, spinners, guards.
-- Services: `src/services/` — Firebase interactions, one file per domain.
-- Hooks: `src/hooks/` — custom hooks for Firestore real-time subscriptions.
-- i18n: `src/i18n/{lang}/translations.json` — flat-ish JSON with dot-path keys.
+```
+src/
+  lib/            # cn(), format, youtube, validators — framework-agnostic helpers
+  constants/      # routes, nav, sermonCategories, giving, site defaults
+  components/
+    ui/           # shadcn primitives (Radix wrappers) — Button, Card, Dialog, etc.
+    common/       # domain components shared across pages (EventCard, PageHero, ...)
+    layout/       # Layout, Navbar, MobileNav, NavDropdown, Footer
+  contexts/       # AuthContext, LanguageContext, SiteSettingsContext
+  hooks/          # useFirestoreCollection, useFirestoreDoc, useScrollLock, useMediaQuery
+  services/       # Firebase-backed service modules (one per domain)
+  pages/          # Public pages
+  pages/admin/    # Admin pages (AdminLayout + per-domain editors)
+  i18n/           # en/translations.json, am/translations.json
+```
+
+- One page or top-level component per file.
+- Promote a page-local subcomponent to `components/common/` only when reused in 2+ places.
+- Services have one file per Firestore domain; the service is the only module that imports `firebase/firestore` for that collection.
+
+## Design System Layers
+
+1. **Tokens** in `src/index.css` (HSL custom props in `:root` / `.dark`).
+2. **Primitives** in `src/components/ui/*.jsx` (Radix + `cva` variants — brand styling lives here, *once*).
+3. **Common domain components** in `src/components/common/*.jsx` compose primitives.
+4. **Pages** compose common components — they should rarely use Tailwind utilities for sizing/colors that are already encoded in a primitive variant.
+
+When in doubt, add a variant to the primitive instead of overriding it via `className` on every call site.
 
 ## Internationalization (i18n)
 
 - Custom lightweight system in `LanguageContext.jsx` — no external i18n library.
-- Access translations via `const { t, language } = useLanguage()`.
-- `t('key.path')` resolves dot-separated keys from the JSON files.
-- Fallback: Amharic → English → raw key string.
-- Some components use inline `language === 'am' ? '...' : '...'` for one-off strings.
-- When adding new user-facing text, add keys to both `en/translations.json` and `am/translations.json`.
+- Access translations via `const { t, language, pickLocalized } = useLanguage()`.
+- `t('key.path')` resolves dot-separated keys from the JSON files; falls back: current lang → English → raw key.
+- **For bilingual *content* fields on Firestore documents** (e.g. `title` + `titleAm`), use the `pickLocalized(obj, 'title')` helper instead of inline `language === 'am' ? ... : ...` ternaries. The helper returns the localized field with English fallback.
+- When adding new user-facing strings, add keys to **both** `en/translations.json` and `am/translations.json`.
 
 ## Firebase Service Pattern
 
 ```javascript
-// Pattern for read services
 export const getItemById = async (id) => {
   const snap = await getDoc(doc(db, 'collectionName', id));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 };
 
-// Pattern for write services
 export const createItem = (data) =>
   addDoc(collection(db, 'collectionName'), {
     ...data,
@@ -82,20 +103,23 @@ export const createItem = (data) =>
   });
 ```
 
-- **YouTube helpers** (`getYoutubeVideoId`, `getYoutubeDefaultThumbnailUrl`) live in `src/services/youthVideosService.js` and are reused anywhere a watch URL, embed, or default still image (`hqdefault.jpg`) is needed.
+- **YouTube helpers** (`getYoutubeVideoId`, `getYoutubeDefaultThumbnailUrl`, `getYoutubeEmbedUrl`) live in `src/lib/youtube.js`. `src/services/youthVideosService.js` re-exports them so service callers don't have to know the split.
+- **Site-wide content** (church info, giving config, youth page copy) is loaded by `SiteSettingsContext` via `siteSettingsService` — pages access it through `useSiteSettings()` rather than fetching directly.
 
 ## Date Handling
 
-- Firestore Timestamps are converted to JS Dates: `event.date?.toDate ? event.date.toDate() : new Date(event.date)`.
-- Formatted with `date-fns` `format()` function.
+- Firestore Timestamps are normalized via `toDate(value)` from `src/lib/format.js`.
+- Display formatting uses `formatDate(date, pattern)` / `formatTime(date)` (thin wrappers over `date-fns`).
 
-## Error Handling
+## Error & Loading States
 
-- Services throw on failure; page components catch and display via local `error` state or `alert()`.
-- Loading/error/empty states pattern: check `loading` → `error` → `data.length === 0` → render data.
+- Services throw on failure; UI catches and surfaces errors via the `<ErrorState />` common component (or `toast.error(...)` for action feedback).
+- Loading uses `<LoadingSpinner />` or `<Skeleton />`; empty states use `<EmptyState />`.
+- Loading/error/empty pattern: check `loading` → `error` → `data.length === 0` → render data.
 
 ## ESLint
 
 - Flat config in `eslint.config.js`.
-- Unused variables error except those matching `^[A-Z_]`.
-- React Hooks and React Refresh plugins enabled.
+- Unused variables / args matching `^[A-Z_]` are allowed (so destructured component props like `icon: IconComponent` are not flagged).
+- `react-refresh/only-export-components` and `react-hooks/incompatible-library` are intentionally disabled (shadcn primitives co-export variants/contexts; `react-hook-form`'s `watch()` is by design un-memoizable).
+- `react-hooks/exhaustive-deps` is on — escape with a targeted `// eslint-disable-next-line` and a comment explaining the intent (see `useFirestoreCollection`).

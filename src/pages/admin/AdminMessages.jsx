@@ -1,138 +1,200 @@
 import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
+import { toast } from 'sonner';
+import { Inbox, Mail, MessageSquare, Phone, CheckCircle2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import {
   getContactMessages,
   getPrayerRequests,
   updateContactMessageStatus,
   updatePrayerRequestStatus,
-} from '../../services/contactService';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
+} from '@/services/contactService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { formatDate, toMailtoHref, toTelHref } from '@/lib/format';
+
+function StatusBadge({ status }) {
+  const variant =
+    status === 'resolved' || status === 'read'
+      ? 'success'
+      : status === 'active'
+        ? 'warning'
+        : 'destructive';
+  return <Badge variant={variant} className="uppercase">{status}</Badge>;
+}
+
+function ContactMessageCard({ message, onChanged }) {
+  const { t } = useLanguage();
+  const handleStatus = async (status) => {
+    try {
+      await updateContactMessageStatus(message.id, status);
+      toast.success(t('admin.flash.saved'));
+      onChanged();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="font-display text-base font-semibold text-primary">
+              {message.firstName} {message.lastName}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {formatDate(message.createdAt, 'MMM d, yyyy h:mm a')} — {message.subject}
+            </p>
+          </div>
+          <StatusBadge status={message.status} />
+        </div>
+        <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">{message.message}</p>
+        <Separator />
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          {message.email && (
+            <Button asChild variant="ghost" size="sm">
+              <a href={toMailtoHref(message.email)}><Mail /> {message.email}</a>
+            </Button>
+          )}
+          {message.phone && (
+            <Button asChild variant="ghost" size="sm">
+              <a href={toTelHref(message.phone)}><Phone /> {message.phone}</a>
+            </Button>
+          )}
+          <div className="ms-auto flex gap-2">
+            {message.status !== 'read' && (
+              <Button variant="outline" size="sm" onClick={() => handleStatus('read')}>
+                {t('admin.messages.markRead')}
+              </Button>
+            )}
+            {message.status !== 'resolved' && (
+              <Button size="sm" onClick={() => handleStatus('resolved')}>
+                <CheckCircle2 /> {t('admin.messages.resolve')}
+              </Button>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PrayerRequestCard({ request, onChanged }) {
+  const { t } = useLanguage();
+  const handleStatus = async (status) => {
+    try {
+      await updatePrayerRequestStatus(request.id, status);
+      toast.success(t('admin.flash.saved'));
+      onChanged();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
+    }
+  };
+
+  return (
+    <Card>
+      <CardContent className="space-y-3 p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="font-display text-base font-semibold text-primary">{request.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {formatDate(request.createdAt, 'MMM d, yyyy h:mm a')}
+              {request.isPrivate && (
+                <span className="ml-2 inline-flex items-center gap-1 text-accent">
+                  · {t('admin.messages.private')}
+                </span>
+              )}
+            </p>
+          </div>
+          <StatusBadge status={request.status} />
+        </div>
+        <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">{request.request}</p>
+        <Separator />
+        <div className="flex justify-end gap-2">
+          {request.status !== 'resolved' && (
+            <Button size="sm" onClick={() => handleStatus('resolved')}>
+              <CheckCircle2 /> {t('admin.messages.resolve')}
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function AdminMessages() {
-  const [tab, setTab] = useState('contact');
+  const { t } = useLanguage();
   const [messages, setMessages] = useState([]);
   const [prayers, setPrayers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    Promise.all([getContactMessages(), getPrayerRequests()]).then(([msgs, prays]) => {
-      setMessages(msgs);
-      setPrayers(prays);
-      setLoading(false);
-    });
-  }, []);
-
-  const markMessageRead = async (id) => {
-    await updateContactMessageStatus(id, 'read');
-    setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, status: 'read' } : m)));
+  const refresh = () => {
+    setLoading(true);
+    Promise.all([getContactMessages(), getPrayerRequests()])
+      .then(([m, p]) => {
+        setMessages(m);
+        setPrayers(p);
+      })
+      .catch(() => {
+        setMessages([]);
+        setPrayers([]);
+      })
+      .finally(() => setLoading(false));
   };
-
-  const markPrayerResolved = async (id) => {
-    await updatePrayerRequestStatus(id, 'resolved');
-    setPrayers((prev) => prev.map((p) => (p.id === id ? { ...p, status: 'resolved' } : p)));
-  };
-
-  const unreadCount = messages.filter((m) => m.status === 'unread').length;
-  const activeCount = prayers.filter((p) => p.status === 'active').length;
+  useEffect(refresh, []);
 
   return (
-    <div>
-      <h1 className="admin-page-title">Messages</h1>
+    <>
+      <header className="mb-8">
+        <h1 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+          {t('admin.messages.title')}
+        </h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t('admin.messages.subtitle')}</p>
+      </header>
 
-      <div className="tab-group">
-        <button
-          className={`tab ${tab === 'contact' ? 'active' : ''}`}
-          onClick={() => setTab('contact')}
-        >
-          Contact Messages {unreadCount > 0 && <span className="badge-count">{unreadCount}</span>}
-        </button>
-        <button
-          className={`tab ${tab === 'prayer' ? 'active' : ''}`}
-          onClick={() => setTab('prayer')}
-        >
-          Prayer Requests {activeCount > 0 && <span className="badge-count">{activeCount}</span>}
-        </button>
-      </div>
+      <Tabs defaultValue="contact">
+        <TabsList>
+          <TabsTrigger value="contact">
+            <Mail className="h-4 w-4" />{t('admin.messages.contactTab')} ({messages.length})
+          </TabsTrigger>
+          <TabsTrigger value="prayer">
+            <MessageSquare className="h-4 w-4" />{t('admin.messages.prayerTab')} ({prayers.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {loading ? (
-        <LoadingSpinner center />
-      ) : tab === 'contact' ? (
-        messages.length === 0 ? (
-          <p className="empty-state">No contact messages yet.</p>
-        ) : (
-          <div className="admin-list">
-            {messages.map((msg) => {
-              const date = msg.createdAt?.toDate ? msg.createdAt.toDate() : new Date();
-              return (
-                <div
-                  key={msg.id}
-                  className={`admin-list-item${msg.status === 'unread' ? ' admin-list-item-unread' : ''}`}
-                >
-                  <div className="admin-list-item-info">
-                    <h3>
-                      {msg.firstName} {msg.lastName}
-                      <span className="text-muted"> &lt;{msg.email}&gt;</span>
-                    </h3>
-                    <p className="text-sm text-muted">
-                      {msg.subject} &bull; {format(date, 'MMM d, yyyy h:mm a')}
-                    </p>
-                    {msg.phone && <p className="text-sm">Phone: {msg.phone}</p>}
-                    <p className="admin-message-body">{msg.message}</p>
-                  </div>
-                  <div className="admin-list-item-actions">
-                    <span className={`status-badge status-${msg.status}`}>{msg.status}</span>
-                    {msg.status === 'unread' && (
-                      <button
-                        className="btn btn-outline btn-sm"
-                        onClick={() => markMessageRead(msg.id)}
-                      >
-                        Mark Read
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )
-      ) : (
-        prayers.length === 0 ? (
-          <p className="empty-state">No prayer requests yet.</p>
-        ) : (
-          <div className="admin-list">
-            {prayers.map((prayer) => {
-              const date = prayer.createdAt?.toDate ? prayer.createdAt.toDate() : new Date();
-              return (
-                <div
-                  key={prayer.id}
-                  className={`admin-list-item${prayer.status === 'active' ? ' admin-list-item-unread' : ''}`}
-                >
-                  <div className="admin-list-item-info">
-                    <h3>
-                      {prayer.name || 'Anonymous'}
-                      {prayer.isPrivate && <span className="badge badge-private">Private</span>}
-                    </h3>
-                    <p className="text-sm text-muted">{format(date, 'MMM d, yyyy h:mm a')}</p>
-                    {prayer.email && <p className="text-sm">{prayer.email}</p>}
-                    <p className="admin-message-body">{prayer.request}</p>
-                  </div>
-                  <div className="admin-list-item-actions">
-                    <span className={`status-badge status-${prayer.status}`}>{prayer.status}</span>
-                    {prayer.status === 'active' && (
-                      <button
-                        className="btn btn-outline btn-sm"
-                        onClick={() => markPrayerResolved(prayer.id)}
-                      >
-                        Mark Resolved
-                      </button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )
-      )}
-    </div>
+        <TabsContent value="contact">
+          {loading ? (
+            <LoadingSpinner size="lg" center />
+          ) : messages.length === 0 ? (
+            <EmptyState icon={Inbox} title={t('admin.messages.emptyContact')} />
+          ) : (
+            <div className="space-y-4">
+              {messages.map((m) => (
+                <ContactMessageCard key={m.id} message={m} onChanged={refresh} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="prayer">
+          {loading ? (
+            <LoadingSpinner size="lg" center />
+          ) : prayers.length === 0 ? (
+            <EmptyState icon={Inbox} title={t('admin.messages.emptyPrayer')} />
+          ) : (
+            <div className="space-y-4">
+              {prayers.map((p) => (
+                <PrayerRequestCard key={p.id} request={p} onChanged={refresh} />
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </>
   );
 }

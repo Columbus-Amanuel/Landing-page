@@ -1,343 +1,196 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { ChevronDownIcon } from '@heroicons/react/24/outline';
-import BrandCrossIcon from '../ui/BrandCrossIcon';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { logoutUser } from '../../services/authService';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { LogOut, ShieldCheck, UserCircle2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { logoutUser } from '@/services/authService';
+import { ROUTES } from '@/constants/routes';
+import {
+  PRIMARY_NAV,
+  MINISTRIES_NAV,
+  MEDIA_NAV,
+  CONNECT_NAV,
+} from '@/constants/nav';
+import { getInitials } from '@/lib/format';
+import LanguageToggle from '@/components/common/LanguageToggle';
+import BrandCrossIcon from '@/components/common/BrandCrossIcon';
+import { cn } from '@/lib/utils';
+import NavDropdown from './NavDropdown';
+import MobileNav from './MobileNav';
 
-function NavDropdown({ label, items, groupActive }) {
+const NAV_LINK_BASE =
+  'relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+
+function NavItem({ to, labelKey, end }) {
+  const { t } = useLanguage();
   return (
-    <Menu as="div" className="nav-dropdown">
-      <MenuButton
-        className={`nav-dropdown-trigger${groupActive ? ' is-active' : ''}`}
-      >
-        {label}
-        <ChevronDownIcon className="nav-dropdown-chevron" aria-hidden />
-      </MenuButton>
-      <MenuItems
-        className="nav-dropdown-panel"
-        anchor="bottom start"
-        transition
-        modal={false}
-      >
-        {items.map(({ to, label: itemLabel, end }) => (
-          <MenuItem key={to}>
-            {({ focus }) => (
-              <NavLink
-                to={to}
-                end={end}
-                className={({ isActive }) =>
-                  `nav-dropdown-item${isActive ? ' active' : ''}${focus ? ' is-focus' : ''}`
-                }
-              >
-                {itemLabel}
-              </NavLink>
-            )}
-          </MenuItem>
-        ))}
-      </MenuItems>
-    </Menu>
+    <NavLink
+      to={to}
+      end={end}
+      className={({ isActive }) =>
+        cn(NAV_LINK_BASE, isActive ? 'text-primary' : 'text-muted-foreground')
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {t(labelKey)}
+          {isActive && (
+            <span
+              aria-hidden="true"
+              className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent"
+            />
+          )}
+        </>
+      )}
+    </NavLink>
+  );
+}
+
+function GiveLink() {
+  const { t } = useLanguage();
+  return (
+    <NavLink
+      to={ROUTES.give}
+      className={({ isActive }) =>
+        cn(
+          'inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90',
+          isActive && 'bg-primary/90',
+        )
+      }
+    >
+      {t('nav.give')}
+    </NavLink>
+  );
+}
+
+function UserMenu() {
+  const { user, profile } = useAuth();
+  const { t, language } = useLanguage();
+  const navigate = useNavigate();
+  const isAdmin = profile?.role === 'admin';
+
+  const handleLogout = async () => {
+    await logoutUser();
+    navigate(ROUTES.home);
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          type="button"
+          className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          aria-label={`${t('nav.hi')} ${profile?.displayName || user?.email || ''}`}
+        >
+          <Avatar className="h-9 w-9">
+            <AvatarFallback>
+              {getInitials(profile?.displayName || user?.email || 'EU')}
+            </AvatarFallback>
+          </Avatar>
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="min-w-[14rem]">
+        <DropdownMenuLabel className="normal-case">
+          <span className="text-xs text-muted-foreground">
+            {t('nav.hi')}, {language === 'am' ? '' : ''}
+          </span>
+          <p className="mt-0.5 text-sm font-semibold text-foreground">
+            {profile?.displayName || user?.email}
+          </p>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link to={ROUTES.profileUpdate} className="cursor-pointer gap-2">
+            <UserCircle2 className="h-4 w-4" />
+            {t('nav.completeProfile')}
+          </Link>
+        </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem asChild>
+            <Link to={ROUTES.admin} className="cursor-pointer gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              {t('nav.admin')}
+            </Link>
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onSelect={(event) => {
+            event.preventDefault();
+            handleLogout();
+          }}
+          className="cursor-pointer gap-2 text-destructive focus:text-destructive"
+        >
+          <LogOut className="h-4 w-4" />
+          {t('common.logout')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, profile } = useAuth();
-  const { language, changeLanguage, t } = useLanguage();
-  const navigate = useNavigate();
+  const { t } = useLanguage();
+  const { user } = useAuth();
   const { pathname } = useLocation();
+  // Hide the navbar entirely on auth pages so they render as standalone screens.
+  if (pathname === ROUTES.login || pathname === ROUTES.register) return null;
 
-  const ministriesActive = pathname.startsWith('/youth-children');
-  const mediaActive =
-    pathname.startsWith('/sermons') || pathname.startsWith('/events');
-  const ministriesItems = useMemo(
-    () => [
-      { to: '/youth-children', label: t('nav.youthChildren'), end: true },
-    ],
-    [t],
-  );
-
-  const mediaItems = useMemo(
-    () => [
-      { to: '/sermons', label: t('nav.sermons'), end: false },
-      { to: '/events', label: t('nav.events'), end: false },
-    ],
-    [t],
-  );
-
-  const mobileConnectItems = useMemo(
-    () => [
-      { to: '/contact', label: t('nav.contact'), end: true },
-      { to: '/give', label: t('nav.give'), end: true },
-    ],
-    [t],
-  );
-
-  const accountLinks = useMemo(() => {
-    const links = [];
-    if (user) {
-      links.push({ to: '/profile-update', label: t('nav.completeProfile'), end: true });
-    }
-    if (profile?.role === 'admin') {
-      links.push({ to: '/admin', label: t('nav.admin'), end: false });
-    }
-    return links;
-  }, [profile?.role, t, user]);
-
-  const handleLogout = async () => {
-    setMobileOpen(false);
-    await logoutUser();
-    navigate('/');
-  };
-
-  useEffect(() => {
-    if (!mobileOpen) return undefined;
-    const onKey = (e) => {
-      if (e.key === 'Escape') setMobileOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = prev;
-    };
-  }, [mobileOpen]);
+  const contactLink = CONNECT_NAV.find((item) => item.key === 'contact');
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <Link to="/" className="navbar-brand">
-          <span className="brand-mark" aria-hidden>
-            <BrandCrossIcon className="brand-icon" />
+    <header className="sticky top-0 z-40 w-full border-b border-border bg-navbar/95 backdrop-blur supports-[backdrop-filter]:bg-navbar/85">
+      <div className="mx-auto flex h-[var(--navbar-height)] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <Link
+          to={ROUTES.home}
+          className="flex items-center gap-3 font-display text-base font-semibold text-primary transition-opacity hover:opacity-90"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-md text-primary">
+            <BrandCrossIcon size={20} />
           </span>
-          <span className="brand-name">{t('common.churchName')}</span>
+          <span className="hidden flex-col leading-tight sm:flex">
+            <span className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+              EuccOnline.com
+            </span>
+            <span>{t('common.churchName')}</span>
+          </span>
         </Link>
 
-        <div className="navbar-links">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-          >
-            {t('nav.home')}
-          </NavLink>
-          <NavLink
-            to="/about"
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-          >
-            {t('nav.about')}
-          </NavLink>
-          <NavDropdown
-            label={t('nav.ministries')}
-            items={ministriesItems}
-            groupActive={ministriesActive}
-          />
-          <NavDropdown
-            label={t('nav.media')}
-            items={mediaItems}
-            groupActive={mediaActive}
-          />
-          <NavLink
-            to="/contact"
-            end
-            className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-          >
-            {t('nav.contact')}
-          </NavLink>
-          <NavLink
-            to="/give"
-            end
-            className={({ isActive }) =>
-              `nav-link nav-link${isActive ? ' active' : ''}`
-            }
-          >
-            {t('nav.give')}
-          </NavLink>
-          {accountLinks.map(({ to, label, end }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={end}
-              className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
-            >
-              {label}
-            </NavLink>
+        <nav className="ml-6 hidden items-center gap-1 lg:flex">
+          {PRIMARY_NAV.map((item) => (
+            <NavItem key={item.key} {...item} />
           ))}
-        </div>
+          <NavDropdown label={t('nav.ministries')} items={MINISTRIES_NAV} />
+          <NavDropdown label={t('nav.media')} items={MEDIA_NAV} />
+          {contactLink && <NavItem {...contactLink} />}
+        </nav>
 
-        <div className="navbar-actions">
-          <div className="lang-toggle" role="group" aria-label={t('common.language')}>
-            <button
-              type="button"
-              className={language === 'en' ? 'is-on' : ''}
-              onClick={() => changeLanguage('en')}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              className={language === 'am' ? 'is-on' : ''}
-              onClick={() => changeLanguage('am')}
-            >
-              አማ
-            </button>
+        <div className="ml-auto flex items-center gap-2 lg:gap-3">
+          <div className="hidden lg:block">
+            <GiveLink />
           </div>
+          <LanguageToggle className="hidden md:inline-flex" />
           {user ? (
-            <div className="user-menu">
-              <span className="user-greeting" title={profile?.displayName || user.email}>
-                {t('nav.hi')}, {profile?.displayName || user.email}
-              </span>
-              <button type="button" onClick={handleLogout} className="btn btn-ghost btn-sm">
-                {t('common.logout')}
-              </button>
+            <div className="hidden lg:block">
+              <UserMenu />
             </div>
           ) : (
-            <Link to="/login" className="btn btn-primary btn-sm">
-              {t('common.signIn')}
-            </Link>
+            <Button asChild size="sm" className="hidden lg:inline-flex">
+              <Link to={ROUTES.login}>{t('common.signIn')}</Link>
+            </Button>
           )}
+          <MobileNav />
         </div>
-
-        <button
-          type="button"
-          className="mobile-menu-btn"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-expanded={mobileOpen}
-          aria-controls="site-mobile-nav"
-          aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
-        >
-          <span className={`hamburger ${mobileOpen ? 'open' : ''}`} />
-        </button>
       </div>
-
-      {mobileOpen && (
-        <>
-          <div
-            className="mobile-menu-backdrop"
-            onClick={() => setMobileOpen(false)}
-            aria-hidden
-          />
-          <div className="mobile-menu" id="site-mobile-nav">
-            <div className="mobile-nav-section">
-              <p className="mobile-nav-label">{t('nav.main')}</p>
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {t('nav.home')}
-              </NavLink>
-              <NavLink
-                to="/about"
-                className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                onClick={() => setMobileOpen(false)}
-              >
-                {t('nav.about')}
-              </NavLink>
-            </div>
-
-            <div className="mobile-nav-section">
-              <p className="mobile-nav-label">{t('nav.ministries')}</p>
-              {ministriesItems.map(({ to, label, end }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-
-            <div className="mobile-nav-section">
-              <p className="mobile-nav-label">{t('nav.media')}</p>
-              {mediaItems.map(({ to, label, end }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-
-            <div className="mobile-nav-section">
-              <p className="mobile-nav-label">{t('nav.connect')}</p>
-              {mobileConnectItems.map(({ to, label, end, emphasize }) => (
-                <NavLink
-                  key={to}
-                  to={to}
-                  end={end}
-                  className={({ isActive }) =>
-                    `mobile-nav-link${emphasize ? ' mobile-nav-link-give' : ''}${isActive ? ' active' : ''}`
-                  }
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-
-            {accountLinks.length > 0 && (
-              <div className="mobile-nav-section">
-                <p className="mobile-nav-label">{t('nav.account')}</p>
-                {accountLinks.map(({ to, label, end }) => (
-                  <NavLink
-                    key={to}
-                    to={to}
-                    end={end}
-                    className={({ isActive }) => `mobile-nav-link${isActive ? ' active' : ''}`}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {label}
-                  </NavLink>
-                ))}
-              </div>
-            )}
-
-            <div className="mobile-menu-actions">
-              <div className="lang-toggle" role="group" aria-label={t('common.language')}>
-                <button
-                  type="button"
-                  className={language === 'en' ? 'is-on' : ''}
-                  onClick={() => changeLanguage('en')}
-                >
-                  EN
-                </button>
-                <button
-                  type="button"
-                  className={language === 'am' ? 'is-on' : ''}
-                  onClick={() => changeLanguage('am')}
-                >
-                  አማ
-                </button>
-              </div>
-              {user ? (
-                <button type="button" onClick={handleLogout} className="mobile-nav-link">
-                  {t('common.logout')}
-                </button>
-              ) : (
-                <Link
-                  to="/login"
-                  className="btn btn-primary"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {t('common.signIn')}
-                </Link>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-    </nav>
+    </header>
   );
 }

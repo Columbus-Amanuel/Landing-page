@@ -1,71 +1,117 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import { CalendarDaysIcon, ClockIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import { getEventById } from '../services/eventsService';
-import { useLanguage } from '../contexts/LanguageContext';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import BackLink from '../components/ui/BackLink';
+import { Link, useParams } from 'react-router-dom';
+import { Calendar, Clock, MapPin, ExternalLink } from 'lucide-react';
+import Container from '@/components/common/Container';
+import BackLink from '@/components/common/BackLink';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { getEventById } from '@/services/eventsService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { formatDate, formatTime, toDate } from '@/lib/format';
+import { ROUTES } from '@/constants/routes';
 
 export default function EventDetail() {
   const { id } = useParams();
+  const { t, pickLocalized } = useLanguage();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { t, language } = useLanguage();
-  const am = language === 'am';
 
   useEffect(() => {
-    getEventById(id).then(setEvent).finally(() => setLoading(false));
+    let active = true;
+    setLoading(true);
+    getEventById(id)
+      .then((data) => active && setEvent(data))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, [id]);
 
-  if (loading) return <LoadingSpinner center size="lg" />;
+  if (loading) return <LoadingSpinner size="lg" center />;
   if (!event) {
     return (
-      <div className="container section">
-        <p>{t('events.notFound')} <Link to="/events">{t('events.backToEvents')}</Link></p>
-      </div>
+      <Container className="py-24">
+        <EmptyState
+          title={t('events.notFound')}
+          action={
+            <Button asChild>
+              <Link to={ROUTES.events}>{t('events.backToEvents')}</Link>
+            </Button>
+          }
+        />
+      </Container>
     );
   }
 
-  const eventDate = event.date?.toDate ? event.date.toDate() : new Date(event.date);
-
-  const title = am && event.titleAm ? event.titleAm : event.title;
-  const description = am && event.descriptionAm ? event.descriptionAm : event.description;
-  const details = am && event.detailsAm ? event.detailsAm : event.details;
-  const location = am && event.locationAm ? event.locationAm : event.location;
+  const date = toDate(event.date);
+  const title = pickLocalized(event, 'title');
+  const description = pickLocalized(event, 'description');
+  const details = pickLocalized(event, 'details');
+  const location = pickLocalized(event, 'location');
 
   return (
-    <div className="page-event-detail">
-      {event.imageUrl && <div className="event-detail-hero"><img src={event.imageUrl} alt={title} /></div>}
-      <section className="section">
-        <div className="container container-narrow">
-          <BackLink to="/events">{t('events.backToEvents')}</BackLink>
-          <h1 className="event-detail-title">{title}</h1>
-          <div className="event-detail-meta">
-            <span className="meta-inline">
-              <CalendarDaysIcon aria-hidden />
-              {format(eventDate, 'EEEE, MMMM d, yyyy')}
-            </span>
-            <span className="meta-inline">
-              <ClockIcon aria-hidden />
-              {format(eventDate, 'h:mm a')}
-            </span>
-            <span className="meta-inline">
-              <MapPinIcon aria-hidden />
+    <article className="pb-24">
+      {event.imageUrl && (
+        <div className="relative h-[40vh] min-h-[18rem] w-full overflow-hidden bg-muted">
+          <img
+            src={event.imageUrl}
+            alt=""
+            className="h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
+        </div>
+      )}
+
+      <Container size="md" className="pt-12">
+        <BackLink to={ROUTES.events} className="mb-8">
+          {t('events.backToEvents')}
+        </BackLink>
+
+        <h1 className="font-hero text-4xl font-semibold text-primary md:text-5xl">{title}</h1>
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          {date && (
+            <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm">
+              <Calendar className="h-4 w-4 text-accent" />
+              {formatDate(date)}
+            </Badge>
+          )}
+          {date && (
+            <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm">
+              <Clock className="h-4 w-4 text-accent" />
+              {formatTime(date)}
+            </Badge>
+          )}
+          {location && (
+            <Badge variant="outline" className="gap-1.5 px-3 py-1.5 text-sm">
+              <MapPin className="h-4 w-4 text-accent" />
               {location}
-            </span>
-          </div>
-          <div className="event-detail-body">
-            {description && <p>{description}</p>}
-            {details && <p>{details}</p>}
-          </div>
-          {event.registrationUrl && (
-            <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary btn-lg">
-              {t('events.registerNow')}
-            </a>
+            </Badge>
           )}
         </div>
-      </section>
-    </div>
+
+        {description && (
+          <p className="mt-8 text-lg leading-relaxed text-foreground/90">{description}</p>
+        )}
+
+        {details && (
+          <div className="mt-6 whitespace-pre-line text-base leading-relaxed text-muted-foreground">
+            {details}
+          </div>
+        )}
+
+        {event.registrationUrl && (
+          <div className="mt-10">
+            <Button asChild size="lg" variant="accent">
+              <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">
+                {t('events.registerNow')} <ExternalLink />
+              </a>
+            </Button>
+          </div>
+        )}
+      </Container>
+    </article>
   );
 }

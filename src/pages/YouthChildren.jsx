@@ -1,311 +1,180 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/react';
-import { ChevronDownIcon, PlayCircleIcon } from '@heroicons/react/24/outline';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
+import { Sparkles } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
+import Section from '@/components/common/Section';
+import VideoEmbed from '@/components/common/VideoEmbed';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import {
-  getYoutubeDefaultThumbnailUrl,
-  getYoutubeVideoId,
-  getYouthPageContent,
-  getYouthVideos,
-  normalizeYouthPageContent,
-} from '../services/youthVideosService';
-import { useLanguage } from '../contexts/LanguageContext';
-
-function getYoutubeEmbedUrl(url = '') {
-  const id = getYoutubeVideoId(url);
-  return id ? `https://www.youtube.com/embed/${id}` : '';
-}
-
-function YouthVideoCard({ video, language }) {
-  const [playing, setPlaying] = useState(false);
-  const embedUrl = getYoutubeEmbedUrl(video.url);
-  const videoId = getYoutubeVideoId(video.url);
-  const thumb =
-    (video.thumbnailUrl && String(video.thumbnailUrl).trim())
-    || getYoutubeDefaultThumbnailUrl(videoId);
-
-  const title =
-    language === 'am' && video.titleAm
-      ? video.titleAm
-      : (video.title || (language === 'am' ? 'የአገልግሎት ቪዲዮ' : 'Ministry Video'));
-  const description =
-    language === 'am' && video.descriptionAm
-      ? video.descriptionAm
-      : video.description;
-
-  if (!embedUrl) return null;
-
-  return (
-    <article className="video-card youth-video-card">
-      <div className="video-embed-wrapper youth-video-frame">
-        {playing ? (
-          <iframe
-            src={`${embedUrl}?autoplay=1`}
-            title={title}
-            className="sermon-video"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        ) : (
-          <button
-            type="button"
-            className="youth-video-poster"
-            onClick={() => setPlaying(true)}
-            aria-label={language === 'am' ? 'ቪዲዮ ያጫውቱ' : 'Play video'}
-          >
-            {thumb ? (
-              <img src={thumb} alt="" className="youth-video-poster-img" />
-            ) : (
-              <span className="youth-video-poster-fallback" aria-hidden />
-            )}
-            <span className="youth-video-play-ring">
-              <PlayCircleIcon className="youth-video-play-icon" aria-hidden />
-            </span>
-          </button>
-        )}
-      </div>
-      <h3>{title}</h3>
-      {description ? <p>{description}</p> : null}
-      <p className="video-meta">{[video.speaker, video.category, video.duration].filter(Boolean).join(' • ')}</p>
-    </article>
-  );
-}
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { getYouthVideos } from '@/services/youthVideosService';
+import { ROUTES } from '@/constants/routes';
 
 export default function YouthChildren() {
   const { language } = useLanguage();
-  const am = language === 'am';
+  const { youthContent } = useSiteSettings();
   const [videos, setVideos] = useState([]);
-  const [pageContent, setPageContent] = useState(() => normalizeYouthPageContent(null));
   const [loading, setLoading] = useState(true);
-  const statsSectionRef = useRef(null);
-  const [statsSectionVisible, setStatsSectionVisible] = useState(false);
-  useEffect(() => {
-    const el = statsSectionRef.current;
-    if (!el) return undefined;
-    const obs = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setStatsSectionVisible(true);
-      },
-      { rootMargin: '0px 0px -10% 0px', threshold: 0.1 },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
 
   useEffect(() => {
-    Promise.all([getYouthVideos(), getYouthPageContent()])
-      .then(([videoItems, rawContent]) => {
-        setVideos(videoItems);
-        setPageContent(normalizeYouthPageContent(rawContent));
-      })
-      .finally(() => setLoading(false));
+    let active = true;
+    setLoading(true);
+    getYouthVideos()
+      .then((data) => active && setVideos(data))
+      .catch(() => active && setVideos([]))
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const pc = pageContent;
-
-  const contentCards = useMemo(() => [
-    {
-      title: am ? (pc.cardOneTitleAm || 'የህፃናት እሁድ ትምህርት') : (pc.cardOneTitleEn || 'Children Sunday School'),
-      description: am
-        ? (pc.cardOneDescriptionAm || 'በእድሜ ተመጣጣኝ መንገድ የመጽሐፍ ቅዱስ ትምህርት፣ ዝማሬ እና ተግባራዊ እንቅስቃሴዎች።')
-        : (pc.cardOneDescriptionEn || 'Age-based Bible lessons, worship songs, and interactive activities.'),
-    },
-    {
-      title: am ? (pc.cardTwoTitleAm || 'የወጣቶች ኅብረት') : (pc.cardTwoTitleEn || 'Youth Fellowship'),
-      description: am
-        ? (pc.cardTwoDescriptionAm || 'ሳምንታዊ የወጣቶች ስብሰባ ለጸሎት፣ ውይይት እና የክርስቲያን ሕይወት ልምድ መጋራት።')
-        : (pc.cardTwoDescriptionEn || 'Weekly gathering for prayer, discussion, and practical Christian living.'),
-    },
-    {
-      title: am ? (pc.cardThreeTitleAm || 'የቤተሰብ ስልጠና') : (pc.cardThreeTitleEn || 'Family Discipleship'),
-      description: am
-        ? (pc.cardThreeDescriptionAm || 'ወላጆችን በቤት ውስጥ ልጆቻቸውን በእምነት ለማሳደግ የሚረዱ ሀብቶችና መመሪያዎች።')
-        : (pc.cardThreeDescriptionEn || 'Resources and guidance for parents to disciple children at home.'),
-    },
-  ], [am, pc]);
-
-  const stats = useMemo(
-    () => [
-      { value: pc.stat1Value, label: am ? pc.stat1LabelAm : pc.stat1LabelEn },
-      { value: pc.stat2Value, label: am ? pc.stat2LabelAm : pc.stat2LabelEn },
-      { value: pc.stat3Value, label: am ? pc.stat3LabelAm : pc.stat3LabelEn },
-    ],
-    [am, pc],
-  );
-
-  const hasStats = stats.some((s) => (s.value && s.value.trim()) || (s.label && s.label.trim()));
-
-  const faqs = Array.isArray(pc.faqs) ? pc.faqs : [];
-  const faqsVisible = faqs.filter((item) => {
-    const q = am ? (item.questionAm || item.questionEn) : (item.questionEn || item.questionAm);
-    const a = am ? (item.answerAm || item.answerEn) : (item.answerEn || item.answerAm);
-    return (q && q.trim()) || (a && a.trim());
-  });
-
-  const showIntro =
-    (pc.introTitleEn || pc.introTitleAm || pc.introBodyEn || pc.introBodyAm)
-    && (am
-      ? (pc.introTitleAm || pc.introBodyAm || pc.introTitleEn || pc.introBodyEn)
-      : (pc.introTitleEn || pc.introBodyEn || pc.introTitleAm || pc.introBodyAm));
-
-  const ctaHref = (pc.ctaHref || '').trim();
-  const ctaIsInternal = ctaHref.startsWith('/') && !ctaHref.startsWith('//');
-  const ctaTitle = am ? (pc.ctaTitleAm || pc.ctaTitleEn) : (pc.ctaTitleEn || pc.ctaTitleAm);
-  const ctaButton = am ? (pc.ctaButtonAm || pc.ctaButtonEn) : (pc.ctaButtonEn || pc.ctaButtonAm);
-  const showCta = (ctaTitle && ctaTitle.trim()) || (ctaButton && ctaButton.trim());
+  const pick = (key) => (language === 'am' ? youthContent[`${key}Am`] : youthContent[`${key}En`]);
 
   return (
-    <div className="page-youth-children">
-      <section className="page-hero">
-        <h1>
-          {am
-            ? (pc.heroTitleAm || 'የወጣቶች እና የህፃናት አገልግሎት')
-            : (pc.heroTitleEn || 'Youth & Children Ministry')}
-        </h1>
-        <p>
-          {am
-            ? (pc.heroSubtitleAm || 'ለህፃናት እና ለወጣቶች እምነትን የሚያበረታታ፣ ማህበረሰብን የሚገነባ እና መሪነትን የሚያዳብር ፕሮግራሞች።')
-            : (pc.heroSubtitleEn || 'Programs that build faith, community, and leadership for children and youth.')}
+    <>
+      <PageHero
+        eyebrow={language === 'am' ? 'አገልግሎት' : 'Ministry'}
+        title={pick('heroTitle')}
+        subtitle={pick('heroSubtitle')}
+      />
+
+      {/* Intro */}
+      <Section containerSize="md">
+        <h2 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+          {pick('introTitle')}
+        </h2>
+        <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
+          {pick('introBody')}
         </p>
-      </section>
+      </Section>
 
-      {showIntro ? (
-        <section className="section youth-intro-section">
-          <div className="container youth-intro-inner">
-            <h2 className="youth-intro-title">
-              {am
-                ? (pc.introTitleAm || pc.introTitleEn || '')
-                : (pc.introTitleEn || pc.introTitleAm || '')}
-            </h2>
-            <div className="youth-intro-body">
-              {(am ? (pc.introBodyAm || pc.introBodyEn) : (pc.introBodyEn || pc.introBodyAm))
-                .split('\n')
-                .filter(Boolean)
-                .map((para, i) => <p key={i}>{para}</p>)}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {hasStats ? (
-        <section
-          className={`section section-alt youth-stats-section${statsSectionVisible ? ' is-revealed' : ''}`}
-          ref={statsSectionRef}
-        >
-          <div className="container">
-            <h2 className="section-title">
-              {am
-                ? (pc.statsSectionTitleAm || 'በአጭሩ')
-                : (pc.statsSectionTitleEn || 'At a glance')}
-            </h2>
-            <ul className="youth-stats-grid">
-              {stats.map((s, i) => (
-                <li key={i} className="youth-stat-card" style={{ '--stagger': i }}>
-                  {s.value ? <span className="youth-stat-value">{s.value}</span> : null}
-                  {s.label ? <span className="youth-stat-label">{s.label}</span> : null}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-
-      <section className="section section-alt">
-        <div className="container">
-          <h2 className="section-title">
-            {am
-              ? (pc.ministrySectionTitleAm || 'የአገልግሎት ክፍሎች')
-              : (pc.ministrySectionTitleEn || 'Ministry Areas')}
-          </h2>
-          <div className="youth-content-grid">
-            {contentCards.map((card) => (
-              <article className="youth-card youth-card-interactive" key={card.title}>
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
-              </article>
+      {/* Stats */}
+      {youthContent.stats?.length > 0 && (
+        <Section tone="muted" className="py-16">
+          <div className="grid gap-6 md:grid-cols-3">
+            {youthContent.stats.map((stat, idx) => (
+              <Card key={idx} className="text-center">
+                <CardContent className="p-8">
+                  <p className="font-hero text-5xl font-semibold text-primary">
+                    {stat.valueEn}
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-muted-foreground">
+                    {language === 'am' ? stat.labelAm : stat.labelEn}
+                  </p>
+                </CardContent>
+              </Card>
             ))}
           </div>
-        </div>
-      </section>
+        </Section>
+      )}
 
-      {faqsVisible.length > 0 ? (
-        <section className="section youth-faq-section">
-          <div className="container container-narrow">
-            <h2 className="section-title">
-              {am
-                ? (pc.faqSectionTitleAm || 'ተደጋጋሚ ጥያቄዎች')
-                : (pc.faqSectionTitleEn || 'Questions parents & youth ask')}
-            </h2>
-            <div className="youth-faq-list">
-              {faqsVisible.map((item, index) => {
-                const q = am ? (item.questionAm || item.questionEn) : (item.questionEn || item.questionAm);
-                const a = am ? (item.answerAm || item.answerEn) : (item.answerEn || item.answerAm);
-                return (
-                  <Disclosure key={`${index}-${q.slice(0, 24)}`} as="div" className="youth-faq-item">
-                    {({ open }) => (
-                      <>
-                        <DisclosureButton className="youth-faq-trigger">
-                          <span>{q}</span>
-                          <ChevronDownIcon className={`youth-faq-chevron${open ? ' is-open' : ''}`} aria-hidden />
-                        </DisclosureButton>
-                        <DisclosurePanel className="youth-faq-panel">
-                          <p>{a}</p>
-                        </DisclosurePanel>
-                      </>
-                    )}
-                  </Disclosure>
-                );
-              })}
-            </div>
+      {/* Ministries */}
+      {youthContent.ministries?.length > 0 && (
+        <Section
+          eyebrow={language === 'am' ? 'ቡድኖች' : 'How we gather'}
+          title={language === 'am' ? 'የእድሜ ቡድኖች' : 'Programs by age'}
+        >
+          <div className="grid gap-6 md:grid-cols-3">
+            {youthContent.ministries.map((m, idx) => (
+              <Card key={idx} className="h-full transition-all hover:border-primary/40 hover:shadow-float">
+                <CardContent className="p-7">
+                  <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-md bg-accent/15 text-accent">
+                    <Sparkles className="h-5 w-5" />
+                  </span>
+                  <h3 className="font-display text-xl font-semibold text-primary">
+                    {language === 'am' ? m.titleAm : m.titleEn}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {language === 'am' ? m.bodyAm : m.bodyEn}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </section>
-      ) : null}
+        </Section>
+      )}
 
-      <section className="section">
-        <div className="container">
-          <h2 className="section-title">
-            {am
-              ? (pc.videosSectionTitleAm || 'የYouTube ቪዲዮዎች')
-              : (pc.videosSectionTitleEn || 'YouTube Videos')}
-          </h2>
-
-          {loading ? (
-            <LoadingSpinner center />
-          ) : videos.length === 0 ? (
-            <p className="empty-state text-center">
-              {am
-                ? (pc.emptyVideosMessageAm || 'እስካሁን ምንም ቪዲዮ አልተጨመረም።')
-                : (pc.emptyVideosMessageEn || 'No videos added yet.')}
-            </p>
-          ) : (
-            <div className="youth-videos-grid">
-              {videos.map((video) => (
-                <YouthVideoCard key={video.id} video={video} language={language} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {showCta ? (
-        <section className="section youth-cta-section">
-          <div className="container youth-cta-inner">
-            {ctaTitle ? <h2 className="youth-cta-title">{ctaTitle}</h2> : null}
-            {ctaButton && ctaHref ? (
-              ctaIsInternal ? (
-                <Link to={ctaHref} className="btn btn-primary youth-cta-btn">
-                  {ctaButton}
-                </Link>
-              ) : (
-                <a href={ctaHref || '#'} className="btn btn-primary youth-cta-btn">
-                  {ctaButton}
-                </a>
-              )
-            ) : null}
+      {/* Videos */}
+      <Section
+        tone="muted"
+        eyebrow={language === 'am' ? 'ቪዲዮዎች' : 'Highlights'}
+        title={language === 'am' ? 'ከእኛ ቤተሰብ' : 'From our family'}
+      >
+        {loading ? (
+          <LoadingSpinner size="lg" center />
+        ) : videos.length === 0 ? (
+          <EmptyState
+            title={language === 'am' ? 'ቪዲዮ ገና አልተጨመረም።' : 'No videos yet.'}
+            description={language === 'am' ? 'በቅርቡ ይመለስ።' : 'Check back soon.'}
+          />
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2">
+            {videos.map((video) => (
+              <Card key={video.id} className="overflow-hidden p-0">
+                <VideoEmbed src={video.url} title={video.title} />
+                <CardContent className="space-y-2 p-5">
+                  <h3 className="font-display text-lg font-semibold text-primary">
+                    {language === 'am' && video.titleAm ? video.titleAm : video.title}
+                  </h3>
+                  {(video.description || video.descriptionAm) && (
+                    <p className="text-sm text-muted-foreground">
+                      {language === 'am' && video.descriptionAm
+                        ? video.descriptionAm
+                        : video.description}
+                    </p>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
           </div>
-        </section>
-      ) : null}
-    </div>
+        )}
+      </Section>
+
+      {/* FAQs */}
+      {youthContent.faqs?.length > 0 && (
+        <Section
+          eyebrow="FAQ"
+          title={language === 'am' ? 'ተደጋጋሚ ጥያቄዎች' : 'Frequently asked'}
+          containerSize="md"
+        >
+          <Accordion type="single" collapsible className="w-full">
+            {youthContent.faqs.map((faq, idx) => (
+              <AccordionItem key={idx} value={`faq-${idx}`}>
+                <AccordionTrigger>
+                  {language === 'am' ? faq.questionAm : faq.questionEn}
+                </AccordionTrigger>
+                <AccordionContent>
+                  {language === 'am' ? faq.answerAm : faq.answerEn}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Section>
+      )}
+
+      {/* CTA band */}
+      <Section tone="primary" className="py-20 text-center">
+        <h2 className="font-hero text-3xl font-semibold md:text-4xl">{pick('ctaTitle')}</h2>
+        <p className="mx-auto mt-3 max-w-xl text-primary-foreground/80">
+          {language === 'am'
+            ? 'በእሁድ 4:00 ሰዓት እንጠብቅዎታለን።'
+            : 'We worship every Sunday at 4:00 PM — bring the whole family.'}
+        </p>
+        <div className="mt-8 flex justify-center">
+          <Button asChild size="lg" variant="accent">
+            <Link to={ROUTES.contact}>{pick('ctaButton')}</Link>
+          </Button>
+        </div>
+      </Section>
+    </>
   );
 }

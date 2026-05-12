@@ -7,6 +7,9 @@
     "submit": "አስገባ",
     "back": "ተመለስ",
     "required": "ያስፈልጋል",
+    "cancel": "ይቅር",
+    "save": "አስቀምጥ",
+    "delete": "አጥፋ",
     "churchName": "ኢትዮዽያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ ኦሃዮ",
     "english": "English",
     "amharic": "አማርኛ",
@@ -35,11 +38,11 @@
   "home": {
     "prewelcome": "እንኳን ደህና መጡ",
     "title": "ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን ኮለንበስ",
-    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 1:30 ፒ.ኤም ይቀላቀሉን።",
+    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 2:00 ፒ.ኤም ይቀላቀሉን።",
     "aboutBtn": "ስለ እኛ ይወቁ",
     "sermonsBtn": "ስብከቶችን ይመልከቱ",
-    "showVideoBtn": "ቪዲዮውን ይመልከቱ",
-    "hideVideoBtn": "የመነሻ ይዘቱን አሳይ",
+    "showVideoBtn": "ቪዲዮ ይመልከቱ",
+    "hideVideoBtn": "ቪዲዮ ደብቅ",
     "heroVideoTitle": "የእንኳን ደህና መጡ የጀርባ ቪዲዮ",
     "heroLetUsCallYou": "እንደውልልዎ",
     "heroCallbackDialogTitle": "ደስ ይለናል ልንደውልልዎ",
@@ -64,10 +67,10 @@
     "missionBody": "በአምልኮ፣ በጸሎት፣ በቃሉ ትምህርት እና በደቀመዝሙርነት እግዚአብሔርን ለማክበር እንኖራለን።",
     "readStory": "ታሪካችንን ያንብቡ",
     "upcomingEvents": "የሚመጡ ዝግጅቶች",
-    "viewAllEvents": "ሁሉንም ዝግጅቶች ይመልከቱ →",
+    "viewAllEvents": "ሁሉንም ዝግጅቶች ይመልከቱ",
     "noEvents": "ምንም የሚመጡ ዝግጅቶች የሉም።",
     "recentSermons": "የቅርብ ጊዜ ስብከቶች",
-    "viewAllSermons": "ሁሉንም ስብከቶች ይመልከቱ →",
+    "viewAllSermons": "ሁሉንም ስብከቶች ይመልከቱ",
     "noSermons": "ስብከቶች በቅርቡ ይመጣሉ!",
     "ctaTitle": "ቀጣይ እርምጃ ለመውሰድ ዝግጁ ነዎት?",
     "ctaText": "ከእርስዎ ጋር ለመገናኘት እና ጥያቄዎችዎን ለመመለስ እንፈልጋለን።",
@@ -139,7 +142,7 @@
     "textToGive": "ጽሑፍ ይላኩ",
     "textInstruction": "ከሞባይልዎ ለመስጠት።",
     "plannedGiving": "የወደፊት ስጦታ ዕቅድ",
-    "plannedGivingDefault": "በሀብት ዕቅድዎ ውስጥ ቤቱን ሊታወቅ የሚያስችል ስጦታ ያስቡ። ረዥም ጊዜ ስጦታዎ ለትውልዶች ተጽዕኖ እንዴት እንደሚኖር ተጨማሪ ለማወቅ ቢሮአችንን ያነጋግሩ።",
+    "plannedGivingDefault": "በሀብት ዕቅድዎ ውስጥ ቤቱን ሊታወቅ የሚያስችል ስጦታ ያስቡ።",
     "whereGivingGoes": "ስጦታዎ የሚሄድበት"
   },
   "events": {
@@ -162,10 +165,142 @@
     "watchListen": "ይመልከቱ / ያዳምጡ",
     "notes": "ማስታወሻዎች",
     "categoryAll": "ሁሉም",
+    "categorySunday": "የእሁድ",
+    "categoryStudy": "የመጽሐፍ ቅዱስ ጥናት",
+    "categoryYouth": "የወጣቶች",
+    "categorySpecial": "ልዩ",
     "notFound": "ስብከቱ አልተገኘም።"
   },
   "notFound": {
     "message": "ገፁ አልተገኘም።",
     "goHome": "ወደ መነሻ ይሂዱ"
+  },
+  "admin": {
+    "title": "አስተዳዳሪ",
+    "welcome": "እንኳን ደህና መጡ",
+    "save": "ለውጦችን አስቀምጥ",
+    "cancel": "ይቅር",
+    "edit": "አርትዕ",
+    "delete": "አጥፋ",
+    "add": "ጨምር",
+    "confirmDelete": "እርግጠኛ ነዎት?",
+    "confirmDeleteBody": "ይህን እርምጃ መቀልበስ አይቻልም።",
+    "flash": {
+      "saved": "ተቀምጧል።",
+      "deleted": "ተሰርዟል።",
+      "error": "ስህተት ተከስቷል።"
+    },
+    "nav": {
+      "section": "አስተዳዳሪ",
+      "dashboard": "ዳሽቦርድ",
+      "churchInfo": "የቤተ ክርስቲያን መረጃ",
+      "events": "ዝግጅቶች",
+      "sermons": "ስብከቶች",
+      "giving": "ስጦታ",
+      "youth": "ወጣቶች እና ህፃናት",
+      "messages": "መልዕክቶች"
+    },
+    "tiles": {
+      "churchInfo": "አድራሻ፣ የአምልኮ ሰዓቶች፣ እምነቶች፣ እሴቶች እና የፓስተር ዝርዝሮችን ያስተካክሉ።",
+      "events": "ዝግጅቶችን ይፍጠሩ፣ ያስተካክሉ እና ያስወግዱ።",
+      "sermons": "የስብከት ቤተ መጻሕፍትን ያስተዳድሩ።",
+      "giving": "ኦንላይን ስጦታ፣ ፈንዶች እና የቅዱስ መጽሐፍ ጥቅስ ያዋቅሩ።",
+      "youth": "የወጣቶች እና ህፃናት ገጽ ይዘት፣ ፕሮግራሞች እና ቪዲዮዎች።",
+      "messages": "የእውቂያ መልዕክቶችን እና የጸሎት ጥያቄዎችን ይመልከቱ።"
+    },
+    "dashboard": {
+      "title": "ዳሽቦርድ",
+      "subtitle": "ጎብኝዎች በ EEUCC ጣቢያ የሚያዩትን ሁሉ ያስተዳድሩ።",
+      "open": "ክፈት"
+    },
+    "churchInfo": {
+      "title": "የቤተ ክርስቲያን መረጃ",
+      "description": "እነዚህ ዝርዝሮች በሁሉም ገጾች ይታያሉ።",
+      "identity": "መለያ",
+      "contact": "ግንኙነት",
+      "pastor": "ፓስተር",
+      "mission": "ተልዕኮ እና ታሪክ",
+      "serviceTimes": "የአምልኮ ሰዓቶች",
+      "values": "የተልዕኮ እሴቶች",
+      "beliefs": "ዋና እምነቶች"
+    },
+    "events": {
+      "title": "ዝግጅቶች",
+      "subtitle": "የሚመጡ ዝግጅቶችን ይጨምሩ እና ያስተዳድሩ።",
+      "new": "አዲስ ዝግጅት",
+      "edit": "ዝግጅት ያስተካክሉ",
+      "empty": "ገና ዝግጅት የለም።",
+      "field": {
+        "title": "ርዕስ",
+        "description": "አጭር ማጠቃለያ",
+        "details": "ሙሉ ገለፃ",
+        "location": "ቦታ",
+        "date": "ቀን እና ሰዓት",
+        "imageUrl": "የምስል URL",
+        "registrationUrl": "የመመዝገቢያ URL"
+      }
+    },
+    "sermons": {
+      "title": "ስብከቶች",
+      "subtitle": "የስብከት ቤተ መጻሕፍትን ያስተዳድሩ።",
+      "new": "አዲስ ስብከት",
+      "edit": "ስብከት ያስተካክሉ",
+      "empty": "ገና ስብከት የለም።",
+      "field": {
+        "title": "ርዕስ",
+        "description": "መግለጫ",
+        "speaker": "ተናጋሪ",
+        "scripture": "የመጽሐፍ ቅዱስ ጥቅስ",
+        "category": "ምድብ",
+        "date": "ቀን",
+        "videoUrl": "የዩቲዩብ URL",
+        "audioUrl": "የድምፅ URL",
+        "thumbnailUrl": "የመቅድም ምስል URL",
+        "notesUrl": "የማስታወሻዎች URL"
+      }
+    },
+    "giving": {
+      "title": "ስጦታ",
+      "subtitle": "አባላት እንዴት እንደሚሰጡ እና በስጦታ ገጽ የሚያዩትን ያስተዳድሩ።",
+      "channels": "የስጦታ መንገዶች",
+      "scripture": "የመጽሐፍ ቅዱስ ጥቅስ",
+      "planned": "የወደፊት ስጦታ",
+      "funds": "ፈንዶች",
+      "field": {
+        "onlineUrl": "የኦንላይን ስጦታ URL",
+        "checksPayableTo": "ቼክ ለ",
+        "textNumber": "የጽሑፍ ቁጥር",
+        "textKeyword": "የጽሑፍ ቃል",
+        "mailAddress": "የፖስታ አድራሻ",
+        "scripture": "የቅዱስ መጽሐፍ ጽሑፍ",
+        "cite": "የቅዱስ መጽሐፍ ጥቅስ",
+        "planned": "የወደፊት ስጦታ ጽሑፍ"
+      }
+    },
+    "youth": {
+      "title": "ወጣቶች እና ህፃናት",
+      "subtitle": "የወጣቶች እና ህፃናት ገጽ ያስተካክሉ።",
+      "tabs": { "content": "የገጽ ይዘት", "videos": "ቪዲዮዎች" },
+      "hero": "ሄሮ",
+      "intro": "መግቢያ",
+      "stats": "ስታቲስቲክስ",
+      "ministries": "አገልግሎቶች",
+      "faqs": "ተደጋጋሚ ጥያቄዎች",
+      "cta": "የድርጊት ጥሪ",
+      "newVideo": "አዲስ ቪዲዮ",
+      "editVideo": "ቪዲዮ ያስተካክሉ",
+      "noVideos": "ገና ቪዲዮ የለም።"
+    },
+    "messages": {
+      "title": "የመልዕክት ሳጥን",
+      "subtitle": "ከጎብኝዎች የተላኩ የእውቂያ መልዕክቶችና የጸሎት ጥያቄዎች።",
+      "contactTab": "እውቂያ",
+      "prayerTab": "ጸሎት",
+      "markRead": "የተነበበ ምልክት",
+      "resolve": "ተፈጽሟል",
+      "private": "በምስጢር",
+      "emptyContact": "ገና የእውቂያ መልዕክት የለም።",
+      "emptyPrayer": "ገና የጸሎት ጥያቄ የለም።"
+    }
   }
 }

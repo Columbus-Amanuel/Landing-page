@@ -1,542 +1,364 @@
 import { useEffect, useState } from 'react';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { Save, Plus, Trash2, Video, Pencil } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import {
-  createYouthVideo,
-  defaultYouthPageFormState,
-  deleteYouthVideo,
-  getYouthPageContent,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import BilingualField from '@/components/common/BilingualField';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { updateYouthContent } from '@/services/siteSettingsService';
+import {
   getYouthVideos,
-  normalizeYouthPageContent,
-  updateYouthPageContent,
+  createYouthVideo,
   updateYouthVideo,
-} from '../../services/youthVideosService';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import AdminFlashMessage from '../../components/ui/AdminFlashMessage';
-import { useLanguage } from '../../contexts/LanguageContext';
+  deleteYouthVideo,
+} from '@/services/youthVideosService';
 
-const PAGE_SECTIONS = [
-  {
-    title: 'Hero',
-    fields: [
-      { key: 'heroTitleEn', label: 'Hero title (EN)' },
-      { key: 'heroTitleAm', label: 'Hero title (Amharic)' },
-      { key: 'heroSubtitleEn', label: 'Hero subtitle (EN)', multiline: true },
-      { key: 'heroSubtitleAm', label: 'Hero subtitle (Amharic)', multiline: true },
-    ],
-  },
-  {
-    title: 'Intro spotlight (optional)',
-    fields: [
-      { key: 'introTitleEn', label: 'Intro title (EN)' },
-      { key: 'introTitleAm', label: 'Intro title (Amharic)' },
-      { key: 'introBodyEn', label: 'Intro body (EN)', multiline: true },
-      { key: 'introBodyAm', label: 'Intro body (Amharic)', multiline: true },
-    ],
-  },
-  {
-    title: 'Stats row (“At a glance”)',
-    fields: [
-      { key: 'statsSectionTitleEn', label: 'Section title (EN)' },
-      { key: 'statsSectionTitleAm', label: 'Section title (Amharic)' },
-      { key: 'stat1Value', label: 'Stat 1 value (e.g. 4:00 PM)' },
-      { key: 'stat1LabelEn', label: 'Stat 1 label (EN)' },
-      { key: 'stat1LabelAm', label: 'Stat 1 label (Amharic)' },
-      { key: 'stat2Value', label: 'Stat 2 value' },
-      { key: 'stat2LabelEn', label: 'Stat 2 label (EN)' },
-      { key: 'stat2LabelAm', label: 'Stat 2 label (Amharic)' },
-      { key: 'stat3Value', label: 'Stat 3 value' },
-      { key: 'stat3LabelEn', label: 'Stat 3 label (EN)' },
-      { key: 'stat3LabelAm', label: 'Stat 3 label (Amharic)' },
-    ],
-  },
-  {
-    title: 'Ministry cards section',
-    fields: [
-      { key: 'ministrySectionTitleEn', label: 'Section title (EN)' },
-      { key: 'ministrySectionTitleAm', label: 'Section title (Amharic)' },
-      { key: 'cardOneTitleEn', label: 'Card 1 title (EN)' },
-      { key: 'cardOneTitleAm', label: 'Card 1 title (Amharic)' },
-      { key: 'cardOneDescriptionEn', label: 'Card 1 description (EN)', multiline: true },
-      { key: 'cardOneDescriptionAm', label: 'Card 1 description (Amharic)', multiline: true },
-      { key: 'cardTwoTitleEn', label: 'Card 2 title (EN)' },
-      { key: 'cardTwoTitleAm', label: 'Card 2 title (Amharic)' },
-      { key: 'cardTwoDescriptionEn', label: 'Card 2 description (EN)', multiline: true },
-      { key: 'cardTwoDescriptionAm', label: 'Card 2 description (Amharic)', multiline: true },
-      { key: 'cardThreeTitleEn', label: 'Card 3 title (EN)' },
-      { key: 'cardThreeTitleAm', label: 'Card 3 title (Amharic)' },
-      { key: 'cardThreeDescriptionEn', label: 'Card 3 description (EN)', multiline: true },
-      { key: 'cardThreeDescriptionAm', label: 'Card 3 description (Amharic)', multiline: true },
-    ],
-  },
-  {
-    title: 'FAQ section',
-    fields: [
-      { key: 'faqSectionTitleEn', label: 'Section title (EN)' },
-      { key: 'faqSectionTitleAm', label: 'Section title (Amharic)' },
-    ],
-  },
-  {
-    title: 'Videos section',
-    fields: [
-      { key: 'videosSectionTitleEn', label: 'Section title (EN)' },
-      { key: 'videosSectionTitleAm', label: 'Section title (Amharic)' },
-      { key: 'emptyVideosMessageEn', label: 'Empty state message (EN)' },
-      { key: 'emptyVideosMessageAm', label: 'Empty state message (Amharic)' },
-    ],
-  },
-  {
-    title: 'Bottom call-to-action',
-    fields: [
-      { key: 'ctaTitleEn', label: 'CTA heading (EN)' },
-      { key: 'ctaTitleAm', label: 'CTA heading (Amharic)' },
-      { key: 'ctaButtonEn', label: 'Button label (EN)' },
-      { key: 'ctaButtonAm', label: 'Button label (Amharic)' },
-      { key: 'ctaHref', label: 'Button link (e.g. /contact or https://…)' },
-    ],
-  },
-];
+function ContentTab() {
+  const { t } = useLanguage();
+  const { youthContent, refresh } = useSiteSettings();
+  const form = useForm({ defaultValues: youthContent });
+  const stats = useFieldArray({ control: form.control, name: 'stats' });
+  const ministries = useFieldArray({ control: form.control, name: 'ministries' });
+  const faqs = useFieldArray({ control: form.control, name: 'faqs' });
+  const [saving, setSaving] = useState(false);
+  const [ready, setReady] = useState(false);
 
-const emptyVideoForm = () => ({
+  useEffect(() => {
+    form.reset(youthContent);
+    setReady(true);
+  }, [youthContent, form]);
+
+  if (!ready) return <LoadingSpinner size="lg" center />;
+
+  const onSubmit = async (data) => {
+    setSaving(true);
+    try {
+      await updateYouthContent(data);
+      await refresh();
+      toast.success(t('admin.flash.saved'));
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const enAm = (base) => ({ nameEn: `${base}En`, nameAm: `${base}Am` });
+
+  return (
+    <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.hero')}</h2>
+          <BilingualField label="Hero title" {...enAm('heroTitle')} register={form.register} />
+          <BilingualField label="Hero subtitle" {...enAm('heroSubtitle')} register={form.register} textarea rows={2} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.intro')}</h2>
+          <BilingualField label="Title" {...enAm('introTitle')} register={form.register} />
+          <BilingualField label="Body" {...enAm('introBody')} register={form.register} textarea rows={3} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.stats')}</h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => stats.append({ valueEn: '', labelEn: '', labelAm: '' })}>
+              <Plus /> {t('admin.add')}
+            </Button>
+          </div>
+          {stats.fields.map((field, idx) => (
+            <div key={field.id} className="rounded-md border border-border bg-muted/30 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">#{idx + 1}</p>
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => stats.remove(idx)}>
+                  <Trash2 />
+                </Button>
+              </div>
+              <div className="mt-3 grid gap-4 sm:grid-cols-3">
+                <Field label="Value"><Input {...form.register(`stats.${idx}.valueEn`)} /></Field>
+                <Field label="Label (EN)"><Input {...form.register(`stats.${idx}.labelEn`)} /></Field>
+                <Field label="Label (AM)"><Input {...form.register(`stats.${idx}.labelAm`)} /></Field>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.ministries')}</h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => ministries.append({ titleEn: '', titleAm: '', bodyEn: '', bodyAm: '' })}>
+              <Plus /> {t('admin.add')}
+            </Button>
+          </div>
+          {ministries.fields.map((field, idx) => (
+            <div key={field.id} className="rounded-md border border-border bg-muted/30 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">#{idx + 1}</p>
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => ministries.remove(idx)}>
+                  <Trash2 />
+                </Button>
+              </div>
+              <div className="mt-3 space-y-4">
+                <BilingualField label="Title" nameEn={`ministries.${idx}.titleEn`} nameAm={`ministries.${idx}.titleAm`} register={form.register} />
+                <BilingualField label="Body" nameEn={`ministries.${idx}.bodyEn`} nameAm={`ministries.${idx}.bodyAm`} register={form.register} textarea rows={2} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.faqs')}</h2>
+            <Button type="button" variant="outline" size="sm" onClick={() => faqs.append({ questionEn: '', questionAm: '', answerEn: '', answerAm: '' })}>
+              <Plus /> {t('admin.add')}
+            </Button>
+          </div>
+          {faqs.fields.map((field, idx) => (
+            <div key={field.id} className="rounded-md border border-border bg-muted/30 p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">#{idx + 1}</p>
+                <Button type="button" variant="ghost" size="icon-sm" onClick={() => faqs.remove(idx)}>
+                  <Trash2 />
+                </Button>
+              </div>
+              <div className="mt-3 space-y-4">
+                <BilingualField label="Question" nameEn={`faqs.${idx}.questionEn`} nameAm={`faqs.${idx}.questionAm`} register={form.register} />
+                <BilingualField label="Answer" nameEn={`faqs.${idx}.answerEn`} nameAm={`faqs.${idx}.answerAm`} register={form.register} textarea rows={3} />
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-5 p-6">
+          <h2 className="font-display text-lg font-semibold text-primary">{t('admin.youth.cta')}</h2>
+          <BilingualField label="CTA title" {...enAm('ctaTitle')} register={form.register} />
+          <BilingualField label="CTA button" {...enAm('ctaButton')} register={form.register} />
+        </CardContent>
+      </Card>
+
+      <div className="sticky bottom-4 z-10 flex justify-end">
+        <Button type="submit" size="lg" disabled={saving}>
+          <Save /> {saving ? t('common.loading') : t('admin.save')}
+        </Button>
+      </div>
+    </form>
+  );
+}
+
+const EMPTY_VIDEO = {
   title: '',
   titleAm: '',
   description: '',
   descriptionAm: '',
   url: '',
-  speaker: '',
-  category: '',
-  duration: '',
-  thumbnailUrl: '',
   sortOrder: 0,
-});
+};
 
-export default function AdminYouth() {
-  const { language } = useLanguage();
-  const [videos, setVideos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [videoSubmitting, setVideoSubmitting] = useState(false);
-  const [contentSubmitting, setContentSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [contentMessage, setContentMessage] = useState('');
-  const [videoFormData, setVideoFormData] = useState(emptyVideoForm);
-  const [pageFormData, setPageFormData] = useState(defaultYouthPageFormState);
-  const [editingVideoId, setEditingVideoId] = useState(null);
-  const [editVideoForm, setEditVideoForm] = useState(emptyVideoForm);
-  const [videoUpdateSubmitting, setVideoUpdateSubmitting] = useState(false);
+function YouthVideoEditor({ video, trigger, onSaved }) {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: video || EMPTY_VIDEO,
+  });
+  useEffect(() => {
+    if (open) reset(video || EMPTY_VIDEO);
+  }, [open, video, reset]);
 
-  const loadData = async () => {
-    setLoading(true);
+  const onSubmit = async (data) => {
+    setSaving(true);
     try {
-      const [videoList, pageContent] = await Promise.all([getYouthVideos(), getYouthPageContent()]);
-      setVideos(videoList);
-      setPageFormData(normalizeYouthPageContent(pageContent));
+      if (video?.id) {
+        await updateYouthVideo(video.id, data);
+      } else {
+        await createYouthVideo(data);
+      }
+      toast.success(t('admin.flash.saved'));
+      setOpen(false);
+      onSaved?.();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
     } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => { loadData(); }, []);
-
-  const onVideoInputChange = (event) => {
-    const { name, value } = event.target;
-    setVideoFormData((prev) => ({
-      ...prev,
-      [name]: name === 'sortOrder' ? Number(value) : value,
-    }));
-  };
-
-  const onPageInputChange = (event) => {
-    const { name, value } = event.target;
-    setPageFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const addFaq = () => {
-    setPageFormData((prev) => ({
-      ...prev,
-      faqs: [...(prev.faqs || []), { questionEn: '', questionAm: '', answerEn: '', answerAm: '' }],
-    }));
-  };
-
-  const removeFaq = (index) => {
-    setPageFormData((prev) => ({
-      ...prev,
-      faqs: (prev.faqs || []).filter((_, i) => i !== index),
-    }));
-  };
-
-  const onFaqChange = (index, field, value) => {
-    setPageFormData((prev) => {
-      const next = [...(prev.faqs || [])];
-      next[index] = { ...next[index], [field]: value };
-      return { ...prev, faqs: next };
-    });
-  };
-
-  const handleVideoSubmit = async (event) => {
-    event.preventDefault();
-    setError('');
-    if (!videoFormData.url.trim()) {
-      setError(language === 'am' ? 'እባክዎ የYouTube ሊንክ ያስገቡ።' : 'Please enter a YouTube link.');
-      return;
-    }
-    setVideoSubmitting(true);
-    try {
-      await createYouthVideo({
-        title: videoFormData.title.trim(),
-        titleAm: videoFormData.titleAm.trim(),
-        description: videoFormData.description.trim(),
-        descriptionAm: videoFormData.descriptionAm.trim(),
-        url: videoFormData.url.trim(),
-        speaker: videoFormData.speaker.trim(),
-        category: videoFormData.category.trim(),
-        duration: videoFormData.duration.trim(),
-        thumbnailUrl: videoFormData.thumbnailUrl.trim(),
-        sortOrder: Number(videoFormData.sortOrder) || 0,
-      });
-      setVideoFormData(emptyVideoForm());
-      await loadData();
-    } catch {
-      setError(language === 'am' ? 'ቪዲዮ ማከል አልተሳካም።' : 'Unable to add video.');
-    } finally {
-      setVideoSubmitting(false);
-    }
-  };
-
-  const handlePageSubmit = async (event) => {
-    event.preventDefault();
-    setContentMessage('');
-    setContentSubmitting(true);
-    try {
-      await updateYouthPageContent(pageFormData);
-      setContentMessage(language === 'am' ? 'የገጽ ይዘት ተቀምጧል።' : 'Page content saved successfully.');
-    } catch {
-      setContentMessage(language === 'am' ? 'የገጽ ይዘት ማስቀመጥ አልተሳካም።' : 'Unable to save page content.');
-    } finally {
-      setContentSubmitting(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this video?')) return;
-    await deleteYouthVideo(id);
-    if (editingVideoId === id) {
-      setEditingVideoId(null);
-    }
-    await loadData();
-  };
-
-  const startEditVideo = (video) => {
-    setEditingVideoId(video.id);
-    setEditVideoForm({
-      title: video.title || '',
-      titleAm: video.titleAm || '',
-      description: video.description || '',
-      descriptionAm: video.descriptionAm || '',
-      url: video.url || '',
-      speaker: video.speaker || '',
-      category: video.category || '',
-      duration: video.duration || '',
-      thumbnailUrl: video.thumbnailUrl || '',
-      sortOrder: Number(video.sortOrder) || 0,
-    });
-  };
-
-  const cancelEditVideo = () => {
-    setEditingVideoId(null);
-  };
-
-  const onEditVideoChange = (event) => {
-    const { name, value } = event.target;
-    setEditVideoForm((prev) => ({
-      ...prev,
-      [name]: name === 'sortOrder' ? Number(value) : value,
-    }));
-  };
-
-  const handleUpdateVideo = async (event) => {
-    event.preventDefault();
-    if (!editingVideoId) return;
-    setVideoUpdateSubmitting(true);
-    try {
-      await updateYouthVideo(editingVideoId, {
-        title: editVideoForm.title.trim(),
-        titleAm: editVideoForm.titleAm.trim(),
-        description: editVideoForm.description.trim(),
-        descriptionAm: editVideoForm.descriptionAm.trim(),
-        url: editVideoForm.url.trim(),
-        speaker: editVideoForm.speaker.trim(),
-        category: editVideoForm.category.trim(),
-        duration: editVideoForm.duration.trim(),
-        thumbnailUrl: editVideoForm.thumbnailUrl.trim(),
-        sortOrder: Number(editVideoForm.sortOrder) || 0,
-      });
-      setEditingVideoId(null);
-      await loadData();
-    } catch {
-      setError(language === 'am' ? 'ቪዲዮ ማዘመን አልተሳካም።' : 'Unable to update video.');
-    } finally {
-      setVideoUpdateSubmitting(false);
+      setSaving(false);
     }
   };
 
   return (
-    <div>
-      <h1 className="admin-page-title">
-        {language === 'am' ? 'የወጣቶች እና ህፃናት ገጽ' : 'Youth & Children'}
-      </h1>
-
-      <div className="admin-card">
-        <h2>{language === 'am' ? 'የገጽ ይዘት (EN/AM)' : 'Page content (all public copy)'}</h2>
-        <form onSubmit={handlePageSubmit} className="admin-form">
-          {PAGE_SECTIONS.map((section) => (
-            <fieldset key={section.title} className="admin-fieldset">
-              <legend>{section.title}</legend>
-              <div className="admin-form-grid">
-                {section.fields.map(({ key, label, multiline }) => (
-                  <label key={key}>
-                    {label}
-                    {multiline ? (
-                      <textarea
-                        name={key}
-                        value={pageFormData[key] || ''}
-                        onChange={onPageInputChange}
-                        className="form-input"
-                        rows={3}
-                      />
-                    ) : (
-                      <input
-                        name={key}
-                        value={pageFormData[key] || ''}
-                        onChange={onPageInputChange}
-                        className="form-input"
-                      />
-                    )}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-          ))}
-
-          <fieldset className="admin-fieldset">
-            <legend>FAQ items</legend>
-            <p className="text-sm text-muted" style={{ marginBottom: 'var(--space-4)' }}>
-              Add questions and answers for the accordion on the public page. Leave rows empty to hide them.
-            </p>
-            {(pageFormData.faqs || []).map((faq, index) => (
-              <div key={index} className="admin-faq-row">
-                <div className="admin-form-grid">
-                  <label>
-                    Question (EN)
-                    <input
-                      value={faq.questionEn || ''}
-                      onChange={(e) => onFaqChange(index, 'questionEn', e.target.value)}
-                      className="form-input"
-                    />
-                  </label>
-                  <label>
-                    Question (Amharic)
-                    <input
-                      value={faq.questionAm || ''}
-                      onChange={(e) => onFaqChange(index, 'questionAm', e.target.value)}
-                      className="form-input"
-                    />
-                  </label>
-                  <label>
-                    Answer (EN)
-                    <textarea
-                      value={faq.answerEn || ''}
-                      onChange={(e) => onFaqChange(index, 'answerEn', e.target.value)}
-                      className="form-input"
-                      rows={2}
-                    />
-                  </label>
-                  <label>
-                    Answer (Amharic)
-                    <textarea
-                      value={faq.answerAm || ''}
-                      onChange={(e) => onFaqChange(index, 'answerAm', e.target.value)}
-                      className="form-input"
-                      rows={2}
-                    />
-                  </label>
-                </div>
-                <button type="button" className="btn btn-outline btn-sm admin-faq-remove" onClick={() => removeFaq(index)}>
-                  Remove FAQ
-                </button>
-              </div>
-            ))}
-            <button type="button" className="btn btn-outline btn-sm" onClick={addFaq}>
-              Add FAQ
-            </button>
-          </fieldset>
-
-          <AdminFlashMessage message={contentMessage} />
-          <div className="admin-form-actions">
-            <button type="submit" className="btn btn-primary" disabled={contentSubmitting}>
-              {contentSubmitting ? 'Saving…' : (language === 'am' ? 'የገጽ ይዘት አስቀምጥ' : 'Save page content')}
-            </button>
-          </div>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{video?.id ? t('admin.youth.editVideo') : t('admin.youth.newVideo')}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <BilingualField label="Title" nameEn="title" nameAm="titleAm" register={register} />
+          <BilingualField label="Description" nameEn="description" nameAm="descriptionAm" register={register} textarea rows={2} />
+          <Field label="YouTube URL"><Input type="url" placeholder="https://youtu.be/..." {...register('url', { required: true })} /></Field>
+          <Field label="Sort order"><Input type="number" {...register('sortOrder', { valueAsNumber: true })} /></Field>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>{t('admin.cancel')}</Button>
+            <Button type="submit" disabled={saving}>
+              <Save /> {saving ? t('common.loading') : t('admin.save')}
+            </Button>
+          </DialogFooter>
         </form>
-      </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-      <div className="admin-card">
-        <h2>{language === 'am' ? 'አዲስ ቪዲዮ አክል' : 'Add new video'}</h2>
-        <form onSubmit={handleVideoSubmit} className="admin-form">
-          <div className="admin-form-grid">
-            <label>
-              {language === 'am' ? 'ርዕስ (EN)' : 'Title (EN)'}
-              <input name="title" value={videoFormData.title} onChange={onVideoInputChange} className="form-input" />
-            </label>
-            <label>
-              {language === 'am' ? 'ርዕስ (አማ)' : 'Title (Amharic)'}
-              <input name="titleAm" value={videoFormData.titleAm} onChange={onVideoInputChange} className="form-input" />
-            </label>
-          </div>
-          <label>
-            YouTube URL *
-            <input
-              name="url"
-              value={videoFormData.url}
-              onChange={onVideoInputChange}
-              className="form-input"
-              placeholder="https://www.youtube.com/watch?v=..."
-              required
-            />
-          </label>
-          <div className="admin-form-grid">
-            <label>
-              {language === 'am' ? 'ማብራሪያ (EN)' : 'Description (EN)'}
-              <textarea name="description" value={videoFormData.description} onChange={onVideoInputChange} className="form-input" rows={3} />
-            </label>
-            <label>
-              {language === 'am' ? 'ማብራሪያ (አማ)' : 'Description (Amharic)'}
-              <textarea name="descriptionAm" value={videoFormData.descriptionAm} onChange={onVideoInputChange} className="form-input" rows={3} />
-            </label>
-          </div>
-          <div className="admin-field-grid">
-            <label>
-              {language === 'am' ? 'ተናጋሪ' : 'Speaker'}
-              <input name="speaker" value={videoFormData.speaker} onChange={onVideoInputChange} className="form-input" />
-            </label>
-            <label>
-              {language === 'am' ? 'ምድብ' : 'Category'}
-              <input name="category" value={videoFormData.category} onChange={onVideoInputChange} className="form-input" />
-            </label>
-            <label>
-              {language === 'am' ? 'ቆይታ' : 'Duration'}
-              <input name="duration" value={videoFormData.duration} onChange={onVideoInputChange} className="form-input" placeholder="e.g. 12:40" />
-            </label>
-            <label>
-              {language === 'am' ? 'የቅደም ተከተል' : 'Sort order'}
-              <input type="number" name="sortOrder" value={videoFormData.sortOrder} onChange={onVideoInputChange} className="form-input" />
-            </label>
-          </div>
-          <label>
-            Thumbnail URL (optional — defaults to YouTube still)
-            <input name="thumbnailUrl" value={videoFormData.thumbnailUrl} onChange={onVideoInputChange} className="form-input" />
-          </label>
-          {error && <p className="error-text">{error}</p>}
-          <div className="admin-form-actions">
-            <button type="submit" className="btn btn-primary" disabled={videoSubmitting}>
-              {videoSubmitting ? (language === 'am' ? 'በመጫን ላይ…' : 'Saving…') : (language === 'am' ? 'ቪዲዮ አክል' : 'Add video')}
-            </button>
-          </div>
-        </form>
-      </div>
+function VideosTab() {
+  const { t, pickLocalized } = useLanguage();
+  const [videos, setVideos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-      <h2 className="section-title">{language === 'am' ? 'የተጨመሩ ቪዲዮዎች' : 'Videos'}</h2>
+  const refresh = () => {
+    setLoading(true);
+    getYouthVideos().then(setVideos).catch(() => setVideos([])).finally(() => setLoading(false));
+  };
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteYouthVideo(id);
+      toast.success(t('admin.flash.deleted'));
+      refresh();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <YouthVideoEditor trigger={<Button><Plus /> {t('admin.youth.newVideo')}</Button>} onSaved={refresh} />
+      </div>
       {loading ? (
-        <LoadingSpinner center />
+        <LoadingSpinner size="lg" center />
       ) : videos.length === 0 ? (
-        <p className="empty-state text-center">
-          {language === 'am' ? 'ምንም ቪዲዮ አልተጨመረም።' : 'No videos added yet.'}
-        </p>
+        <EmptyState icon={Video} title={t('admin.youth.noVideos')} />
       ) : (
-        <div className="admin-list">
-          {videos.map((video) => (
-            <div key={video.id} className="admin-list-item admin-list-item-stack">
-              {editingVideoId === video.id ? (
-                <form onSubmit={handleUpdateVideo} className="admin-form admin-form-tight">
-                  <div className="admin-form-grid">
-                    <label>
-                      Title (EN)
-                      <input name="title" value={editVideoForm.title} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                    <label>
-                      Title (Amharic)
-                      <input name="titleAm" value={editVideoForm.titleAm} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                  </div>
-                  <label>
-                    YouTube URL *
-                    <input name="url" value={editVideoForm.url} onChange={onEditVideoChange} className="form-input" required />
-                  </label>
-                  <div className="admin-form-grid">
-                    <label>
-                      Description (EN)
-                      <textarea name="description" value={editVideoForm.description} onChange={onEditVideoChange} className="form-input" rows={2} />
-                    </label>
-                    <label>
-                      Description (Amharic)
-                      <textarea name="descriptionAm" value={editVideoForm.descriptionAm} onChange={onEditVideoChange} className="form-input" rows={2} />
-                    </label>
-                  </div>
-                  <div className="admin-field-grid">
-                    <label>
-                      Speaker
-                      <input name="speaker" value={editVideoForm.speaker} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                    <label>
-                      Category
-                      <input name="category" value={editVideoForm.category} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                    <label>
-                      Duration
-                      <input name="duration" value={editVideoForm.duration} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                    <label>
-                      Sort order
-                      <input type="number" name="sortOrder" value={editVideoForm.sortOrder} onChange={onEditVideoChange} className="form-input" />
-                    </label>
-                  </div>
-                  <label>
-                    Thumbnail URL
-                    <input name="thumbnailUrl" value={editVideoForm.thumbnailUrl} onChange={onEditVideoChange} className="form-input" />
-                  </label>
-                  <div className="admin-form-actions">
-                    <button type="submit" className="btn btn-primary btn-sm" disabled={videoUpdateSubmitting}>
-                      {videoUpdateSubmitting ? 'Saving…' : 'Save changes'}
-                    </button>
-                    <button type="button" className="btn btn-outline btn-sm" onClick={cancelEditVideo}>
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <>
-                  <div className="admin-list-item-info">
-                    <h3>{video.title || video.titleAm || 'Untitled video'}</h3>
-                    <p className="text-sm text-muted">{video.url}</p>
-                    <p className="text-sm">
-                      {[video.speaker, video.category, video.duration].filter(Boolean).join(' • ')}
-                    </p>
-                  </div>
-                  <div className="admin-list-item-actions">
-                    <button type="button" className="btn btn-outline btn-sm" onClick={() => startEditVideo(video)}>
-                      {language === 'am' ? 'አርም' : 'Edit'}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline btn-sm"
-                      onClick={() => handleDelete(video.id)}
-                    >
-                      {language === 'am' ? 'ሰርዝ' : 'Delete'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
+        videos.map((v) => (
+          <Card key={v.id}>
+            <CardContent className="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="font-display text-lg font-semibold text-primary">{pickLocalized(v, 'title') || v.url}</p>
+                <p className="text-xs text-muted-foreground">{v.url}</p>
+              </div>
+              <div className="flex gap-2">
+                <YouthVideoEditor
+                  video={v}
+                  onSaved={refresh}
+                  trigger={<Button variant="outline" size="sm"><Pencil /> {t('admin.edit')}</Button>}
+                />
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                      <Trash2 /> {t('admin.delete')}
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>{t('admin.confirmDelete')}</AlertDialogTitle>
+                      <AlertDialogDescription>{t('admin.confirmDeleteBody')}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>{t('admin.cancel')}</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(v.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                        {t('admin.delete')}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </CardContent>
+          </Card>
+        ))
       )}
     </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label>{label}</Label>
+      {children}
+    </div>
+  );
+}
+
+export default function AdminYouth() {
+  const { t } = useLanguage();
+  const [tab, setTab] = useState('content');
+
+  return (
+    <>
+      <header className="mb-8">
+        <h1 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+          {t('admin.youth.title')}
+        </h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t('admin.youth.subtitle')}</p>
+      </header>
+
+      <div className="mb-6 inline-flex rounded-lg border border-border bg-card p-1">
+        {[
+          { id: 'content', label: t('admin.youth.tabs.content') },
+          { id: 'videos', label: t('admin.youth.tabs.videos') },
+        ].map((it) => (
+          <button
+            key={it.id}
+            type="button"
+            onClick={() => setTab(it.id)}
+            className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+              tab === it.id ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {it.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'content' ? <ContentTab /> : <VideosTab />}
+    </>
   );
 }

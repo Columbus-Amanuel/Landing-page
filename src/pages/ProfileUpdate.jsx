@@ -1,190 +1,202 @@
 import { useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../contexts/AuthContext';
-import { submitChurchProfileUpdate } from '../services/missingDataService';
+import { Link } from 'react-router-dom';
+import { CheckCircle2, Send } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
+import Section from '@/components/common/Section';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { submitChurchProfileUpdate } from '@/services/missingDataService';
+import { ROUTES } from '@/constants/routes';
 
+/**
+ * "Help us complete the church profile" — a long form members can fill out
+ * with up-to-date EEUCC contact / pastoral details that an admin then reviews.
+ */
 export default function ProfileUpdate() {
   const { user } = useAuth();
+  const { t, language } = useLanguage();
+  const { churchInfo } = useSiteSettings();
   const [submitting, setSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [successOpen, setSuccessOpen] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
     defaultValues: {
-      officialName: 'Ethiopian Emmanuel United Church of Columbus',
-      amharicName: 'የኢትዮዽያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ ኦሃዮ',
-      address: '1055 McNaughten Rd, Columbus, OH 43213',
-      phone: '(614) 843-5975',
-      email: 'emmanuel.ohio1055@gmail.com',
-      serviceTimes: 'Sunday 4:00 PM - 7:00 PM',
-      foundedYear: '2012 (estimated)',
-      socialLinks: 'Facebook: https://facebook.com/p/Ethiopian-Emmanuel-United-Church-of-Columbus-100067210424028/\nYouTube: https://youtube.com/@ethiopianemmanuelunitedchu9591',
-      ministryPrograms: '',
-      pastorName: '',
-      leadershipTeam: '',
-      attendanceEstimate: '',
-      languagesUsed: 'Amharic, English',
-      legalNameOrEntity: '',
-      ownershipOrLeaseInfo: 'Location may be shared/leased; please confirm official property arrangement.',
-      prayerNeeds: '',
-      announcements: '',
-      additionalNotes: '',
+      churchName: churchInfo.name || '',
+      address: churchInfo.address || '',
+      city: churchInfo.city || '',
+      state: churchInfo.state || '',
+      zip: churchInfo.zip || '',
+      phone: churchInfo.phone || '',
+      email: churchInfo.email || '',
+      pastorName: churchInfo.pastorName || '',
+      pastorRole: churchInfo.pastorRole || '',
+      facebookUrl: churchInfo.facebookUrl || '',
+      youtubeUrl: churchInfo.youtubeUrl || '',
+      notes: '',
     },
   });
 
-  const onSubmit = async (data) => {
-    setSubmitting(true);
+  const onSubmit = async (values) => {
     setError('');
-
+    setSubmitting(true);
     try {
-      await submitChurchProfileUpdate(data, user);
-      setShowSuccess(true);
-      reset(data);
-    } catch {
-      setError('Unable to save the form right now. Please try again.');
+      await submitChurchProfileUpdate(values, user);
+      reset();
+      setSuccessOpen(true);
+    } catch (err) {
+      setError(err?.message || (language === 'am' ? 'ስህተት ተከስቷል።' : 'Could not submit your update.'));
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="page-contact">
-      <Dialog open={showSuccess} onClose={() => setShowSuccess(false)} className="profile-dialog-overlay">
-        <div className="profile-dialog-backdrop" aria-hidden="true" />
-        <div className="profile-dialog-container">
-          <DialogPanel className="profile-dialog-panel">
-            <div className="profile-dialog-icon">&#10003;</div>
-            <DialogTitle className="profile-dialog-title">Submission Successful</DialogTitle>
-            <p className="profile-dialog-body">
-              Thank you. Your update was submitted to Firebase successfully.
-            </p>
-            <button className="btn btn-primary" onClick={() => setShowSuccess(false)}>
-              OK
-            </button>
-          </DialogPanel>
-        </div>
-      </Dialog>
+    <>
+      <PageHero
+        eyebrow={language === 'am' ? 'መለያ' : 'Member'}
+        title={language === 'am' ? 'የቤተክርስቲያን ፕሮፋይል ያስተካክሉ' : 'Help us keep EEUCC up to date'}
+        subtitle={
+          language === 'am'
+            ? 'የቤተክርስቲያን መረጃ ካልታደሰ ይህን መልክት በመላክ እንዲታደስ ይረዳሉ።'
+            : 'Submit corrections to our church profile and an admin will review them.'
+        }
+      />
 
-      <section className="page-hero">
-        <h1>Complete Church Profile</h1>
-        <p>
-          Help us fill missing information for the website and church records. This page is available to
-          logged-in members only.
-        </p>
-      </section>
+      <Section containerSize="md">
+        <Card>
+          <CardContent className="p-8">
+            {error && (
+              <Alert variant="destructive" className="mb-6">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-      <section className="section">
-        <div className="container container-narrow">
-          {error && <div className="alert alert-error">{error}</div>}
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-6">
+              <Fieldset legend={language === 'am' ? 'መሰረታዊ መረጃ' : 'Basic info'}>
+                <FieldRow>
+                  <Field label={language === 'am' ? 'የቤተክርስቲያን ስም' : 'Church name'} error={errors.churchName?.message}>
+                    <Input
+                      aria-invalid={Boolean(errors.churchName)}
+                      {...register('churchName', { required: t('common.required') })}
+                    />
+                  </Field>
+                </FieldRow>
+                <FieldRow>
+                  <Field label={language === 'am' ? 'አድራሻ' : 'Street address'}>
+                    <Input {...register('address')} />
+                  </Field>
+                </FieldRow>
+                <FieldRow cols={3}>
+                  <Field label={language === 'am' ? 'ከተማ' : 'City'}><Input {...register('city')} /></Field>
+                  <Field label={language === 'am' ? 'ግዛት' : 'State'}><Input {...register('state')} /></Field>
+                  <Field label="ZIP"><Input {...register('zip')} /></Field>
+                </FieldRow>
+                <FieldRow cols={2}>
+                  <Field label={language === 'am' ? 'ስልክ' : 'Phone'}><Input type="tel" {...register('phone')} /></Field>
+                  <Field label="Email"><Input type="email" {...register('email')} /></Field>
+                </FieldRow>
+              </Fieldset>
 
-          <form className="form" onSubmit={handleSubmit(onSubmit)}>
-            <div className="form-group">
-              <label>Official Church Name *</label>
-              <input className="form-input" {...register('officialName', { required: 'Required' })} />
-              {errors.officialName && <span className="form-error">{errors.officialName.message}</span>}
-            </div>
+              <Fieldset legend={language === 'am' ? 'የፓስተር መረጃ' : 'Pastoral contact'}>
+                <FieldRow cols={2}>
+                  <Field label={language === 'am' ? 'ስም' : 'Pastor name'}><Input {...register('pastorName')} /></Field>
+                  <Field label={language === 'am' ? 'ሚና' : 'Role / title'}><Input {...register('pastorRole')} /></Field>
+                </FieldRow>
+              </Fieldset>
 
-            <div className="form-group">
-              <label>Amharic Name</label>
-              <input className="form-input" {...register('amharicName')} />
-            </div>
+              <Fieldset legend={language === 'am' ? 'በመስመር ላይ' : 'Online'}>
+                <FieldRow cols={2}>
+                  <Field label="Facebook URL"><Input type="url" {...register('facebookUrl')} /></Field>
+                  <Field label="YouTube URL"><Input type="url" {...register('youtubeUrl')} /></Field>
+                </FieldRow>
+              </Fieldset>
 
-            <div className="form-group">
-              <label>Address *</label>
-              <input className="form-input" {...register('address', { required: 'Required' })} />
-              {errors.address && <span className="form-error">{errors.address.message}</span>}
-            </div>
+              <Field label={language === 'am' ? 'ተጨማሪ ማስታወሻ' : 'Additional notes'}>
+                <Textarea rows={4} {...register('notes')} placeholder={language === 'am' ? 'ሌላ ማንኛውም ማስታወሻ…' : 'Anything else we should know…'} />
+              </Field>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Phone</label>
-                <input className="form-input" {...register('phone')} />
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <Button asChild variant="ghost">
+                  <Link to={ROUTES.about}>{language === 'am' ? 'ይቅር' : 'Cancel'}</Link>
+                </Button>
+                <Button type="submit" size="lg" disabled={submitting}>
+                  <Send /> {submitting ? t('common.loading') : (language === 'am' ? 'መረጃ ላክ' : 'Submit update')}
+                </Button>
               </div>
-              <div className="form-group">
-                <label>Email</label>
-                <input className="form-input" type="email" {...register('email')} />
-              </div>
-            </div>
+            </form>
+          </CardContent>
+        </Card>
+      </Section>
 
-            <div className="form-group">
-              <label>Main Service Times *</label>
-              <input className="form-input" {...register('serviceTimes', { required: 'Required' })} />
-              {errors.serviceTimes && <span className="form-error">{errors.serviceTimes.message}</span>}
+      <AlertDialog open={successOpen} onOpenChange={setSuccessOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-success/15 text-success">
+              <CheckCircle2 className="h-7 w-7" />
             </div>
+            <AlertDialogTitle className="text-center">
+              {language === 'am' ? 'አመሰግናለሁ!' : 'Thank you!'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-center">
+              {language === 'am'
+                ? 'መረጃዎ ደርሷል። አስተዳዳሪ ይገመግማል።'
+                : 'Your update was received. An admin will review it shortly.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="sm:justify-center">
+            <AlertDialogAction onClick={() => setSuccessOpen(false)}>
+              {language === 'am' ? 'ዝጋ' : 'Close'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
 
-            <div className="form-row">
-              <div className="form-group">
-                <label>Founding Year</label>
-                <input className="form-input" {...register('foundedYear')} />
-              </div>
-              <div className="form-group">
-                <label>Estimated Attendance</label>
-                <input className="form-input" {...register('attendanceEstimate')} placeholder="e.g., 120 weekly" />
-              </div>
-            </div>
+/* ---------- Small inline form helpers (kept local; only used here) ---------- */
 
-            <div className="form-group">
-              <label>Pastor / Main Leader Name</label>
-              <input className="form-input" {...register('pastorName')} />
-            </div>
+function Fieldset({ legend, children }) {
+  return (
+    <fieldset className="rounded-lg border border-border p-5">
+      <legend className="px-2 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+        {legend}
+      </legend>
+      <div className="flex flex-col gap-4">{children}</div>
+    </fieldset>
+  );
+}
 
-            <div className="form-group">
-              <label>Leadership Team (elders, deacons, board)</label>
-              <textarea className="form-input" rows={4} {...register('leadershipTeam')} />
-            </div>
+function FieldRow({ cols = 1, children }) {
+  const grid =
+    cols === 3 ? 'grid-cols-1 sm:grid-cols-3' : cols === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1';
+  return <div className={`grid gap-4 ${grid}`}>{children}</div>;
+}
 
-            <div className="form-group">
-              <label>Languages Used in Worship</label>
-              <input className="form-input" {...register('languagesUsed')} />
-            </div>
-
-            <div className="form-group">
-              <label>Ministries / Programs (youth, children, outreach, etc.)</label>
-              <textarea className="form-input" rows={4} {...register('ministryPrograms')} />
-            </div>
-
-            <div className="form-group">
-              <label>Social Media / Website Links</label>
-              <textarea className="form-input" rows={3} {...register('socialLinks')} />
-            </div>
-
-            <div className="form-group">
-              <label>Legal Registered Name / Nonprofit Entity</label>
-              <input className="form-input" {...register('legalNameOrEntity')} />
-            </div>
-
-            <div className="form-group">
-              <label>Property Ownership / Lease Details</label>
-              <textarea className="form-input" rows={3} {...register('ownershipOrLeaseInfo')} />
-            </div>
-
-            <div className="form-group">
-              <label>Upcoming Announcements for Website Homepage</label>
-              <textarea className="form-input" rows={3} {...register('announcements')} />
-            </div>
-
-            <div className="form-group">
-              <label>Prayer Needs / Special Notes</label>
-              <textarea className="form-input" rows={3} {...register('prayerNeeds')} />
-            </div>
-
-            <div className="form-group">
-              <label>Additional Notes or Corrections</label>
-              <textarea className="form-input" rows={4} {...register('additionalNotes')} />
-            </div>
-
-            <button type="submit" className="btn btn-primary btn-full" disabled={submitting}>
-              {submitting ? 'Submitting...' : 'Submit Church Profile Update'}
-            </button>
-          </form>
-        </div>
-      </section>
+function Field({ label, error, children }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <Label>{label}</Label>
+      {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

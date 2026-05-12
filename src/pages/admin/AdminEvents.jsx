@@ -1,225 +1,250 @@
 import { useEffect, useState } from 'react';
-import { format } from 'date-fns';
-import { Timestamp } from 'firebase/firestore';
-import { getAllEvents, createEvent, updateEvent, deleteEvent } from '../../services/eventsService';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { Plus, Pencil, Trash2, Save, Calendar } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import BilingualField from '@/components/common/BilingualField';
+import EmptyState from '@/components/common/EmptyState';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import {
+  getAllEvents,
+  createEvent,
+  updateEvent,
+  deleteEvent,
+} from '@/services/eventsService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { formatDate, toDate } from '@/lib/format';
 
-const EMPTY_FORM = {
-  title: '', titleAm: '',
-  description: '', descriptionAm: '',
-  details: '', detailsAm: '',
+const emptyEvent = {
+  title: '',
+  titleAm: '',
+  description: '',
+  descriptionAm: '',
+  details: '',
+  detailsAm: '',
+  location: '',
+  locationAm: '',
   date: '',
-  location: '', locationAm: '',
   imageUrl: '',
   registrationUrl: '',
 };
 
-export default function AdminEvents() {
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+function toDateInputValue(value) {
+  const d = toDate(value);
+  if (!d) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function EventEditor({ event, onSaved, trigger }) {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [editingId, setEditingId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(EMPTY_FORM);
-  const [error, setError] = useState('');
+  const isEdit = Boolean(event?.id);
 
-  const load = async () => {
-    setLoading(true);
-    const data = await getAllEvents();
-    setEvents(data);
-    setLoading(false);
-  };
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: { ...emptyEvent, ...event, date: toDateInputValue(event?.date) },
+  });
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    if (open) reset({ ...emptyEvent, ...event, date: toDateInputValue(event?.date) });
+  }, [open, event, reset]);
 
-  const setField = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
-
-  const openCreate = () => {
-    setForm(EMPTY_FORM);
-    setEditingId(null);
-    setShowForm(true);
-    setError('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const openEdit = (event) => {
-    let dateStr = '';
-    if (event.date) {
-      const d = event.date.toDate ? event.date.toDate() : new Date(event.date);
-      dateStr = format(d, "yyyy-MM-dd'T'HH:mm");
-    }
-    setForm({
-      title: event.title || '',
-      titleAm: event.titleAm || '',
-      description: event.description || '',
-      descriptionAm: event.descriptionAm || '',
-      details: event.details || '',
-      detailsAm: event.detailsAm || '',
-      date: dateStr,
-      location: event.location || '',
-      locationAm: event.locationAm || '',
-      imageUrl: event.imageUrl || '',
-      registrationUrl: event.registrationUrl || '',
-    });
-    setEditingId(event.id);
-    setShowForm(true);
-    setError('');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.title.trim() || !form.date || !form.location.trim()) {
-      setError('English title, date, and location are required.');
-      return;
-    }
+  const onSubmit = async (data) => {
     setSaving(true);
-    setError('');
     try {
-      const data = {
-        title: form.title.trim(),
-        titleAm: form.titleAm.trim(),
-        description: form.description.trim(),
-        descriptionAm: form.descriptionAm.trim(),
-        details: form.details.trim(),
-        detailsAm: form.detailsAm.trim(),
-        date: Timestamp.fromDate(new Date(form.date)),
-        location: form.location.trim(),
-        locationAm: form.locationAm.trim(),
-        imageUrl: form.imageUrl.trim(),
-        registrationUrl: form.registrationUrl.trim(),
+      const payload = {
+        ...data,
+        date: data.date ? new Date(data.date) : null,
       };
-      if (editingId) {
-        await updateEvent(editingId, data);
+      if (isEdit) {
+        await updateEvent(event.id, payload);
       } else {
-        await createEvent(data);
+        await createEvent(payload);
       }
-      setShowForm(false);
-      setEditingId(null);
-      await load();
-    } catch {
-      setError('Failed to save. Please try again.');
+      toast.success(t('admin.flash.saved'));
+      setOpen(false);
+      onSaved();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
     } finally {
       setSaving(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('Delete this event? This cannot be undone.')) return;
-    await deleteEvent(id);
-    await load();
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>{isEdit ? t('admin.events.edit') : t('admin.events.new')}</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <BilingualField label={t('admin.events.field.title')} nameEn="title" nameAm="titleAm" register={register} required />
+          {errors.title && <p className="-mt-2 text-xs text-destructive">{t('common.required')}</p>}
+          <BilingualField label={t('admin.events.field.description')} nameEn="description" nameAm="descriptionAm" register={register} textarea rows={2} />
+          <BilingualField label={t('admin.events.field.details')} nameEn="details" nameAm="detailsAm" register={register} textarea rows={4} />
+          <BilingualField label={t('admin.events.field.location')} nameEn="location" nameAm="locationAm" register={register} />
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <Label>{t('admin.events.field.date')}</Label>
+              <Input type="datetime-local" {...register('date', { required: true })} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t('admin.events.field.imageUrl')}</Label>
+              <Input type="url" {...register('imageUrl')} />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label>{t('admin.events.field.registrationUrl')}</Label>
+            <Input type="url" {...register('registrationUrl')} />
+          </div>
+
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+              {t('admin.cancel')}
+            </Button>
+            <Button type="submit" disabled={saving}>
+              <Save /> {saving ? t('common.loading') : t('admin.save')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function EventRow({ event, onChanged }) {
+  const { t, pickLocalized } = useLanguage();
+
+  const handleDelete = async () => {
+    try {
+      await deleteEvent(event.id);
+      toast.success(t('admin.flash.deleted'));
+      onChanged();
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
+    }
   };
 
   return (
-    <div>
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">Events</h1>
-        <button className="btn btn-primary" onClick={openCreate}>+ Add Event</button>
-      </div>
-
-      {showForm && (
-        <div className="admin-card">
-          <h2>{editingId ? 'Edit Event' : 'New Event'}</h2>
-          <form onSubmit={handleSubmit} className="admin-form">
-
-            <div className="bilingual-group">
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag">EN</span> Title *
-                <input className="form-input" value={form.title} onChange={(e) => setField('title', e.target.value)} required />
-              </label>
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag am">አማ</span> Title (አማርኛ)
-                <input className="form-input" value={form.titleAm} onChange={(e) => setField('titleAm', e.target.value)} />
-              </label>
-            </div>
-
-            <label>
-              Date &amp; Time *
-              <input type="datetime-local" className="form-input" value={form.date} onChange={(e) => setField('date', e.target.value)} required />
-            </label>
-
-            <div className="bilingual-group">
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag">EN</span> Location *
-                <input className="form-input" value={form.location} onChange={(e) => setField('location', e.target.value)} required />
-              </label>
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag am">አማ</span> Location (አማርኛ)
-                <input className="form-input" value={form.locationAm} onChange={(e) => setField('locationAm', e.target.value)} />
-              </label>
-            </div>
-
-            <div className="bilingual-group">
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag">EN</span> Short Description
-                <textarea className="form-input" rows={2} value={form.description} onChange={(e) => setField('description', e.target.value)} />
-              </label>
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag am">አማ</span> Short Description (አማርኛ)
-                <textarea className="form-input" rows={2} value={form.descriptionAm} onChange={(e) => setField('descriptionAm', e.target.value)} />
-              </label>
-            </div>
-
-            <div className="bilingual-group">
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag">EN</span> Full Details
-                <textarea className="form-input" rows={4} value={form.details} onChange={(e) => setField('details', e.target.value)} />
-              </label>
-              <label className="bilingual-label">
-                <span className="bilingual-lang-tag am">አማ</span> Full Details (አማርኛ)
-                <textarea className="form-input" rows={4} value={form.detailsAm} onChange={(e) => setField('detailsAm', e.target.value)} />
-              </label>
-            </div>
-
-            <label>
-              Image URL
-              <input className="form-input" value={form.imageUrl} onChange={(e) => setField('imageUrl', e.target.value)} placeholder="https://…" />
-            </label>
-            <label>
-              Registration URL
-              <input className="form-input" value={form.registrationUrl} onChange={(e) => setField('registrationUrl', e.target.value)} placeholder="https://…" />
-            </label>
-
-            {error && <p className="error-text">{error}</p>}
-            <div className="admin-form-actions">
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving ? 'Saving…' : editingId ? 'Update Event' : 'Create Event'}
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={() => { setShowForm(false); setEditingId(null); }}>
-                Cancel
-              </button>
-            </div>
-          </form>
+    <Card>
+      <CardContent className="flex flex-col gap-3 p-5 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="font-display text-lg font-semibold text-primary">
+            {pickLocalized(event, 'title')}
+          </p>
+          <p className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+            <Calendar className="h-3.5 w-3.5" />
+            {formatDate(event.date, 'MMM d, yyyy h:mm a')}
+            {pickLocalized(event, 'location') && <span>· {pickLocalized(event, 'location')}</span>}
+          </p>
         </div>
-      )}
+        <div className="flex flex-wrap gap-2">
+          <EventEditor
+            event={event}
+            onSaved={onChanged}
+            trigger={
+              <Button variant="outline" size="sm"><Pencil /> {t('admin.edit')}</Button>
+            }
+          />
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
+                <Trash2 /> {t('admin.delete')}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t('admin.confirmDelete')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t('admin.confirmDeleteBody')}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t('admin.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  {t('admin.delete')}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function AdminEvents() {
+  const { t } = useLanguage();
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = () => {
+    setLoading(true);
+    getAllEvents()
+      .then(setEvents)
+      .catch(() => setEvents([]))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  return (
+    <>
+      <header className="mb-8 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+            {t('admin.events.title')}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t('admin.events.subtitle')}</p>
+        </div>
+        <EventEditor
+          onSaved={refresh}
+          trigger={
+            <Button size="lg"><Plus /> {t('admin.events.new')}</Button>
+          }
+        />
+      </header>
 
       {loading ? (
-        <LoadingSpinner center />
+        <LoadingSpinner size="lg" center />
       ) : events.length === 0 ? (
-        <p className="empty-state">No events yet. Click &ldquo;Add Event&rdquo; to create one.</p>
+        <EmptyState icon={Calendar} title={t('admin.events.empty')} />
       ) : (
-        <div className="admin-list">
-          {events.map((event) => {
-            const dateObj = event.date?.toDate ? event.date.toDate() : new Date(event.date);
-            return (
-              <div key={event.id} className="admin-list-item">
-                <div className="admin-list-item-info">
-                  <h3>{event.title} {event.titleAm && <span className="text-muted">/ {event.titleAm}</span>}</h3>
-                  <p className="text-sm text-muted">
-                    {format(dateObj, 'MMMM d, yyyy h:mm a')} &bull; {event.location}
-                    {event.locationAm && ` / ${event.locationAm}`}
-                  </p>
-                  {event.description && <p className="text-sm">{event.description}</p>}
-                </div>
-                <div className="admin-list-item-actions">
-                  <button className="btn btn-outline btn-sm" onClick={() => openEdit(event)}>Edit</button>
-                  <button className="btn btn-outline btn-sm" onClick={() => handleDelete(event.id)}>Delete</button>
-                </div>
-              </div>
-            );
-          })}
+        <div className="space-y-4">
+          {events.map((event) => (
+            <EventRow key={event.id} event={event} onChanged={refresh} />
+          ))}
         </div>
       )}
-    </div>
+    </>
   );
 }
