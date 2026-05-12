@@ -4,10 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "migrate:firestore": "node scripts/migrate-firestore.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:prod": "vite build",
+    "build:dev": "vite build --mode staging",
+    "deploy:prod": "npm run build:prod && firebase deploy --only hosting",
+    "deploy:dev": "npm run build:dev && firebase hosting:channel:deploy dev --expires 30d"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
