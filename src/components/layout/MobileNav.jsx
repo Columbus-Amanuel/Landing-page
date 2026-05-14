@@ -14,7 +14,7 @@ import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logoutUser } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
-import { PRIMARY_NAV, MEDIA_NAV, CONNECT_NAV } from '@/constants/nav';
+import { PRIMARY_NAV, CONNECT_NAV } from '@/constants/nav';
 import LanguageToggle from '@/components/common/LanguageToggle';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
@@ -104,7 +104,6 @@ export default function MobileNav() {
         <nav className="flex flex-1 flex-col gap-5 overflow-y-auto pb-4">
           <MobileGroup titleKey="nav.main" items={PRIMARY_NAV} onSelect={close} t={t} language={language} />
           <MobileGroup titleKey="nav.ministries" items={ministriesNav} onSelect={close} t={t} language={language} />
-          <MobileGroup titleKey="nav.media" items={MEDIA_NAV} onSelect={close} t={t} language={language} />
           <MobileGroup titleKey="nav.connect" items={CONNECT_NAV} onSelect={close} t={t} language={language} />
 
           {(user || isAdmin) && (

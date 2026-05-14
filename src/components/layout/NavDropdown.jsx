@@ -11,7 +11,7 @@ import { isGroupActive } from '@/constants/nav';
 import { cn } from '@/lib/utils';
 
 /**
- * Desktop dropdown for navbar groups (Ministries, Media).
+ * Desktop dropdown for navbar groups (e.g. Ministries).
  *
  * @param {{ label: string, items: { key: string, to: string, labelKey?: string, labelEn?: string, labelAm?: string }[] }} props
  */

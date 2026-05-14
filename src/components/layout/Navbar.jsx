@@ -15,11 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { logoutUser } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
-import {
-  PRIMARY_NAV,
-  MEDIA_NAV,
-  CONNECT_NAV,
-} from '@/constants/nav';
+import { PRIMARY_NAV, CONNECT_NAV } from '@/constants/nav';
 import { getInitials } from '@/lib/format';
 import LanguageToggle from '@/components/common/LanguageToggle';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
@@ -178,7 +174,6 @@ export default function Navbar() {
             <NavItem key={key} {...item} />
           ))}
           <NavDropdown label={t('nav.ministries')} items={ministriesNav} />
-          <NavDropdown label={t('nav.media')} items={MEDIA_NAV} />
           {contactLink && (
             <NavItem
               key={contactLink.key}

@@ -8,15 +8,12 @@ import { ROUTES } from './routes';
 export const PRIMARY_NAV = [
   { key: 'home', to: ROUTES.home, labelKey: 'nav.home', end: true },
   { key: 'about', to: ROUTES.about, labelKey: 'nav.about' },
+  { key: 'sermons', to: ROUTES.sermons, labelKey: 'nav.sermons' },
+  { key: 'events', to: ROUTES.events, labelKey: 'nav.events' },
 ];
 
 /** @deprecated Public ministry links are loaded from Firestore via `SiteSettingsContext` (`ministriesNav`). Kept empty so imports do not break. */
 export const MINISTRIES_NAV = [];
-
-export const MEDIA_NAV = [
-  { key: 'sermons', to: ROUTES.sermons, labelKey: 'nav.sermons' },
-  { key: 'events', to: ROUTES.events, labelKey: 'nav.events' },
-];
 
 export const CONNECT_NAV = [
   { key: 'contact', to: ROUTES.contact, labelKey: 'nav.contact' },
