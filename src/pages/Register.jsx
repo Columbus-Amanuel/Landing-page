@@ -3,22 +3,25 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
+import GoogleSignInButton from '@/components/common/GoogleSignInButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { registerUser } from '@/services/authService';
+import { registerUser, signInWithGoogle } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
 import { EMAIL_REGEX } from '@/lib/validators';
 
 export default function Register() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
 
   const {
@@ -52,6 +55,35 @@ export default function Register() {
     }
   };
 
+  const onGoogleSignIn = async () => {
+    setError('');
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      await refreshProfile();
+      navigate(ROUTES.home);
+    } catch (err) {
+      if (err?.code === 'auth/popup-closed-by-user') return;
+      if (err?.code === 'auth/account-exists-with-different-credential') {
+        setError(
+          language === 'am'
+            ? 'ይህ ኢሜል አስቀድሞ ተመዝግቧል። በመግቢያ ገጽ በኢሜል ይግቡ።'
+            : 'This email is already registered. Sign in with email on the login page.',
+        );
+      } else if (err?.code === 'auth/popup-blocked') {
+        setError(
+          language === 'am'
+            ? 'ፖፕ አፕ ታግዷል። ብራውዘርዎ ፖፕ አፕን ይፈቅዱ።'
+            : 'Pop-up was blocked. Allow pop-ups for this site and try again.',
+        );
+      } else {
+        setError(err?.message || (language === 'am' ? 'ስህተት ተከስቷል።' : 'Could not create your account.'));
+      }
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   return (
     <div className="relative isolate flex min-h-screen items-center justify-center overflow-hidden bg-muted/40 px-4 py-12">
       <div className="absolute inset-0 bg-grid opacity-30" aria-hidden="true" />
@@ -80,7 +112,21 @@ export default function Register() {
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4">
+          <div className="mt-6 flex flex-col gap-4">
+            <GoogleSignInButton
+              onClick={onGoogleSignIn}
+              loading={googleLoading}
+              disabled={loading}
+              className="w-full"
+            />
+            <div className="relative flex items-center gap-3 py-1">
+              <Separator className="flex-1" />
+              <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('common.orContinueWith')}
+              </span>
+              <Separator className="flex-1" />
+            </div>
+            <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <Label htmlFor="displayName">{language === 'am' ? 'ሙሉ ስም' : 'Full name'}</Label>
               <Input
@@ -141,7 +187,7 @@ export default function Register() {
               )}
             </div>
 
-            <Button type="submit" size="lg" disabled={loading} className="mt-2">
+            <Button type="submit" size="lg" disabled={loading || googleLoading} className="mt-2">
               <UserPlus /> {loading ? t('common.loading') : language === 'am' ? 'መለያ ክፈት' : 'Create account'}
             </Button>
 
@@ -151,7 +197,8 @@ export default function Register() {
                 {t('common.signIn')}
               </Link>
             </p>
-          </form>
+            </form>
+          </div>
         </CardContent>
       </Card>
     </div>

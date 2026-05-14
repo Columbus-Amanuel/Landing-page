@@ -13,7 +13,9 @@
     "churchName": "ኢትዮዽያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ ኦሃዮ",
     "english": "English",
     "amharic": "አማርኛ",
-    "language": "ቋንቋ"
+    "language": "ቋንቋ",
+    "continueWithGoogle": "በጉግል ይቀጥሉ",
+    "orContinueWith": "ወይም በኢሜል ይቀጥሉ"
   },
   "site": {
     "underConstruction": "ይህ ድረ-ገጽ በመገንባት ላይ ነው። አንዳንድ ገጾች ወይም አገልግሎቶች እስካሁን አልተጠናቀቁም።"

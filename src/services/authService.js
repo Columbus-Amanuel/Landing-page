@@ -1,6 +1,8 @@
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   sendPasswordResetEmail,
   updateProfile,
@@ -9,6 +11,37 @@ import {
 import { doc, setDoc, getDoc, updateDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './firebase';
 import { USER_INDEX_COLLECTION } from './usersAdminService';
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+async function ensureMemberFirestoreProfile(firebaseUser) {
+  const { uid } = firebaseUser;
+  const userRef = doc(db, 'users', uid);
+  const userSnap = await getDoc(userRef);
+  if (userSnap.exists()) return;
+
+  const email = firebaseUser.email || '';
+  const displayName =
+    (firebaseUser.displayName || '').trim() || (email.includes('@') ? email.split('@')[0] : 'Member');
+
+  const batch = writeBatch(db);
+  const userPayload = {
+    uid,
+    email,
+    displayName,
+    role: 'member',
+    createdAt: serverTimestamp(),
+  };
+  batch.set(userRef, userPayload);
+  batch.set(doc(db, USER_INDEX_COLLECTION, uid), {
+    displayName,
+    email,
+    role: 'member',
+    createdAt: serverTimestamp(),
+  });
+  await batch.commit();
+}
 
 export const registerUser = async (email, password, displayName) => {
   const credential = await createUserWithEmailAndPassword(auth, email, password);
@@ -35,6 +68,15 @@ export const registerUser = async (email, password, displayName) => {
 
 export const loginUser = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
+
+/**
+ * Sign in with Google and ensure `users/{uid}` + user index exist (same shape as email registration).
+ */
+export const signInWithGoogle = async () => {
+  const credential = await signInWithPopup(auth, googleProvider);
+  await ensureMemberFirestoreProfile(credential.user);
+  return credential.user;
+};
 
 export const logoutUser = () => signOut(auth);
 

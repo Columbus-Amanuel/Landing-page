@@ -10,16 +10,19 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { loginUser, resetPassword } from '@/services/authService';
+import { Separator } from '@/components/ui/separator';
+import GoogleSignInButton from '@/components/common/GoogleSignInButton';
+import { loginUser, resetPassword, signInWithGoogle } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
 import { EMAIL_REGEX } from '@/lib/validators';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
   const { t, language } = useLanguage();
   const [mode, setMode] = useState('login');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState('');
   const [resetSent, setResetSent] = useState(false);
 
@@ -45,6 +48,35 @@ export default function Login() {
       setError(err?.message || (language === 'am' ? 'ስህተት ተከስቷል።' : 'Something went wrong.'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onGoogleSignIn = async () => {
+    setError('');
+    setGoogleLoading(true);
+    try {
+      await signInWithGoogle();
+      await refreshProfile();
+      navigate(ROUTES.home);
+    } catch (err) {
+      if (err?.code === 'auth/popup-closed-by-user') return;
+      if (err?.code === 'auth/account-exists-with-different-credential') {
+        setError(
+          language === 'am'
+            ? 'ይህ ኢሜል በሌላ መንገድ ተመዝግቧል። በኢሜል እና ፓስወርድ ይግቡ።'
+            : 'This email is already registered with email/password. Sign in with email instead.',
+        );
+      } else if (err?.code === 'auth/popup-blocked') {
+        setError(
+          language === 'am'
+            ? 'ፖፕ አፕ ታግዷል። ብራውዘርዎ ፖፕ አፕን ይፈቅዱ።'
+            : 'Pop-up was blocked. Allow pop-ups for this site and try again.',
+        );
+      } else {
+        setError(err?.message || (language === 'am' ? 'ስህተት ተከስቷል።' : 'Something went wrong.'));
+      }
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -101,7 +133,25 @@ export default function Login() {
               </Button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4">
+            <div className="mt-6 flex flex-col gap-4">
+              {mode === 'login' && (
+                <>
+                  <GoogleSignInButton
+                    onClick={onGoogleSignIn}
+                    loading={googleLoading}
+                    disabled={loading}
+                    className="w-full"
+                  />
+                  <div className="relative flex items-center gap-3 py-1">
+                    <Separator className="flex-1" />
+                    <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      {t('common.orContinueWith')}
+                    </span>
+                    <Separator className="flex-1" />
+                  </div>
+                </>
+              )}
+              <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -131,7 +181,7 @@ export default function Login() {
                 </div>
               )}
 
-              <Button type="submit" size="lg" disabled={loading} className="mt-2">
+              <Button type="submit" size="lg" disabled={loading || googleLoading} className="mt-2">
                 {mode === 'login' ? (
                   <>
                     <LogIn /> {loading ? t('common.loading') : t('common.signIn')}
@@ -169,7 +219,8 @@ export default function Login() {
                   <ArrowLeft /> {language === 'am' ? 'ወደ መግቢያ' : 'Back to sign in'}
                 </Button>
               )}
-            </form>
+              </form>
+            </div>
           )}
         </CardContent>
       </Card>

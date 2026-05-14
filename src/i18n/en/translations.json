@@ -13,7 +13,9 @@
     "churchName": "Ethiopian Emmanuel United Church of Columbus",
     "english": "English",
     "amharic": "አማርኛ",
-    "language": "Language"
+    "language": "Language",
+    "continueWithGoogle": "Continue with Google",
+    "orContinueWith": "Or continue with email"
   },
   "site": {
     "underConstruction": "This website is under construction. Some pages or features are not finished yet."
