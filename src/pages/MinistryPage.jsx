@@ -27,7 +27,7 @@ import NotFound from '@/pages/NotFound';
 export default function MinistryPage({ fixedSlug } = {}) {
   const { slug: slugParam } = useParams();
   const slug = fixedSlug || slugParam;
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { youthContent } = useSiteSettings();
   const [resolved, setResolved] = useState({
     loading: true,
@@ -165,12 +165,21 @@ export default function MinistryPage({ fixedSlug } = {}) {
               />
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
-                {videos.map((video) => (
+                {videos.map((video) => {
+                  const displayTitle =
+                    language === 'am' && video.titleAm ? video.titleAm : video.title;
+                  return (
                   <Card key={video.id} className="overflow-hidden p-0">
-                    <VideoEmbed src={video.url} title={video.title} />
+                    <VideoEmbed
+                      src={video.url}
+                      title={displayTitle}
+                      clickToPlay
+                      className="rounded-none"
+                      playLabel={`${t('common.playVideo')}: ${displayTitle}`}
+                    />
                     <CardContent className="space-y-2 p-5">
                       <h3 className="font-display text-lg font-semibold text-primary">
-                        {language === 'am' && video.titleAm ? video.titleAm : video.title}
+                        {displayTitle}
                       </h3>
                       {(video.description || video.descriptionAm) && (
                         <p className="text-sm text-muted-foreground">
@@ -181,7 +190,8 @@ export default function MinistryPage({ fixedSlug } = {}) {
                       )}
                     </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
               </div>
             )}
           </Section>
