@@ -10,9 +10,8 @@ export const PRIMARY_NAV = [
   { key: 'about', to: ROUTES.about, labelKey: 'nav.about' },
 ];
 
-export const MINISTRIES_NAV = [
-  { key: 'youth', to: ROUTES.youthChildren, labelKey: 'nav.youthChildren' },
-];
+/** @deprecated Public ministry links are loaded from Firestore via `SiteSettingsContext` (`ministriesNav`). Kept empty so imports do not break. */
+export const MINISTRIES_NAV = [];
 
 export const MEDIA_NAV = [
   { key: 'sermons', to: ROUTES.sermons, labelKey: 'nav.sermons' },
@@ -30,7 +29,7 @@ export const ADMIN_NAV = [
   { key: 'events', to: ROUTES.adminEvents, labelKey: 'admin.nav.events' },
   { key: 'sermons', to: ROUTES.adminSermons, labelKey: 'admin.nav.sermons' },
   { key: 'giving', to: ROUTES.adminGiving, labelKey: 'admin.nav.giving' },
-  { key: 'youth', to: ROUTES.adminYouth, labelKey: 'admin.nav.youth' },
+  { key: 'ministries', to: ROUTES.adminMinistries, labelKey: 'admin.nav.ministries' },
   {
     key: 'messages',
     to: ROUTES.adminMessages,

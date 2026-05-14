@@ -30,6 +30,8 @@ import AdminChurchInfo from './AdminChurchInfo';
 import AdminEvents from './AdminEvents';
 import AdminSermons from './AdminSermons';
 import AdminGiving from './AdminGiving';
+import AdminMinistries from './AdminMinistries';
+import AdminMinistryEdit from './AdminMinistryEdit';
 import AdminYouth from './AdminYouth';
 import AdminMessages from './AdminMessages';
 import AdminUsers from './AdminUsers';
@@ -40,7 +42,7 @@ const ICONS = {
   events: CalendarDays,
   sermons: Mic,
   giving: Heart,
-  youth: Sparkles,
+  ministries: Sparkles,
   messages: Inbox,
   users: Users,
 };
@@ -122,6 +124,8 @@ export default function AdminLayout() {
           <Route path="events" element={<AdminEvents />} />
           <Route path="sermons" element={<AdminSermons />} />
           <Route path="giving" element={<AdminGiving />} />
+          <Route path="ministries" element={<AdminMinistries />} />
+          <Route path="ministries/:ministryId" element={<AdminMinistryEdit />} />
           <Route path="youth" element={<AdminYouth />} />
           <Route
             path="messages"

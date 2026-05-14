@@ -21,7 +21,7 @@ const TILES = [
   { key: 'events', icon: CalendarDays, to: ROUTES.adminEvents },
   { key: 'sermons', icon: Mic, to: ROUTES.adminSermons },
   { key: 'giving', icon: Heart, to: ROUTES.adminGiving },
-  { key: 'youth', icon: Sparkles, to: ROUTES.adminYouth },
+  { key: 'ministries', icon: Sparkles, to: ROUTES.adminMinistries },
   { key: 'messages', icon: Inbox, to: ROUTES.adminMessages, superOnly: true },
   { key: 'users', icon: Users, to: ROUTES.adminUsers, superOnly: true },
 ];

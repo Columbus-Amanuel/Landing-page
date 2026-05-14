@@ -231,6 +231,7 @@
       "events": "Events",
       "sermons": "Sermons",
       "giving": "Giving",
+      "ministries": "Ministries",
       "youth": "Youth & children",
       "messages": "Messages",
       "users": "Users"
@@ -240,6 +241,7 @@
       "events": "Create, edit, and remove upcoming events.",
       "sermons": "Manage the sermon library, including videos and notes.",
       "giving": "Configure online giving, funds, and scripture text.",
+      "ministries": "Add ministry pages, choose which sections each one shows, and manage videos per ministry.",
       "youth": "Youth & children page content, programs, and videos.",
       "messages": "View contact submissions and prayer requests.",
       "users": "View member profiles and assign admin access (super-admins only)."
@@ -327,18 +329,47 @@
       "editVideo": "Edit video",
       "noVideos": "No videos yet."
     },
+    "ministries": {
+      "title": "Ministries",
+      "subtitle": "Each ministry has its own public page URL. Pick which sections appear (intro, stats, programs, videos, FAQs, CTA).",
+      "add": "Add ministry",
+      "addTitle": "New ministry",
+      "create": "Create ministry",
+      "empty": "No ministries yet. Add one to show it in the site menu.",
+      "backToList": "Back to ministries",
+      "editSubtitle": "Settings, page copy, and videos for this ministry.",
+      "publicUrl": "Public URL:",
+      "visible": "Visible in menu",
+      "hidden": "Hidden from menu",
+      "sections": "Sections",
+      "sectionsTitle": "Sections on this page",
+      "sectionsHelp": "Hero (title and subtitle) always appears first. Choose additional blocks below. Order follows: intro → stats → programs → videos → FAQs → CTA.",
+      "settingsNav": "Menu & URL",
+      "legacyHint": "If you have not created a ministry with slug “youth-children”, the site still uses the legacy Youth & Children copy from Church settings.",
+      "legacyLink": "Open legacy Youth & Children editor",
+      "tabs": {
+        "settings": "Settings",
+        "content": "Page content",
+        "videos": "Videos"
+      },
+      "field": {
+        "slug": "URL slug",
+        "slugHint": "Lowercase letters, numbers, and hyphens only. Example: youth-children",
+        "navLabels": "Menu labels (EN / አማ)",
+        "sortOrder": "Sort order",
+        "visible": "Show in menu"
+      },
+      "section": {
+        "intro": "Intro text",
+        "stats": "Statistics row",
+        "programs": "Program cards",
+        "videos": "Video highlights",
+        "faqs": "FAQs",
+        "cta": "Bottom call to action"
+      }
+    },
     "messages": {
       "title": "Inbox",
-      "subtitle": "Contact submissions and prayer requests from your visitors.",
-      "contactTab": "Contact",
-      "prayerTab": "Prayer",
-      "markRead": "Mark read",
-      "resolve": "Resolve",
-      "private": "Private",
-      "emptyContact": "No contact messages yet.",
-      "emptyPrayer": "No prayer requests yet."
-    },
-    "users": {
       "title": "Users",
       "subtitle": "Browse member profiles and set access levels. Only super-admins can open this page.",
       "loadError": "Could not load users",

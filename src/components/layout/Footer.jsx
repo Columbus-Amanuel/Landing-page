@@ -25,7 +25,7 @@ function FooterSocial({ href, label, icon: IconComponent }) {
 
 export default function Footer() {
   const { t, pickLocalized, language } = useLanguage();
-  const { churchInfo } = useSiteSettings();
+  const { churchInfo, ministriesNav } = useSiteSettings();
 
   const addressLine = [churchInfo.address, churchInfo.city, churchInfo.state, churchInfo.zip]
     .filter(Boolean)
@@ -63,7 +63,13 @@ export default function Footer() {
               <li><Link to={ROUTES.about} className="transition-colors hover:text-accent">{t('nav.about')}</Link></li>
               <li><Link to={ROUTES.sermons} className="transition-colors hover:text-accent">{t('nav.sermons')}</Link></li>
               <li><Link to={ROUTES.events} className="transition-colors hover:text-accent">{t('nav.events')}</Link></li>
-              <li><Link to={ROUTES.youthChildren} className="transition-colors hover:text-accent">{t('nav.youthChildren')}</Link></li>
+              {ministriesNav.map((item) => (
+                <li key={item.key}>
+                  <Link to={item.to} className="transition-colors hover:text-accent">
+                    {language === 'am' && item.labelAm ? item.labelAm : item.labelEn}
+                  </Link>
+                </li>
+              ))}
               <li><Link to={ROUTES.give} className="transition-colors hover:text-accent">{t('nav.give')}</Link></li>
               <li><Link to={ROUTES.contact} className="transition-colors hover:text-accent">{t('nav.contact')}</Link></li>
             </ul>

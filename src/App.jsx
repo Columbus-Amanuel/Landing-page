@@ -17,7 +17,7 @@ import Sermons from '@/pages/Sermons';
 import SermonDetail from '@/pages/SermonDetail';
 import Contact from '@/pages/Contact';
 import Give from '@/pages/Give';
-import YouthChildren from '@/pages/YouthChildren';
+import MinistryPage from '@/pages/MinistryPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ProfileUpdate from '@/pages/ProfileUpdate';
@@ -46,7 +46,8 @@ function AppRoutes() {
               <Route path="sermons/:id" element={<SermonDetail />} />
               <Route path="contact" element={<Contact />} />
               <Route path="give" element={<Give />} />
-              <Route path="youth-children" element={<YouthChildren />} />
+              <Route path="ministries/:slug" element={<MinistryPage />} />
+              <Route path="youth-children" element={<MinistryPage fixedSlug="youth-children" />} />
               <Route
                 path="profile-update"
                 element={(

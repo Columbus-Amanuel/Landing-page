@@ -12,11 +12,11 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { logoutUser } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
 import {
   PRIMARY_NAV,
-  MINISTRIES_NAV,
   MEDIA_NAV,
   CONNECT_NAV,
 } from '@/constants/nav';
@@ -148,6 +148,7 @@ function UserMenu() {
 export default function Navbar() {
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { ministriesNav } = useSiteSettings();
   const { pathname } = useLocation();
   // Hide the navbar entirely on auth pages so they render as standalone screens.
   if (pathname === ROUTES.login || pathname === ROUTES.register) return null;
@@ -176,7 +177,7 @@ export default function Navbar() {
           {PRIMARY_NAV.map(({ key, ...item }) => (
             <NavItem key={key} {...item} />
           ))}
-          <NavDropdown label={t('nav.ministries')} items={MINISTRIES_NAV} />
+          <NavDropdown label={t('nav.ministries')} items={ministriesNav} />
           <NavDropdown label={t('nav.media')} items={MEDIA_NAV} />
           {contactLink && (
             <NavItem

@@ -75,6 +75,11 @@ service cloud.firestore {
       allow write: if isStaff();
     }
 
+    match /ministries/{ministryId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
     match /youthPageContent/{docId} {
       allow read: if true;
       allow write: if isStaff();

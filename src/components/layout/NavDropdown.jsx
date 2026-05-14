@@ -13,12 +13,17 @@ import { cn } from '@/lib/utils';
 /**
  * Desktop dropdown for navbar groups (Ministries, Media).
  *
- * @param {{ label: string, items: { key: string, to: string, labelKey: string }[] }} props
+ * @param {{ label: string, items: { key: string, to: string, labelKey?: string, labelEn?: string, labelAm?: string }[] }} props
  */
 export default function NavDropdown({ label, items }) {
   const { pathname } = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const groupActive = isGroupActive(pathname, items);
+
+  const linkLabel = (item) => {
+    if (item.labelKey) return t(item.labelKey);
+    return language === 'am' && item.labelAm ? item.labelAm : item.labelEn;
+  };
 
   return (
     <DropdownMenu>
@@ -44,7 +49,7 @@ export default function NavDropdown({ label, items }) {
                 )
               }
             >
-              {t(item.labelKey)}
+              {linkLabel(item)}
             </NavLink>
           </DropdownMenuItem>
         ))}

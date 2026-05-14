@@ -13,6 +13,8 @@ export const ROUTES = {
   contact: '/contact',
   give: '/give',
   youthChildren: '/youth-children',
+  ministries: '/ministries',
+  ministryDetail: '/ministries/:slug',
   login: '/login',
   register: '/register',
   profileUpdate: '/profile-update',
@@ -22,6 +24,8 @@ export const ROUTES = {
   adminSermons: '/admin/sermons',
   adminGiving: '/admin/giving',
   adminYouth: '/admin/youth',
+  adminMinistries: '/admin/ministries',
+  adminMinistryEdit: '/admin/ministries/:ministryId',
   adminMessages: '/admin/messages',
   adminUsers: '/admin/users',
 };

@@ -10,23 +10,23 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { logoutUser } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
-import {
-  PRIMARY_NAV,
-  MINISTRIES_NAV,
-  MEDIA_NAV,
-  CONNECT_NAV,
-} from '@/constants/nav';
+import { PRIMARY_NAV, MEDIA_NAV, CONNECT_NAV } from '@/constants/nav';
 import LanguageToggle from '@/components/common/LanguageToggle';
 import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
 import { isStaffRole } from '@/lib/roles';
 import { useState } from 'react';
 
-function MobileGroup({ titleKey, items, onSelect, t }) {
+function MobileGroup({ titleKey, items, onSelect, t, language }) {
   if (!items?.length) return null;
+  const linkLabel = (item) => {
+    if (item.labelKey) return t(item.labelKey);
+    return language === 'am' && item.labelAm ? item.labelAm : item.labelEn;
+  };
   return (
     <div className="flex flex-col gap-1">
       <p className="px-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
@@ -50,7 +50,7 @@ function MobileGroup({ titleKey, items, onSelect, t }) {
                 )
               }
             >
-              {t(item.labelKey)}
+              {linkLabel(item)}
             </NavLink>
           </li>
         ))}
@@ -66,7 +66,8 @@ function MobileGroup({ titleKey, items, onSelect, t }) {
  */
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { ministriesNav } = useSiteSettings();
   const { user, profile } = useAuth();
   const navigate = useNavigate();
 
@@ -101,10 +102,10 @@ export default function MobileNav() {
         </SheetHeader>
 
         <nav className="flex flex-1 flex-col gap-5 overflow-y-auto pb-4">
-          <MobileGroup titleKey="nav.main" items={PRIMARY_NAV} onSelect={close} t={t} />
-          <MobileGroup titleKey="nav.ministries" items={MINISTRIES_NAV} onSelect={close} t={t} />
-          <MobileGroup titleKey="nav.media" items={MEDIA_NAV} onSelect={close} t={t} />
-          <MobileGroup titleKey="nav.connect" items={CONNECT_NAV} onSelect={close} t={t} />
+          <MobileGroup titleKey="nav.main" items={PRIMARY_NAV} onSelect={close} t={t} language={language} />
+          <MobileGroup titleKey="nav.ministries" items={ministriesNav} onSelect={close} t={t} language={language} />
+          <MobileGroup titleKey="nav.media" items={MEDIA_NAV} onSelect={close} t={t} language={language} />
+          <MobileGroup titleKey="nav.connect" items={CONNECT_NAV} onSelect={close} t={t} language={language} />
 
           {(user || isAdmin) && (
             <>
