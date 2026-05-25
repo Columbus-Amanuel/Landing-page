@@ -11,11 +11,13 @@
     "save": "አስቀምጥ",
     "delete": "አጥፋ",
     "churchName": "ኢትዮዽያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ ኦሃዮ",
+    "churchNameShort": "አማኑኤል ሕብረት ቤተክርስቲያን",
     "english": "English",
     "amharic": "አማርኛ",
     "language": "ቋንቋ",
     "continueWithGoogle": "በጉግል ይቀጥሉ",
-    "orContinueWith": "ወይም በኢሜል ይቀጥሉ"
+    "orContinueWith": "ወይም በኢሜል ይቀጥሉ",
+    "playVideo": "ቪዲዮ ያጫውቱ"
   },
   "site": {
     "underConstruction": "ይህ ድረ-ገጽ በመገንባት ላይ ነው። አንዳንድ ገጾች ወይም አገልግሎቶች እስካሁን አልተጠናቀቁም።"

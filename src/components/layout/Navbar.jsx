@@ -156,16 +156,19 @@ export default function Navbar() {
       <div className="mx-auto flex h-[var(--navbar-height)] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           to={ROUTES.home}
-          className="flex items-center gap-3 font-display text-base font-semibold text-primary transition-opacity hover:opacity-90"
+          className="flex min-w-0 max-sm:flex-1 items-center gap-3 font-display text-base font-semibold text-primary transition-opacity hover:opacity-90"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-md text-primary">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-primary">
             <BrandCrossIcon size={20} />
           </span>
-          <span className="hidden flex-col leading-tight sm:flex">
-            <span className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="flex min-w-0 flex-col justify-center leading-tight">
+            <span className="truncate text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
               EuccOnline.com
             </span>
-            <span>{t('common.churchName')}</span>
+            <span className="text-sm sm:text-base">
+              <span className="block truncate sm:hidden">{t('common.churchNameShort')}</span>
+              <span className="hidden truncate sm:block">{t('common.churchName')}</span>
+            </span>
           </span>
         </Link>
 

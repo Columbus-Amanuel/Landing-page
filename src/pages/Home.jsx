@@ -37,7 +37,6 @@ import SermonCard from '@/components/common/SermonCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import EmptyState from '@/components/common/EmptyState';
 import ValueIcon from '@/components/common/ValueIcon';
-import VideoEmbed from '@/components/common/VideoEmbed';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { getUpcomingEvents } from '@/services/eventsService';
@@ -162,11 +161,12 @@ function Hero() {
   return (
     <section className="relative isolate overflow-hidden bg-foreground text-background">
       {/* Background video layer (always rendered; opacity flips when toggled) */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <iframe
           title={t('home.heroVideoTitle')}
           className={cn(
-            'absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2',
+            // 16:9 embed scaled to cover the hero (crops on narrow / portrait viewports)
+            'absolute left-1/2 top-1/2 aspect-video h-full min-h-full w-auto min-w-full max-w-none -translate-x-1/2 -translate-y-1/2',
             'transition-opacity duration-700',
             videoOpen ? 'opacity-90' : 'opacity-30',
           )}
