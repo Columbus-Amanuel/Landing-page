@@ -1,201 +1,134 @@
 import { useEffect, useState } from 'react';
-import { getGivingSettings, updateGivingSettings } from '../../services/siteSettingsService';
-import { useSiteSettings, DEFAULT_GIVING } from '../../contexts/SiteSettingsContext';
-import LoadingSpinner from '../../components/ui/LoadingSpinner';
-import AdminFlashMessage from '../../components/ui/AdminFlashMessage';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { Save, Plus, Trash2 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import BilingualField from '@/components/common/BilingualField';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { updateGivingSettings } from '@/services/siteSettingsService';
 
 export default function AdminGiving() {
-  const { reloadSettings } = useSiteSettings();
-  const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+  const { givingSettings, refresh } = useSiteSettings();
+  const [ready, setReady] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
-  const [giving, setGiving] = useState(null);
+
+  const form = useForm({ defaultValues: givingSettings });
+  const funds = useFieldArray({ control: form.control, name: 'funds' });
 
   useEffect(() => {
-    getGivingSettings().then((data) => {
-      setGiving(data ? { ...DEFAULT_GIVING, ...data } : { ...DEFAULT_GIVING });
-      setLoading(false);
-    });
-  }, []);
+    form.reset(givingSettings);
+    setReady(true);
+  }, [givingSettings, form]);
 
-  const set = (field, value) => setGiving((prev) => ({ ...prev, [field]: value }));
+  if (!ready) return <LoadingSpinner size="lg" center />;
 
-  const updateFund = (i, key, value) => {
-    const funds = [...(giving.funds || [])];
-    funds[i] = { ...funds[i], [key]: value };
-    set('funds', funds);
-  };
-
-  const removeFund = (i) => set('funds', (giving.funds || []).filter((_, idx) => idx !== i));
-
-  const addFund = () =>
-    set('funds', [...(giving.funds || []), { id: '', label: '', labelAm: '', desc: '', descAm: '' }]);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     setSaving(true);
-    setMessage('');
     try {
-      await updateGivingSettings(giving);
-      reloadSettings();
-      setMessage('Saved successfully.');
-    } catch {
-      setMessage('Failed to save. Please try again.');
+      await updateGivingSettings(data);
+      await refresh();
+      toast.success(t('admin.flash.saved'));
+    } catch (err) {
+      toast.error(err?.message || t('admin.flash.error'));
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading || !giving) return <LoadingSpinner center />;
-
   return (
-    <div>
-      <h1 className="admin-page-title">Giving Settings</h1>
-      <p className="admin-page-subtitle">
-        All text fields support both English and Amharic.
-      </p>
-      <form onSubmit={handleSave} className="admin-form-sections">
+    <>
+      <header className="mb-8">
+        <h1 className="font-hero text-3xl font-semibold text-primary md:text-4xl">
+          {t('admin.giving.title')}
+        </h1>
+        <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{t('admin.giving.subtitle')}</p>
+      </header>
 
-        {/* Online Giving */}
-        <section className="admin-section">
-          <h2>Online Giving</h2>
-          <p className="admin-section-hint">
-            Enter your payment processor link (Stripe, Tithe.ly, Pushpay, etc.). Leave blank to show a &ldquo;coming soon&rdquo; notice.
-          </p>
-          <label>
-            Online Giving URL
-            <input
-              className="form-input"
-              value={giving.onlineGivingUrl || ''}
-              onChange={(e) => set('onlineGivingUrl', e.target.value)}
-              placeholder="https://give.example.com/eeucc"
-            />
-          </label>
-        </section>
-
-        {/* Giving Funds */}
-        <section className="admin-section">
-          <h2>Giving Funds</h2>
-          <p className="admin-section-hint">
-            Funds appear in the dropdown and the &ldquo;Where Your Giving Goes&rdquo; section on the Give page.
-          </p>
-          {(giving.funds || []).map((fund, i) => (
-            <div key={i} className="admin-array-row admin-array-row-stacked">
-              <label>
-                Fund ID (used internally, e.g. &ldquo;general&rdquo;)
-                <input className="form-input" placeholder="general" value={fund.id || ''} onChange={(e) => updateFund(i, 'id', e.target.value)} />
-              </label>
-              <div className="bilingual-group">
-                <label className="bilingual-label">
-                  <span className="bilingual-lang-tag">EN</span> Fund Label
-                  <input className="form-input" placeholder="General Fund" value={fund.label || ''} onChange={(e) => updateFund(i, 'label', e.target.value)} />
-                </label>
-                <label className="bilingual-label">
-                  <span className="bilingual-lang-tag am">አማ</span> Fund Label (አማርኛ)
-                  <input className="form-input" placeholder="አጠቃላይ ፈንድ" value={fund.labelAm || ''} onChange={(e) => updateFund(i, 'labelAm', e.target.value)} />
-                </label>
-              </div>
-              <div className="bilingual-group">
-                <label className="bilingual-label">
-                  <span className="bilingual-lang-tag">EN</span> Description
-                  <input className="form-input" placeholder="Supports all church ministries..." value={fund.desc || ''} onChange={(e) => updateFund(i, 'desc', e.target.value)} />
-                </label>
-                <label className="bilingual-label">
-                  <span className="bilingual-lang-tag am">አማ</span> Description (አማርኛ)
-                  <input className="form-input" placeholder="ሁሉንም አገልግሎቶችን ይደግፋል..." value={fund.descAm || ''} onChange={(e) => updateFund(i, 'descAm', e.target.value)} />
-                </label>
-              </div>
-              <button type="button" className="btn btn-outline btn-sm" onClick={() => removeFund(i)}>Remove Fund</button>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+        {/* Channels */}
+        <Card>
+          <CardContent className="space-y-5 p-6">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.channels')}</h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label={t('admin.giving.field.onlineUrl')}><Input type="url" {...form.register('onlineGivingUrl')} /></Field>
+              <Field label={t('admin.giving.field.checksPayableTo')}><Input {...form.register('checksPayableTo')} /></Field>
+              <Field label={t('admin.giving.field.textNumber')}><Input {...form.register('textToGiveNumber')} /></Field>
+              <Field label={t('admin.giving.field.textKeyword')}><Input {...form.register('textToGiveKeyword')} /></Field>
             </div>
-          ))}
-          <button type="button" className="btn btn-ghost btn-sm" onClick={addFund}>+ Add Fund</button>
-        </section>
-
-        {/* Give by Mail */}
-        <section className="admin-section">
-          <h2>Give by Mail</h2>
-          <div className="admin-field-grid">
-            <label>
-              Checks Payable To
-              <input className="form-input" value={giving.mailPayableTo || ''} onChange={(e) => set('mailPayableTo', e.target.value)} />
-            </label>
-          </div>
-          <label>
-            Mailing Address (shown as-is, supports line breaks)
-            <textarea
-              className="form-input"
-              rows={3}
-              value={giving.mailAddress || ''}
-              onChange={(e) => set('mailAddress', e.target.value)}
-              placeholder="1055 McNaughten Rd&#10;Columbus, OH 43213"
-            />
-          </label>
-        </section>
-
-        {/* Text to Give */}
-        <section className="admin-section">
-          <h2>Text to Give</h2>
-          <p className="admin-section-hint">Leave both fields blank to hide this section on the Give page.</p>
-          <div className="admin-field-grid">
-            <label>
-              Phone Number
-              <input className="form-input" value={giving.textNumber || ''} onChange={(e) => set('textNumber', e.target.value)} placeholder="(555) 555-5555" />
-            </label>
-            <label>
-              Keyword
-              <input className="form-input" value={giving.textKeyword || ''} onChange={(e) => set('textKeyword', e.target.value)} placeholder="GIVE" />
-            </label>
-          </div>
-        </section>
-
-        {/* Planned Giving Text */}
-        <section className="admin-section">
-          <h2>Planned Giving Description</h2>
-          <p className="admin-section-hint">Paragraph shown under the &ldquo;Planned Giving&rdquo; heading. Leave blank to use the default text.</p>
-          <div className="bilingual-group">
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag">EN</span> Planned Giving Text
-              <textarea className="form-input" rows={3} value={giving.plannedGivingText || ''} onChange={(e) => set('plannedGivingText', e.target.value)} placeholder="Consider leaving a legacy gift in your estate planning…" />
-            </label>
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag am">አማ</span> Planned Giving Text (አማርኛ)
-              <textarea className="form-input" rows={3} value={giving.plannedGivingTextAm || ''} onChange={(e) => set('plannedGivingTextAm', e.target.value)} placeholder="በሀብት ዕቅድዎ ውስጥ ስጦታ ያስቡ…" />
-            </label>
-          </div>
-        </section>
+            <Field label={t('admin.giving.field.mailAddress')}>
+              <Textarea rows={3} {...form.register('mailAddress')} />
+            </Field>
+          </CardContent>
+        </Card>
 
         {/* Scripture */}
-        <section className="admin-section">
-          <h2>Giving Scripture</h2>
-          <div className="bilingual-group">
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag">EN</span> Scripture Text
-              <textarea className="form-input" rows={3} value={giving.scriptureText || ''} onChange={(e) => set('scriptureText', e.target.value)} />
-            </label>
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag am">አማ</span> Scripture Text (አማርኛ)
-              <textarea className="form-input" rows={3} value={giving.scriptureTextAm || ''} onChange={(e) => set('scriptureTextAm', e.target.value)} />
-            </label>
-          </div>
-          <div className="bilingual-group">
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag">EN</span> Citation
-              <input className="form-input" value={giving.scriptureCite || ''} onChange={(e) => set('scriptureCite', e.target.value)} placeholder="2 Corinthians 9:7" />
-            </label>
-            <label className="bilingual-label">
-              <span className="bilingual-lang-tag am">አማ</span> Citation (አማርኛ)
-              <input className="form-input" value={giving.scriptureCiteAm || ''} onChange={(e) => set('scriptureCiteAm', e.target.value)} placeholder="2 ቆሮንቶስ 9:7" />
-            </label>
-          </div>
-        </section>
+        <Card>
+          <CardContent className="space-y-5 p-6">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.scripture')}</h2>
+            <BilingualField label={t('admin.giving.field.scripture')} nameEn="scriptureText" nameAm="scriptureTextAm" register={form.register} textarea rows={3} />
+            <BilingualField label={t('admin.giving.field.cite')} nameEn="scriptureCite" nameAm="scriptureCiteAm" register={form.register} />
+          </CardContent>
+        </Card>
 
-        <AdminFlashMessage message={message} />
-        <div className="admin-form-actions">
-          <button type="submit" className="btn btn-primary" disabled={saving}>
-            {saving ? 'Saving…' : 'Save Giving Settings'}
-          </button>
+        {/* Planned */}
+        <Card>
+          <CardContent className="space-y-5 p-6">
+            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.planned')}</h2>
+            <BilingualField label={t('admin.giving.field.planned')} nameEn="plannedGivingText" nameAm="plannedGivingTextAm" register={form.register} textarea rows={3} />
+          </CardContent>
+        </Card>
+
+        {/* Funds */}
+        <Card>
+          <CardContent className="space-y-5 p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.funds')}</h2>
+              <Button type="button" variant="outline" size="sm" onClick={() => funds.append({ id: `fund-${Date.now()}`, label: '', labelAm: '', desc: '', descAm: '' })}>
+                <Plus /> {t('admin.add')}
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {funds.fields.map((field, idx) => (
+                <div key={field.id} className="rounded-md border border-border bg-muted/30 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">#{idx + 1}</p>
+                    <Button type="button" variant="ghost" size="icon-sm" onClick={() => funds.remove(idx)}>
+                      <Trash2 />
+                    </Button>
+                  </div>
+                  <div className="mt-3 space-y-4">
+                    <Field label="ID"><Input {...form.register(`funds.${idx}.id`)} /></Field>
+                    <BilingualField label="Label" nameEn={`funds.${idx}.label`} nameAm={`funds.${idx}.labelAm`} register={form.register} />
+                    <BilingualField label="Description" nameEn={`funds.${idx}.desc`} nameAm={`funds.${idx}.descAm`} register={form.register} textarea rows={2} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="sticky bottom-4 z-10 flex justify-end">
+          <Button type="submit" size="lg" disabled={saving}>
+            <Save /> {saving ? t('common.loading') : t('admin.save')}
+          </Button>
         </div>
       </form>
+    </>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label>{label}</Label>
+      {children}
     </div>
   );
 }

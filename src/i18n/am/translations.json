@@ -7,10 +7,18 @@
     "submit": "አስገባ",
     "back": "ተመለስ",
     "required": "ያስፈልጋል",
+    "cancel": "ይቅር",
+    "save": "አስቀምጥ",
+    "delete": "አጥፋ",
     "churchName": "ኢትዮዽያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ ኦሃዮ",
     "english": "English",
     "amharic": "አማርኛ",
-    "language": "ቋንቋ"
+    "language": "ቋንቋ",
+    "continueWithGoogle": "በጉግል ይቀጥሉ",
+    "orContinueWith": "ወይም በኢሜል ይቀጥሉ"
+  },
+  "site": {
+    "underConstruction": "ይህ ድረ-ገጽ በመገንባት ላይ ነው። አንዳንድ ገጾች ወይም አገልግሎቶች እስካሁን አልተጠናቀቁም።"
   },
   "nav": {
     "home": "መነሻ",
@@ -35,11 +43,11 @@
   "home": {
     "prewelcome": "እንኳን ደህና መጡ",
     "title": "ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን ኮለንበስ",
-    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 1:30 ፒ.ኤም ይቀላቀሉን።",
+    "subtitle": "በኮለንበስ ኦሃዮ የሚገኝ በክርስቶስ የተመሠረተ የኢትዮጵያ የእምነት ማህበር። በየእሁዱ 2:00 ፒ.ኤም ይቀላቀሉን።",
     "aboutBtn": "ስለ እኛ ይወቁ",
     "sermonsBtn": "ስብከቶችን ይመልከቱ",
-    "showVideoBtn": "ቪዲዮውን ይመልከቱ",
-    "hideVideoBtn": "የመነሻ ይዘቱን አሳይ",
+    "showVideoBtn": "ቪዲዮ ይመልከቱ",
+    "hideVideoBtn": "ቪዲዮ ደብቅ",
     "heroVideoTitle": "የእንኳን ደህና መጡ የጀርባ ቪዲዮ",
     "heroLetUsCallYou": "እንደውልልዎ",
     "heroCallbackDialogTitle": "ደስ ይለናል ልንደውልልዎ",
@@ -64,10 +72,10 @@
     "missionBody": "በአምልኮ፣ በጸሎት፣ በቃሉ ትምህርት እና በደቀመዝሙርነት እግዚአብሔርን ለማክበር እንኖራለን።",
     "readStory": "ታሪካችንን ያንብቡ",
     "upcomingEvents": "የሚመጡ ዝግጅቶች",
-    "viewAllEvents": "ሁሉንም ዝግጅቶች ይመልከቱ →",
+    "viewAllEvents": "ሁሉንም ዝግጅቶች ይመልከቱ",
     "noEvents": "ምንም የሚመጡ ዝግጅቶች የሉም።",
     "recentSermons": "የቅርብ ጊዜ ስብከቶች",
-    "viewAllSermons": "ሁሉንም ስብከቶች ይመልከቱ →",
+    "viewAllSermons": "ሁሉንም ስብከቶች ይመልከቱ",
     "noSermons": "ስብከቶች በቅርቡ ይመጣሉ!",
     "ctaTitle": "ቀጣይ እርምጃ ለመውሰድ ዝግጁ ነዎት?",
     "ctaText": "ከእርስዎ ጋር ለመገናኘት እና ጥያቄዎችዎን ለመመለስ እንፈልጋለን።",
@@ -95,9 +103,38 @@
     "online": "ኦንላይን",
     "facebook": "የፌስቡክ ገጽ",
     "youtube": "የዩቲዩብ ቻናል",
-    "missingDetails": "ዝርዝሮች ይጎድላሉ? የተመዘገቡ አባሎች የቤተ ክርስቲያን መገለጫ ለማጠናቀቅ ይረዳሉ።",
-    "completeProfile": "የቤተ ክርስቲያን መገለጫ ሙላ",
+    "missingDetails": "የተመዘገቡ አባሎች ስልክ እና ሌሎች ዝርዝሮችን በመለያቸው ሊጨምሩ ይችላሉ።",
+    "completeProfile": "የአባል መገለጫ ያጠናቅቁ",
     "beliefsEmpty": "የእምነት ቃሎች በቅርቡ ይመጣሉ።"
+  },
+  "profileUpdate": {
+    "eyebrow": "መለያዎ",
+    "title": "መገለጫዎን ያጠናቅቁ",
+    "subtitle": "ዝርዝሮች በመጨመር እንድናውቅዎ እና እንድንገናኝ ይረዱ። በማንኛውም ጊዜ ማዘመን ይችላሉ።",
+    "saveError": "መገለጫ አልተቀመጠም። እንደገና ይሞክሩ።",
+    "sectionAccount": "ስም እና መግቢያ",
+    "sectionContact": "እንዴት እንደርስዎ",
+    "sectionPersonal": "ስለ እርስዎ",
+    "sectionEmergency": "የአስቸኳይ ጊዜ ግንኙነት",
+    "fullName": "ሙሉ ስም",
+    "email": "ኢሜይል (መግቢያ)",
+    "phone": "ሞባይል / ስልክ",
+    "street": "የአድራሻ መንገድ",
+    "city": "ከተማ",
+    "state": "ግዛት",
+    "zip": "ዚፕ ኮድ",
+    "dateOfBirth": "የትውልድ ቀን",
+    "occupation": "ሥራ",
+    "bio": "አጭር መግለጫ",
+    "bioPlaceholder": "ስለ እርስዎ ወይም ቤተሰብዎ በጥቂት ዓረፍተ ነገሮች…",
+    "ministryInterests": "የአገልግሎት ፍላጎት",
+    "ministryPlaceholder": "ለመስራት የሚፈልጉት ወይም የሚያስቡት አገልግሎቶች…",
+    "emergencyName": "የአስቸኳይ ግንኙነት ስም",
+    "emergencyPhone": "የአስቸኳይ ግንኙነት ስልክ",
+    "save": "መገለጫ አስቀምጥ",
+    "successTitle": "መገለጫ ተቀምጧል",
+    "successBody": "መረጃዎ ተዘምኗል።",
+    "successClose": "ዝጋ"
   },
   "contact": {
     "heroTitle": "ያግኙን",
@@ -139,7 +176,7 @@
     "textToGive": "ጽሑፍ ይላኩ",
     "textInstruction": "ከሞባይልዎ ለመስጠት።",
     "plannedGiving": "የወደፊት ስጦታ ዕቅድ",
-    "plannedGivingDefault": "በሀብት ዕቅድዎ ውስጥ ቤቱን ሊታወቅ የሚያስችል ስጦታ ያስቡ። ረዥም ጊዜ ስጦታዎ ለትውልዶች ተጽዕኖ እንዴት እንደሚኖር ተጨማሪ ለማወቅ ቢሮአችንን ያነጋግሩ።",
+    "plannedGivingDefault": "በሀብት ዕቅድዎ ውስጥ ቤቱን ሊታወቅ የሚያስችል ስጦታ ያስቡ።",
     "whereGivingGoes": "ስጦታዎ የሚሄድበት"
   },
   "events": {
@@ -162,10 +199,220 @@
     "watchListen": "ይመልከቱ / ያዳምጡ",
     "notes": "ማስታወሻዎች",
     "categoryAll": "ሁሉም",
+    "categorySunday": "የእሁድ",
+    "categoryStudy": "የመጽሐፍ ቅዱስ ጥናት",
+    "categoryYouth": "የወጣቶች",
+    "categorySpecial": "ልዩ",
     "notFound": "ስብከቱ አልተገኘም።"
   },
   "notFound": {
     "message": "ገፁ አልተገኘም።",
     "goHome": "ወደ መነሻ ይሂዱ"
+  },
+  "admin": {
+    "title": "አስተዳዳሪ",
+    "welcome": "እንኳን ደህና መጡ",
+    "save": "ለውጦችን አስቀምጥ",
+    "cancel": "ይቅር",
+    "edit": "አርትዕ",
+    "delete": "አጥፋ",
+    "add": "ጨምር",
+    "confirmDelete": "እርግጠኛ ነዎት?",
+    "confirmDeleteBody": "ይህን እርምጃ መቀልበስ አይቻልም።",
+    "flash": {
+      "saved": "ተቀምጧል።",
+      "deleted": "ተሰርዟል።",
+      "error": "ስህተት ተከስቷል።"
+    },
+    "nav": {
+      "section": "አስተዳዳሪ",
+      "dashboard": "ዳሽቦርድ",
+      "churchInfo": "የቤተ ክርስቲያን መረጃ",
+      "events": "ዝግጅቶች",
+      "sermons": "ስብከቶች",
+      "giving": "ስጦታ",
+      "ministries": "አገልግሎቶች",
+      "youth": "ወጣቶች እና ህፃናት",
+      "messages": "መልዕክቶች",
+      "users": "ተጠቃሚዎች"
+    },
+    "tiles": {
+      "churchInfo": "አድራሻ፣ የአምልኮ ሰዓቶች፣ እምነቶች፣ እሴቶች እና የፓስተር ዝርዝሮችን ያስተካክሉ።",
+      "events": "ዝግጅቶችን ይፍጠሩ፣ ያስተካክሉ እና ያስወግዱ።",
+      "sermons": "የስብከት ቤተ መጻሕፍትን ያስተዳድሩ።",
+      "giving": "ኦንላይን ስጦታ፣ ፈንዶች እና የቅዱስ መጽሐፍ ጥቅስ ያዋቅሩ።",
+      "ministries": "የአገልግሎት ገጾችን ይጨምሩ፣ ለእያንዳንዱ የሚታዩ ክፍሎችን ይምረጡ እና ቪዲዮዎችን ያስተዳድሩ።",
+      "youth": "የወጣቶች እና ህፃናት ገጽ ይዘት፣ ፕሮግራሞች እና ቪዲዮዎች።",
+      "messages": "የእውቂያ መልዕክቶችን እና የጸሎት ጥያቄዎችን ይመልከቱ።",
+      "users": "የአባላት መገለጫዎችን ይመልከቱ እና የአስተዳዳር መዳረሻ ደረጃ ያዋቅሩ (ለከፍተኛ አስተዳዳሮች ብቻ)።"
+    },
+    "dashboard": {
+      "title": "ዳሽቦርድ",
+      "subtitle": "ጎብኝዎች በ EEUCC ጣቢያ የሚያዩትን ሁሉ ያስተዳድሩ።",
+      "open": "ክፈት"
+    },
+    "churchInfo": {
+      "title": "የቤተ ክርስቲያን መረጃ",
+      "description": "እነዚህ ዝርዝሮች በሁሉም ገጾች ይታያሉ።",
+      "identity": "መለያ",
+      "contact": "ግንኙነት",
+      "pastor": "ፓስተር",
+      "mission": "ተልዕኮ እና ታሪክ",
+      "serviceTimes": "የአምልኮ ሰዓቶች",
+      "values": "የተልዕኮ እሴቶች",
+      "beliefs": "ዋና እምነቶች"
+    },
+    "events": {
+      "title": "ዝግጅቶች",
+      "subtitle": "የሚመጡ ዝግጅቶችን ይጨምሩ እና ያስተዳድሩ።",
+      "new": "አዲስ ዝግጅት",
+      "edit": "ዝግጅት ያስተካክሉ",
+      "empty": "ገና ዝግጅት የለም።",
+      "field": {
+        "title": "ርዕስ",
+        "description": "አጭር ማጠቃለያ",
+        "details": "ሙሉ ገለፃ",
+        "location": "ቦታ",
+        "date": "ቀን እና ሰዓት",
+        "imageUrl": "የምስል URL",
+        "registrationUrl": "የመመዝገቢያ URL"
+      }
+    },
+    "sermons": {
+      "title": "ስብከቶች",
+      "subtitle": "የስብከት ቤተ መጻሕፍትን ያስተዳድሩ።",
+      "new": "አዲስ ስብከት",
+      "edit": "ስብከት ያስተካክሉ",
+      "empty": "ገና ስብከት የለም።",
+      "field": {
+        "title": "ርዕስ",
+        "description": "መግለጫ",
+        "speaker": "ተናጋሪ",
+        "scripture": "የመጽሐፍ ቅዱስ ጥቅስ",
+        "category": "ምድብ",
+        "date": "ቀን",
+        "videoUrl": "የዩቲዩብ URL",
+        "audioUrl": "የድምፅ URL",
+        "thumbnailUrl": "የመቅድም ምስል URL",
+        "notesUrl": "የማስታወሻዎች URL"
+      }
+    },
+    "giving": {
+      "title": "ስጦታ",
+      "subtitle": "አባላት እንዴት እንደሚሰጡ እና በስጦታ ገጽ የሚያዩትን ያስተዳድሩ።",
+      "channels": "የስጦታ መንገዶች",
+      "scripture": "የመጽሐፍ ቅዱስ ጥቅስ",
+      "planned": "የወደፊት ስጦታ",
+      "funds": "ፈንዶች",
+      "field": {
+        "onlineUrl": "የኦንላይን ስጦታ URL",
+        "checksPayableTo": "ቼክ ለ",
+        "textNumber": "የጽሑፍ ቁጥር",
+        "textKeyword": "የጽሑፍ ቃል",
+        "mailAddress": "የፖስታ አድራሻ",
+        "scripture": "የቅዱስ መጽሐፍ ጽሑፍ",
+        "cite": "የቅዱስ መጽሐፍ ጥቅስ",
+        "planned": "የወደፊት ስጦታ ጽሑፍ"
+      }
+    },
+    "youth": {
+      "title": "ወጣቶች እና ህፃናት",
+      "subtitle": "የወጣቶች እና ህፃናት ገጽ ያስተካክሉ።",
+      "tabs": { "content": "የገጽ ይዘት", "videos": "ቪዲዮዎች" },
+      "hero": "ሄሮ",
+      "intro": "መግቢያ",
+      "stats": "ስታቲስቲክስ",
+      "ministries": "አገልግሎቶች",
+      "faqs": "ተደጋጋሚ ጥያቄዎች",
+      "cta": "የድርጊት ጥሪ",
+      "newVideo": "አዲስ ቪዲዮ",
+      "editVideo": "ቪዲዮ ያስተካክሉ",
+      "noVideos": "ገና ቪዲዮ የለም።"
+    },
+    "ministries": {
+      "title": "አገልግሎቶች",
+      "subtitle": "እያንዳንዱ አገልግሎት የራሱ የሕዝብ ገጽ አድራሻ አለው። የሚታዩ ክፍሎችን ይምረጡ (መግቢያ፣ ስታትስቲክስ፣ ፕሮግራሞች፣ ቪዲዮ፣ ጥያቄዎች፣ CTA)።",
+      "add": "አገልግሎት ጨምር",
+      "addTitle": "አዲስ አገልግሎት",
+      "create": "አገልግሎት ፍጠር",
+      "empty": "ገና አገልግሎት የለም። በምናሌው ውስጥ ለማሳየት ይጨምሩ።",
+      "backToList": "ወደ አገልግሎቶች ዝርዝር ተመለስ",
+      "editSubtitle": "ለዚህ አገልግሎት ቅንብሮች፣ ጽሑፍ እና ቪዲዮዎች።",
+      "publicUrl": "የሕዝብ URL:",
+      "visible": "በምናሌው ውስጥ ይታያል",
+      "hidden": "ከምናሌ ተደብቋል",
+      "sections": "ክፍሎች",
+      "sectionsTitle": "በዚህ ገጽ ላይ ክፍሎች",
+      "sectionsHelp": "ሄሮ (ርዕስ እና ንዑስ ርዕስ) ሁልጊዜ መጀመሪያ ይታያል። ከዚህ በታች ተጨማሪ ብሎኮችን ይምረጡ።",
+      "settingsNav": "ምናሌ እና URL",
+      "legacyHint": "slug «youth-children» ከሌለ አገልግሎት፣ ጣቢያው አሁንም ከቅንብሮች የወጣቶች እና ህፃናት ይዘት ይጠቀማል።",
+      "legacyLink": "የወጣቶች እና ህፃናት ቆይተኛ አስተዳዳሪ ይክፈቱ",
+      "tabs": {
+        "settings": "ቅንብሮች",
+        "content": "የገጽ ይዘት",
+        "videos": "ቪዲዮዎች"
+      },
+      "field": {
+        "slug": "URL slug",
+        "slugHint": "ትንሽ ፊደላት፣ ቁጥሮች እና ሰረዝ ብቻ። ምሳሌ፦ youth-children",
+        "navLabels": "የምናሌ መለያዎች (EN / አማ)",
+        "sortOrder": "የደረሰኝ ቅደም ተከተል",
+        "visible": "በምናሌ ውስጥ አሳይ"
+      },
+      "section": {
+        "intro": "የመግቢያ ጽሑፍ",
+        "stats": "ስታትስቲክስ ረድፍ",
+        "programs": "የፕሮግራም ካርዶች",
+        "videos": "የቪዲዮ ማጉላት",
+        "faqs": "ተደጋጋሚ ጥያቄዎች",
+        "cta": "የታችኛው የድርጊት ጥሪ"
+      }
+    },
+    "messages": {
+      "title": "የመልዕክት ሳጥን",
+      "subtitle": "ከጎብኝዎች የተላኩ የእውቂያ መልዕክቶችና የጸሎት ጥያቄዎች።",
+      "contactTab": "እውቂያ",
+      "prayerTab": "ጸሎት",
+      "markRead": "የተነበበ ምልክት",
+      "resolve": "ተፈጽሟል",
+      "private": "በምስጢር",
+      "emptyContact": "ገና የእውቂያ መልዕክት የለም።",
+      "emptyPrayer": "ገና የጸሎት ጥያቄ የለም።"
+    },
+    "users": {
+      "title": "ተጠቃሚዎች",
+      "subtitle": "የአባላት መገለጫዎችን ይመልከቱ እና የመዳረሻ ደረጃ ያዋቅሩ። ይህን ገጽ የሚከፍቱት ከፍተኛ አስተዳዳሮች ብቻ ናቸው።",
+      "loadError": "ተጠቃሚዎችን መጫን አልተቻለም",
+      "empty": "ምንም የተጠቃሚ መገለጫ አልተገኘም።",
+      "you": "እርስዎ",
+      "profile": "መገለጫ",
+      "accessLevel": "የመዳረሻ ደረጃ",
+      "accessLevelHint": "አባል፡ ጣቢያ እና መገለጫ ብቻ። አስተዳዳር፡ የጣቢያ ይዘት ያስተዳድሩ። ከፍተኛ አስተዳዳር፡ ይህን የተጠቃሚ ዝርዝር ጨምሮ ሙሉ ቁጥጥር።",
+      "saveRole": "የመዳረሻ ደረጃ አስቀምጥ",
+      "perPage": "አባላት በገጽ።",
+      "prevPage": "ያለፈው ገጽ",
+      "nextPage": "ቀጣይ ገጽ",
+      "pageLabel": "ገጽ",
+      "syncDirectory": "የአባላት ዝርዝር እንደገና ግንባር",
+      "syncDirectoryHint": "ዝርዝሩ ባዶ ከሆነ ወይም ከዚህ በፊት የተመዘገቡ ሰዎች ከጎደሉ፣ አንድ ጊዜ ከሙሉ መገለጫ ዳግም ይገንቡ (ጥቂት ጊዜ ሊወስድ ይችላል)።",
+      "syncDone": "የአባላት ዝርዝር ተዘምኗል",
+      "selectMember": "ሙሉ መገለጫ ለመጫን ከዝርዝሩ አባል ይምረጡ።",
+      "detailError": "መገለጫ መጫን አልተቻለም",
+      "field": {
+        "email": "ኢሜይል",
+        "phone": "ስልክ",
+        "city": "ከተማ",
+        "state": "ግዛት",
+        "uid": "የተጠቃሚ መለያ",
+        "joined": "የተቀላቀሉበት",
+        "bio": "የራስ ገለፃ",
+        "ministry": "የአገልግሎት ፍላጎቶች"
+      },
+      "role": {
+        "member": "አባል",
+        "admin": "አስተዳዳር",
+        "superAdmin": "ከፍተኛ አስተዳዳር"
+      }
+    }
   }
 }

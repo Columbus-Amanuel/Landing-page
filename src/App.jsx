@@ -1,42 +1,37 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
-import { LanguageProvider, useLanguage } from './contexts/LanguageContext';
-import { SiteSettingsProvider } from './contexts/SiteSettingsContext';
-import Layout from './components/layout/Layout';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { LanguageProvider } from '@/contexts/LanguageContext';
+import { SiteSettingsProvider } from '@/contexts/SiteSettingsContext';
+import Layout from '@/components/layout/Layout';
+import ScrollToTop from '@/components/common/ScrollToTop';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
+import { ROUTES } from '@/constants/routes';
 
-import Home from './pages/Home';
-import About from './pages/About';
-import Events from './pages/Events';
-import EventDetail from './pages/EventDetail';
-import Sermons from './pages/Sermons';
-import SermonDetail from './pages/SermonDetail';
-import Contact from './pages/Contact';
-import Give from './pages/Give';
-import YouthChildren from './pages/YouthChildren';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ProfileUpdate from './pages/ProfileUpdate';
-import AdminLayout from './pages/admin/AdminLayout';
-import ProtectedRoute from './components/ui/ProtectedRoute';
-import ScrollToTop from './components/ScrollToTop';
-
-function NotFound() {
-  const { t } = useLanguage();
-
-  return (
-    <div className="not-found">
-      <h1>404</h1>
-      <p>{t('notFound.message')}</p>
-      <a href="/" className="btn btn-primary">{t('notFound.goHome')}</a>
-    </div>
-  );
-}
+import Home from '@/pages/Home';
+import About from '@/pages/About';
+import Events from '@/pages/Events';
+import EventDetail from '@/pages/EventDetail';
+import Sermons from '@/pages/Sermons';
+import SermonDetail from '@/pages/SermonDetail';
+import Contact from '@/pages/Contact';
+import Give from '@/pages/Give';
+import MinistryPage from '@/pages/MinistryPage';
+import Login from '@/pages/Login';
+import Register from '@/pages/Register';
+import ProfileUpdate from '@/pages/ProfileUpdate';
+import NotFound from '@/pages/NotFound';
+import AdminLayout from '@/pages/admin/AdminLayout';
+import ConstructionBanner from '@/components/common/ConstructionBanner';
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+    <>
+      <ConstructionBanner />
+      <Routes>
+      <Route path={ROUTES.login} element={<Login />} />
+      <Route path={ROUTES.register} element={<Register />} />
 
       <Route
         path="/*"
@@ -51,7 +46,8 @@ function AppRoutes() {
               <Route path="sermons/:id" element={<SermonDetail />} />
               <Route path="contact" element={<Contact />} />
               <Route path="give" element={<Give />} />
-              <Route path="youth-children" element={<YouthChildren />} />
+              <Route path="ministries/:slug" element={<MinistryPage />} />
+              <Route path="youth-children" element={<MinistryPage fixedSlug="youth-children" />} />
               <Route
                 path="profile-update"
                 element={(
@@ -74,6 +70,7 @@ function AppRoutes() {
         )}
       />
     </Routes>
+    </>
   );
 }
 
@@ -84,7 +81,10 @@ export default function App() {
       <AuthProvider>
         <LanguageProvider>
           <SiteSettingsProvider>
-            <AppRoutes />
+            <TooltipProvider delayDuration={150}>
+              <AppRoutes />
+              <Toaster />
+            </TooltipProvider>
           </SiteSettingsProvider>
         </LanguageProvider>
       </AuthProvider>

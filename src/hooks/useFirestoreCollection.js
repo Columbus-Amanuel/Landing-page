@@ -21,6 +21,10 @@ export const useFirestoreCollection = (collectionName, queryConstraints = []) =>
       }
     );
     return unsubscribe;
+    // queryConstraints is a fresh array per render from callers; keying on the
+    // collection name avoids resubscribing every render. Callers needing
+    // dynamic queries should memoize their constraints.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collectionName]);
 
   return { data, loading, error };

@@ -1,476 +1,580 @@
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import {
-  ArrowTopRightOnSquareIcon,
-  EnvelopeIcon,
-  MapPinIcon,
-  PhoneIcon,
-  PlayCircleIcon,
-  UserCircleIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
-import { getUpcomingEvents } from '../services/eventsService';
-import { getSermons } from '../services/sermonsService';
-import { submitContactForm } from '../services/contactService';
-import { getYoutubeVideoId } from '../services/youthVideosService';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useSiteSettings } from '../contexts/SiteSettingsContext';
-import EventCard from '../components/ui/EventCard';
-import SermonCard from '../components/ui/SermonCard';
-import LoadingSpinner from '../components/ui/LoadingSpinner';
-import ValueIcon from '../components/ui/ValueIcon';
+  ArrowRight,
+  Calendar,
+  ChevronRight,
+  Heart,
+  MapPin,
+  Phone,
+  PlayCircle,
+  Sparkles,
+  UserCircle2,
+  PhoneCall,
+  Mail,
+  Pause,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import Container from '@/components/common/Container';
+import Section from '@/components/common/Section';
+import EventCard from '@/components/common/EventCard';
+import SermonCard from '@/components/common/SermonCard';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import EmptyState from '@/components/common/EmptyState';
+import ValueIcon from '@/components/common/ValueIcon';
+import VideoEmbed from '@/components/common/VideoEmbed';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { getUpcomingEvents } from '@/services/eventsService';
+import { getSermons } from '@/services/sermonsService';
+import { submitContactForm } from '@/services/contactService';
+import { ROUTES } from '@/constants/routes';
+import {
+  toMapsHref,
+  toTelHref,
+  toMailtoHref,
+  formatPhoneDisplay,
+} from '@/lib/format';
+import { isValidPhone } from '@/lib/validators';
+import { getYoutubeEmbedUrl } from '@/lib/youtube';
+import { cn } from '@/lib/utils';
 
 const DEFAULT_HERO_YOUTUBE_VIDEO_ID = '9tFh_EwJWdc';
-
-function resolveHeroYoutubeId(value = '') {
-  const trimmedValue = String(value).trim();
-  if (!trimmedValue) return '';
-  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmedValue)) return trimmedValue;
-  return getYoutubeVideoId(trimmedValue);
-}
-
 const HERO_CALLBACK_PLACEHOLDER_EMAIL = 'not-provided@example.com';
 
-export default function Home() {
-  const [events, setEvents] = useState([]);
-  const [sermons, setSermons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isHeroVideoVisible, setIsHeroVideoVisible] = useState(false);
-  const [heroVideoBurstTick, setHeroVideoBurstTick] = useState(0);
-  const [callbackOpen, setCallbackOpen] = useState(false);
-  const [callbackSuccess, setCallbackSuccess] = useState(false);
-  const [callbackSubmitting, setCallbackSubmitting] = useState(false);
+function HeroCallbackDialog() {
   const { t, language } = useLanguage();
-  const { churchInfo } = useSiteSettings();
+  const [open, setOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
-    register: registerCallback,
-    handleSubmit: handleSubmitCallback,
-    reset: resetCallback,
-    formState: { errors: callbackErrors },
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
   } = useForm({ defaultValues: { name: '', phone: '' } });
 
-  useEffect(() => {
-    Promise.all([getUpcomingEvents(3), getSermons(3)])
-      .then(([evts, srms]) => {
-        setEvents(evts);
-        setSermons(srms);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  const am = language === 'am';
-
-  const serviceTimes = churchInfo?.serviceTimes || [];
-  const values = churchInfo?.values || [];
-  const {
-    address,
-    city,
-    state,
-    zip,
-    phone,
-    email,
-    pastorName,
-    pastorNameAm,
-  } = churchInfo || {};
-  const fullAddress = [address, city && state ? `${city}, ${state}` : city || state, zip]
-    .filter(Boolean)
-    .join(' ');
-  const mapsHref =
-    fullAddress &&
-    `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`;
-  const pastorDisplay = am ? (pastorNameAm || pastorName) : (pastorName || pastorNameAm);
-  const missionStatement = am
-    ? (churchInfo?.missionStatementAm || churchInfo?.missionStatement || t('home.missionBody'))
-    : (churchInfo?.missionStatement || t('home.missionBody'));
-  const primaryService = serviceTimes[0] || null;
-  const primaryServiceDay = primaryService
-    ? (am && primaryService.dayAm ? primaryService.dayAm : primaryService.day)
-    : '';
-  const primaryServiceSummary = primaryService
-    ? [primaryServiceDay, primaryService.time].filter(Boolean).join(' • ')
-    : '';
-  const primaryServiceNote = primaryService
-    ? (am && primaryService.noteAm ? primaryService.noteAm : primaryService.note)
-    : '';
-  const missionTeaser =
-    missionStatement.length > 170
-      ? `${missionStatement.slice(0, 167).trimEnd()}...`
-      : missionStatement;
-  const heroVideoId = resolveHeroYoutubeId(
-    import.meta.env.VITE_HERO_YOUTUBE_VIDEO_ID || DEFAULT_HERO_YOUTUBE_VIDEO_ID,
-  );
-  const heroVideoEmbedUrl = heroVideoId
-    ? `https://www.youtube-nocookie.com/embed/${heroVideoId}?autoplay=1&mute=1&loop=1&playlist=${heroVideoId}&playsinline=1&rel=0&modestbranding=1&iv_load_policy=3&controls=1`
-    : '';
-
-  const openCallbackDialog = () => {
-    resetCallback();
-    setCallbackSuccess(false);
-    setCallbackOpen(true);
-  };
-
-  const closeCallbackDialog = () => {
-    if (callbackSubmitting) return;
-    setCallbackOpen(false);
-    setCallbackSuccess(false);
-    resetCallback();
-  };
-
-  const onSubmitHeroCallback = async ({ name, phone }) => {
-    setCallbackSubmitting(true);
+  const onSubmit = async (values) => {
+    setSubmitting(true);
     try {
       await submitContactForm({
-        firstName: name.trim(),
+        firstName: values.name,
         lastName: '',
         email: HERO_CALLBACK_PLACEHOLDER_EMAIL,
-        phone: phone.trim(),
+        phone: values.phone,
         subject: t('home.heroCallbackSubject'),
         message: t('home.heroCallbackMessageBody'),
       });
-      setCallbackSuccess(true);
-      resetCallback();
+      toast.success(t('home.heroCallbackThanksTitle'), {
+        description: t('home.heroCallbackThanksBody'),
+      });
+      reset();
+      setOpen(false);
     } catch {
-      alert(am ? 'ችግር ተፈጥሯል። እንደገና ይሞክሩ።' : 'Something went wrong. Please try again.');
+      toast.error(language === 'am' ? 'ስህተት ተከስቷል።' : 'Could not send request.');
     } finally {
-      setCallbackSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  const toggleHeroVideo = () => {
-    setIsHeroVideoVisible((currentValue) => !currentValue);
-    setHeroVideoBurstTick((currentValue) => currentValue + 1);
-  };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="lg" className="bg-white/90 text-foreground backdrop-blur hover:bg-white">
+          <PhoneCall /> {t('home.heroLetUsCallYou')}
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{t('home.heroCallbackDialogTitle')}</DialogTitle>
+          <DialogDescription>{t('home.heroCallbackDialogLead')}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cb-name">{t('home.heroCallbackNameLabel')}</Label>
+            <Input
+              id="cb-name"
+              aria-invalid={Boolean(errors.name)}
+              {...register('name', { required: t('common.required') })}
+            />
+            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cb-phone">{t('home.heroCallbackPhoneLabel')}</Label>
+            <Input
+              id="cb-phone"
+              type="tel"
+              aria-invalid={Boolean(errors.phone)}
+              {...register('phone', {
+                required: t('common.required'),
+                validate: (value) => isValidPhone(value) || t('home.heroCallbackPhoneInvalid'),
+              })}
+            />
+            {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
+              {t('home.heroCallbackCancel')}
+            </Button>
+            <Button type="submit" disabled={submitting}>
+              <PhoneCall /> {submitting ? t('common.loading') : t('home.heroCallbackSubmit')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function Hero() {
+  const { t } = useLanguage();
+  const { churchInfo } = useSiteSettings();
+  const [videoOpen, setVideoOpen] = useState(false);
+
+  const heroVideoId =
+    import.meta.env.VITE_HERO_YOUTUBE_VIDEO_ID || DEFAULT_HERO_YOUTUBE_VIDEO_ID;
+  const heroVideoUrl = getYoutubeEmbedUrl(heroVideoId, {
+    autoplay: true,
+    mute: true,
+    loop: true,
+    controls: false,
+  });
+
+  const fullAddress = [churchInfo.address, churchInfo.city, churchInfo.state, churchInfo.zip]
+    .filter(Boolean)
+    .join(', ');
 
   return (
-    <div className="page-home">
-      <Dialog open={callbackOpen} onClose={closeCallbackDialog} className="profile-dialog-overlay">
-        <div className="profile-dialog-backdrop" aria-hidden="true" />
-        <div className="profile-dialog-container">
-          <DialogPanel className="profile-dialog-panel hero-callback-dialog-panel">
-            <DialogTitle className="profile-dialog-title">
-              {callbackSuccess ? t('home.heroCallbackThanksTitle') : t('home.heroCallbackDialogTitle')}
-            </DialogTitle>
-            {callbackSuccess ? (
-              <>
-                <p className="profile-dialog-body">{t('home.heroCallbackThanksBody')}</p>
-                <button type="button" className="btn btn-primary" onClick={closeCallbackDialog}>
-                  {t('home.heroCallbackClose')}
-                </button>
-              </>
-            ) : (
-              <form className="form hero-callback-form" onSubmit={handleSubmitCallback(onSubmitHeroCallback)}>
-                <p className="profile-dialog-body hero-callback-dialog-lead">{t('home.heroCallbackDialogLead')}</p>
-                <div className="form-group">
-                  <label htmlFor="hero-callback-name">{t('home.heroCallbackNameLabel')}</label>
-                  <input
-                    id="hero-callback-name"
-                    className="form-input"
-                    autoComplete="name"
-                    {...registerCallback('name', { required: t('common.required') })}
-                  />
-                  {callbackErrors.name && (
-                    <span className="form-error">{callbackErrors.name.message}</span>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label htmlFor="hero-callback-phone">{t('home.heroCallbackPhoneLabel')}</label>
-                  <input
-                    id="hero-callback-phone"
-                    type="tel"
-                    className="form-input"
-                    autoComplete="tel"
-                    inputMode="tel"
-                    {...registerCallback('phone', {
-                      required: t('common.required'),
-                      validate: (value) => {
-                        const digits = String(value).replace(/\D/g, '');
-                        if (digits.length >= 10) return true;
-                        return t('home.heroCallbackPhoneInvalid');
-                      },
-                    })}
-                  />
-                  {callbackErrors.phone && (
-                    <span className="form-error">{callbackErrors.phone.message}</span>
-                  )}
-                </div>
-                <div className="hero-callback-dialog-actions">
-                  <button type="button" className="btn btn-ghost" onClick={closeCallbackDialog}>
-                    {t('home.heroCallbackCancel')}
-                  </button>
-                  <button type="submit" className="btn btn-primary" disabled={callbackSubmitting}>
-                    {callbackSubmitting ? t('contact.sending') : t('home.heroCallbackSubmit')}
-                  </button>
-                </div>
-              </form>
-            )}
-          </DialogPanel>
-        </div>
-      </Dialog>
+    <section className="relative isolate overflow-hidden bg-foreground text-background">
+      {/* Background video layer (always rendered; opacity flips when toggled) */}
+      <div className="absolute inset-0">
+        <iframe
+          title={t('home.heroVideoTitle')}
+          className={cn(
+            'absolute left-1/2 top-1/2 h-[120%] w-[120%] -translate-x-1/2 -translate-y-1/2',
+            'transition-opacity duration-700',
+            videoOpen ? 'opacity-90' : 'opacity-30',
+          )}
+          src={heroVideoUrl}
+          frameBorder="0"
+          allow="autoplay; encrypted-media; picture-in-picture"
+        />
+        <div
+          className={cn(
+            'absolute inset-0 transition-opacity duration-700',
+            videoOpen
+              ? 'bg-gradient-to-t from-foreground/80 via-foreground/30 to-foreground/40'
+              : 'bg-gradient-to-br from-foreground/85 via-primary/40 to-foreground/85',
+          )}
+          aria-hidden="true"
+        />
+      </div>
 
-      <section className={`hero hero--showcase${isHeroVideoVisible ? ' hero--video-focus' : ''}`}>
-        <div className="hero-showcase-stage">
-          {heroVideoEmbedUrl ? (
-            <div className="hero-video-frame-wrap">
-              <iframe
-                className="hero-video-frame"
-                src={heroVideoEmbedUrl}
-                title={t('home.heroVideoTitle')}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                tabIndex={isHeroVideoVisible ? 0 : -1}
-              />
-            </div>
-          ) : null}
-          <div className="hero-showcase-mesh" />
-          <div className="hero-showcase-glow hero-showcase-glow--left" />
-          <div className="hero-showcase-glow hero-showcase-glow--right" />
-          <div className="hero-showcase-orbit" />
-        </div>
-        <div className="hero-overlay" />
-        {heroVideoEmbedUrl && (
-          <div className="hero-video-toggle-wrap">
-            <button
-              type="button"
-              className="btn btn-outline-light btn-sm hero-video-toggle"
-              onClick={toggleHeroVideo}
-              aria-pressed={isHeroVideoVisible}
-            >
-              {isHeroVideoVisible ? (
-                <XMarkIcon className="btn-inline-icon" aria-hidden />
-              ) : (
-                <PlayCircleIcon className="btn-inline-icon" aria-hidden />
-              )}
-              <span>{isHeroVideoVisible ? t('home.hideVideoBtn') : t('home.showVideoBtn')}</span>
-            </button>
-            <span className="hero-video-burst" key={heroVideoBurstTick} aria-hidden>
-              {Array.from({ length: 12 }).map((_, index) => (
-                <span key={index} className="hero-video-burst-particle" style={{ '--particle-index': index }} />
-              ))}
-            </span>
+      <Container className="relative grid min-h-[78svh] grid-cols-1 items-center gap-12 py-24 md:min-h-[88svh]">
+        <div
+          className={cn(
+            'max-w-3xl transition-all duration-500',
+            videoOpen ? 'pointer-events-none opacity-0' : 'opacity-100',
+          )}
+        >
+          <Badge variant="accent" className="mb-5 px-3 py-1 text-[0.7rem] uppercase tracking-[0.22em]">
+            <Sparkles className="h-3 w-3" />
+            {t('home.prewelcome')}
+          </Badge>
+          <h1 className="font-hero text-4xl font-semibold leading-[1.05] tracking-tight text-balance text-white md:text-6xl lg:text-7xl">
+            {t('home.title')}
+          </h1>
+          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-background/85 md:text-xl">
+            {t('home.subtitle')}
+          </p>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <Button asChild size="lg" variant="accent">
+              <Link to={ROUTES.about}>
+                {t('home.aboutBtn')} <ArrowRight />
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="border-white/40 bg-white/10 text-white hover:bg-white hover:text-foreground">
+              <Link to={ROUTES.sermons}>
+                <PlayCircle /> {t('home.sermonsBtn')}
+              </Link>
+            </Button>
+            <HeroCallbackDialog />
           </div>
-        )}
-        <div className="container hero-shell">
-          <div className="hero-content hero-content--showcase">
-            <div className="hero-kicker-row">
-              <button
-                type="button"
-                className="hero-meta-pill hero-meta-pill--action"
-                onClick={openCallbackDialog}
+
+          {/* Meta chips: address + service time */}
+          <div className="mt-10 flex flex-wrap gap-2">
+            {fullAddress && (
+              <a
+                href={toMapsHref(fullAddress)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs text-white backdrop-blur hover:border-white/40 hover:bg-white/20"
               >
-                <PhoneIcon aria-hidden />
-                <span>{t('home.heroLetUsCallYou')}</span>
-              </button>
-              {fullAddress && mapsHref && (
-                <a
-                  href={mapsHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hero-meta-pill hero-meta-pill--action hero-meta-pill--multiline"
-                >
-                  <MapPinIcon aria-hidden />
-                  <span>{fullAddress}</span>
-                </a>
-              )}
-            </div>
-
-            <h1 className="hero-title">{t('home.prewelcome')}</h1>
-            <h1 className="hero-title">{t('home.title')}</h1>
-            <p className="hero-subtitle">{t('home.subtitle')}</p>
-
-            <div className="hero-actions">
-              <Link to="/about" className="btn btn-primary btn-lg">{t('home.aboutBtn')}</Link>
-              <Link to="/sermons" className="btn btn-outline-light btn-lg">{t('home.sermonsBtn')}</Link>
-            </div>
-
-            <div className="hero-signal-bar">
-              {primaryServiceSummary && (
-                <article className="hero-signal-card">
-                  <span className="hero-signal-label">{t('home.joinTitle')}</span>
-                  <strong>{primaryServiceSummary}</strong>
-                  {primaryServiceNote && <p>{primaryServiceNote}</p>}
-                </article>
-              )}
-
-              <article className="hero-signal-card hero-signal-card--accent">
-                <span className="hero-signal-label">{t('home.missionTitle')}</span>
-                <p>{missionTeaser}</p>
-              </article>
-            </div>
+                <MapPin className="h-3.5 w-3.5 text-accent" />
+                {fullAddress}
+              </a>
+            )}
+            {churchInfo.phone && (
+              <a
+                href={toTelHref(churchInfo.phone)}
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs text-white backdrop-blur hover:border-white/40 hover:bg-white/20"
+              >
+                <Phone className="h-3.5 w-3.5 text-accent" />
+                {formatPhoneDisplay(churchInfo.phone)}
+              </a>
+            )}
           </div>
-
         </div>
-      </section>
+      </Container>
 
-      <section className="section section-alt">
-        <div className="container">
-          <h2 className="section-title">{t('home.joinTitle')}</h2>
-          <div className="service-times-grid">
-            {serviceTimes.map((s, i) => (
-              <div key={i} className="service-time-card">
-                <h3>{am && s.dayAm ? s.dayAm : s.day}</h3>
-                <p className="service-time">{s.time}</p>
-                {(am ? s.noteAm || s.note : s.note) && (
-                  <p className="service-note">{am && s.noteAm ? s.noteAm : s.note}</p>
-                )}
+      {/* Video toggle, top right */}
+      <div className="absolute right-4 top-24 z-10 md:right-8 md:top-28">
+        <Button
+          type="button"
+          variant="ghost"
+          onClick={() => setVideoOpen((v) => !v)}
+          aria-pressed={videoOpen}
+          className="rounded-full border border-white/30 bg-foreground/40 text-white backdrop-blur hover:bg-foreground/60 hover:text-white"
+        >
+          {videoOpen ? <Pause /> : <PlayCircle />}
+          <span className="hidden md:inline">
+            {videoOpen ? t('home.hideVideoBtn') : t('home.showVideoBtn')}
+          </span>
+        </Button>
+      </div>
+
+      {/* Subtle bottom curve */}
+      <svg
+        className="pointer-events-none absolute -bottom-px left-0 right-0 h-12 w-full text-background"
+        viewBox="0 0 1440 60"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <path d="M0,60 C480,0 960,0 1440,60 L1440,60 L0,60 Z" fill="currentColor" />
+      </svg>
+    </section>
+  );
+}
+
+function ServiceTimes() {
+  const { t, pickLocalized } = useLanguage();
+  const { churchInfo } = useSiteSettings();
+  return (
+    <Section
+      eyebrow={t('home.joinTitle')}
+      title={t('about.serviceTimes')}
+      description={t('home.subtitle')}
+    >
+      <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
+        {(churchInfo.serviceTimes || []).map((entry, idx) => (
+          <Card key={idx} className="border-t-4 border-t-accent text-center">
+            <CardContent className="space-y-2 p-7">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                {pickLocalized(entry, 'day')}
+              </p>
+              <p className="font-hero text-3xl font-semibold text-primary">{entry.time}</p>
+              {entry.note && (
+                <p className="text-sm text-muted-foreground">{pickLocalized(entry, 'note')}</p>
+              )}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <div className="mt-10 flex justify-center">
+        <Button asChild size="lg">
+          <Link to={ROUTES.about}>
+            {t('home.planVisit')} <ArrowRight />
+          </Link>
+        </Button>
+      </div>
+    </Section>
+  );
+}
+
+function Mission() {
+  const { t, pickLocalized, language } = useLanguage();
+  const { churchInfo } = useSiteSettings();
+  return (
+    <Section tone="muted">
+      <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.1fr]">
+        <div>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            {language === 'am' ? 'ተልዕኮ' : 'Our mission'}
+          </p>
+          <h2 className="font-hero text-3xl font-semibold tracking-tight text-balance text-primary md:text-4xl lg:text-5xl">
+            {t('home.missionTitle')}
+          </h2>
+          <p className="mt-5 text-lg leading-relaxed text-muted-foreground">
+            {pickLocalized(churchInfo, 'missionStatement') || t('home.missionBody')}
+          </p>
+          <Button asChild variant="link" className="mt-4 px-0 text-base">
+            <Link to={ROUTES.about}>
+              {t('home.readStory')} <ChevronRight />
+            </Link>
+          </Button>
+        </div>
+
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {(churchInfo.values || []).map((value, idx) => (
+            <li key={`${value.title}-${idx}`}>
+              <Card className="h-full transition-all hover:border-primary/40 hover:shadow-soft">
+                <CardContent className="flex items-start gap-4 p-5">
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                    <ValueIcon icon={value.icon} />
+                  </span>
+                  <div>
+                    <h3 className="font-display text-lg font-semibold text-primary">
+                      {pickLocalized(value, 'title')}
+                    </h3>
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {pickLocalized(value, 'desc')}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
+  );
+}
+
+function ContactLab() {
+  const { t, pickLocalized } = useLanguage();
+  const { churchInfo } = useSiteSettings();
+
+  const fullAddress = [churchInfo.address, churchInfo.city, churchInfo.state, churchInfo.zip]
+    .filter(Boolean)
+    .join(', ');
+
+  return (
+    <section className="relative isolate overflow-hidden bg-foreground py-20 text-background md:py-24">
+      <div className="absolute inset-0 bg-grid opacity-[0.12]" aria-hidden="true" />
+      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary/40 blur-3xl" aria-hidden="true" />
+      <div className="absolute -left-32 -bottom-32 h-96 w-96 rounded-full bg-accent/30 blur-3xl" aria-hidden="true" />
+
+      <Container className="relative">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-accent">
+            {t('home.contactLabEyebrow')}
+          </p>
+          <h2 className="font-hero text-3xl font-semibold text-balance md:text-4xl lg:text-5xl">
+            {t('home.contactLabTitle')}
+          </h2>
+          <p className="mt-4 text-base text-background/75 md:text-lg">
+            {t('home.contactLabLead')}
+          </p>
+        </div>
+
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          {/* Address card */}
+          <Card className="border-white/10 bg-white/5 text-background backdrop-blur-md">
+            <CardContent className="space-y-6 p-7">
+              <div className="flex items-start gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-accent/15 text-accent">
+                  <MapPin className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                    {t('home.contactLabAddressLabel')}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold leading-snug">
+                    {fullAddress}
+                  </p>
+                </div>
               </div>
+              {fullAddress && (
+                <Button asChild variant="outline" className="border-white/30 bg-white/5 text-background hover:bg-white hover:text-foreground">
+                  <a href={toMapsHref(fullAddress)} target="_blank" rel="noopener noreferrer">
+                    <MapPin /> {t('home.contactLabDirections')}
+                  </a>
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Pastor card */}
+          <Card className="border-white/10 bg-white/5 text-background backdrop-blur-md">
+            <CardContent className="space-y-6 p-7">
+              <div className="flex items-start gap-4">
+                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/30 text-primary-foreground">
+                  <UserCircle2 className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                    {t('home.contactLabPastorLabel')}
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-semibold">
+                    {pickLocalized(churchInfo, 'pastorName') || t('home.contactLabPastorFallback')}
+                  </p>
+                  {churchInfo.pastorRole && (
+                    <p className="text-sm text-background/70">
+                      {pickLocalized(churchInfo, 'pastorRole')}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <ul className="flex flex-col gap-2">
+                {churchInfo.phone && (
+                  <li>
+                    <a
+                      href={toTelHref(churchInfo.phone)}
+                      className="flex items-center gap-3 rounded-md border border-white/10 bg-foreground/40 px-4 py-3 text-sm font-medium transition-colors hover:border-accent/60 hover:bg-foreground/60"
+                    >
+                      <Phone className="h-4 w-4 text-accent" />
+                      {formatPhoneDisplay(churchInfo.phone)}
+                    </a>
+                  </li>
+                )}
+                {churchInfo.email && (
+                  <li>
+                    <a
+                      href={toMailtoHref(churchInfo.email)}
+                      className="flex items-center gap-3 rounded-md border border-white/10 bg-foreground/40 px-4 py-3 text-sm font-medium transition-colors hover:border-accent/60 hover:bg-foreground/60"
+                    >
+                      <Mail className="h-4 w-4 text-accent" />
+                      {churchInfo.email}
+                    </a>
+                  </li>
+                )}
+              </ul>
+              <Button asChild variant="accent" className="w-full">
+                <Link to={ROUTES.contact}>{t('home.contactLabMessage')}</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+function Highlights() {
+  const { t } = useLanguage();
+  const [events, setEvents] = useState([]);
+  const [sermons, setSermons] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    Promise.all([getUpcomingEvents(3), getSermons(3)])
+      .then(([evts, srms]) => {
+        if (!active) return;
+        setEvents(evts);
+        setSermons(srms);
+      })
+      .finally(() => active && setLoading(false));
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <>
+      <Section
+        eyebrow={t('home.upcomingEvents')}
+        title={t('home.upcomingEvents')}
+        headerActions={
+          <Button asChild variant="link">
+            <Link to={ROUTES.events}>
+              {t('home.viewAllEvents')} <ArrowRight />
+            </Link>
+          </Button>
+        }
+      >
+        {loading ? (
+          <LoadingSpinner size="lg" center />
+        ) : events.length === 0 ? (
+          <EmptyState icon={Calendar} title={t('home.noEvents')} />
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {events.map((event) => (
+              <EventCard key={event.id} event={event} />
             ))}
           </div>
-          <div className="section-cta">
-            <Link to="/contact" className="btn btn-primary">{t('home.planVisit')}</Link>
+        )}
+      </Section>
+
+      <Section
+        tone="muted"
+        eyebrow={t('home.recentSermons')}
+        title={t('home.recentSermons')}
+        headerActions={
+          <Button asChild variant="link">
+            <Link to={ROUTES.sermons}>
+              {t('home.viewAllSermons')} <ArrowRight />
+            </Link>
+          </Button>
+        }
+      >
+        {loading ? (
+          <LoadingSpinner size="lg" center />
+        ) : sermons.length === 0 ? (
+          <EmptyState icon={PlayCircle} title={t('home.noSermons')} />
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sermons.map((sermon) => (
+              <SermonCard key={sermon.id} sermon={sermon} />
+            ))}
           </div>
+        )}
+      </Section>
+    </>
+  );
+}
+
+function CTA() {
+  const { t } = useLanguage();
+  return (
+    <section className="relative isolate overflow-hidden bg-primary py-20 text-center text-primary-foreground md:py-24">
+      <div className="absolute inset-0 bg-grid opacity-15" aria-hidden="true" />
+      <Container className="relative">
+        <Heart className="mx-auto mb-4 h-10 w-10 text-accent" />
+        <h2 className="font-hero text-3xl font-semibold text-balance md:text-4xl lg:text-5xl">
+          {t('home.ctaTitle')}
+        </h2>
+        <p className="mx-auto mt-3 max-w-xl text-primary-foreground/85">
+          {t('home.ctaText')}
+        </p>
+        <div className="mt-8 flex justify-center">
+          <Button asChild size="lg" variant="accent">
+            <Link to={ROUTES.contact}>
+              {t('home.ctaButton')} <ArrowRight />
+            </Link>
+          </Button>
         </div>
-      </section>
+      </Container>
+    </section>
+  );
+}
 
-      {(fullAddress || phone || email) && (
-        <section className="home-contact-lab" aria-labelledby="home-contact-lab-title">
-          <div className="home-contact-lab-grid-bg" aria-hidden />
-          <div className="home-contact-lab-glow" aria-hidden />
-          <div className="container">
-            <p className="home-contact-lab-eyebrow">{t('home.contactLabEyebrow')}</p>
-            <h2 id="home-contact-lab-title" className="home-contact-lab-title">
-              {t('home.contactLabTitle')}
-            </h2>
-            <p className="home-contact-lab-lead">{t('home.contactLabLead')}</p>
-
-            <div className="home-contact-lab-panels">
-              {fullAddress && (
-                <article className="home-contact-panel">
-                  <div className="home-contact-panel-header">
-                    <span className="home-contact-panel-icon" aria-hidden>
-                      <MapPinIcon />
-                    </span>
-                    <div>
-                      <h3 className="home-contact-panel-label">{t('home.contactLabAddressLabel')}</h3>
-                      <p className="home-contact-panel-value">{fullAddress}</p>
-                    </div>
-                  </div>
-                  {mapsHref && (
-                    <a
-                      href={mapsHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="home-contact-panel-link"
-                    >
-                      <span>{t('home.contactLabDirections')}</span>
-                      <ArrowTopRightOnSquareIcon aria-hidden />
-                    </a>
-                  )}
-                </article>
-              )}
-
-              {(phone || email) && (
-                <article className="home-contact-panel home-contact-panel--pastor">
-                  <div className="home-contact-panel-header">
-                    <span className="home-contact-panel-icon" aria-hidden>
-                      <UserCircleIcon />
-                    </span>
-                    <div>
-                      <h3 className="home-contact-panel-label">{t('home.contactLabPastorLabel')}</h3>
-                      {pastorDisplay ? (
-                        <p className="home-contact-panel-pastor-name">{pastorDisplay}</p>
-                      ) : (
-                        <p className="home-contact-panel-role">{t('home.contactLabPastorFallback')}</p>
-                      )}
-                    </div>
-                  </div>
-                  <ul className="home-contact-panel-actions">
-                    {phone && (
-                      <li>
-                        <a href={`tel:${String(phone).replace(/\D/g, '')}`} className="home-contact-chip">
-                          <PhoneIcon aria-hidden />
-                          <span>{phone}</span>
-                        </a>
-                      </li>
-                    )}
-                    {email && (
-                      <li>
-                        <a href={`mailto:${email}`} className="home-contact-chip">
-                          <EnvelopeIcon aria-hidden />
-                          <span>{email}</span>
-                        </a>
-                      </li>
-                    )}
-                  </ul>
-                  <Link to="/contact" className="home-contact-panel-cta">
-                    {t('home.contactLabMessage')}
-                  </Link>
-                </article>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <section className="section">
-        <div className="container">
-          <div className="mission-grid">
-            <div className="mission-text">
-              <h2 className="section-title text-left">{t('home.missionTitle')}</h2>
-              <p>{missionStatement}</p>
-              <Link to="/about" className="btn btn-outline mt-4">{t('home.readStory')}</Link>
-            </div>
-            <div className="mission-values">
-              {values.map((v, i) => (
-                <div key={i} className="value-card">
-                  <ValueIcon iconKey={v.icon} />
-                  <div>
-                    <h4>{am && v.titleAm ? v.titleAm : v.title}</h4>
-                    <p>{am && v.descAm ? v.descAm : v.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section section-alt">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">{t('home.upcomingEvents')}</h2>
-            <Link to="/events" className="btn btn-ghost">{t('home.viewAllEvents')}</Link>
-          </div>
-          {loading ? (
-            <LoadingSpinner center />
-          ) : events.length > 0 ? (
-            <div className="events-grid">
-              {events.map((event) => <EventCard key={event.id} event={event} />)}
-            </div>
-          ) : (
-            <p className="empty-state">{t('home.noEvents')}</p>
-          )}
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">{t('home.recentSermons')}</h2>
-            <Link to="/sermons" className="btn btn-ghost">{t('home.viewAllSermons')}</Link>
-          </div>
-          {loading ? (
-            <LoadingSpinner center />
-          ) : sermons.length > 0 ? (
-            <div className="sermons-grid">
-              {sermons.map((sermon) => <SermonCard key={sermon.id} sermon={sermon} />)}
-            </div>
-          ) : (
-            <p className="empty-state">{t('home.noSermons')}</p>
-          )}
-        </div>
-      </section>
-
-      <section className="cta-banner">
-        <div className="container">
-          <h2>{t('home.ctaTitle')}</h2>
-          <p>{t('home.ctaText')}</p>
-          <Link to="/contact" className="btn btn-primary btn-lg">{t('home.ctaButton')}</Link>
-        </div>
-      </section>
-    </div>
+export default function Home() {
+  return (
+    <>
+      <Hero />
+      <ServiceTimes />
+      <Mission />
+      <Highlights />
+      <ContactLab />
+      <CTA />
+    </>
   );
 }

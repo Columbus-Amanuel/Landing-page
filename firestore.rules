@@ -3,75 +3,101 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper functions
     function isAuthenticated() {
       return request.auth != null;
     }
-    function isAdmin() {
-      return isAuthenticated() &&
-        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+
+    /** Caller Firestore profile role; null if no user doc or no `role` field. */
+    function callerRole() {
+      let path = /databases/$(database)/documents/users/$(request.auth.uid);
+      let userData = exists(path) ? get(path).data : null;
+      return userData == null ? null : userData.role;
     }
+
+    /** Church staff with admin panel + content access. */
+    function isStaff() {
+      let r = callerRole();
+      return isAuthenticated() && (r == 'admin' || r == 'super-admin' || r == 'super_admin');
+    }
+
+    function isSuperAdmin() {
+      let r = callerRole();
+      return isAuthenticated() && (r == 'super-admin' || r == 'super_admin');
+    }
+
     function isOwner(uid) {
       return isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Users — read own profile; admin reads all
     match /users/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
-      allow create: if isAuthenticated() && request.auth.uid == uid;
-      allow update: if isOwner(uid) || isAdmin();
-      allow delete: if isAdmin();
+      // Split get vs list: unfiltered collection listeners use `list`. A combined
+      // `allow read` with (isOwner || isSuperAdmin) can fail query validation even
+      // for super-admins; `list` only checks the caller role via get(self).
+      allow get: if isOwner(uid) || isSuperAdmin();
+      allow list: if isSuperAdmin();
+      allow create: if isAuthenticated()
+        && request.auth.uid == uid
+        && request.resource.data.role == 'member';
+      allow update: if isSuperAdmin()
+        || (isOwner(uid) && request.resource.data.role == resource.data.role);
+      allow delete: if isSuperAdmin();
     }
 
-    // Events — public read; admin write
+    // Minimal directory rows for paginated admin lists (displayName, email, role, createdAt).
+    match /userIndex/{uid} {
+      allow get, list: if isSuperAdmin();
+      allow create: if isSuperAdmin()
+        || (isAuthenticated() && request.auth.uid == uid
+            && request.resource.data.role == 'member'
+            && request.resource.data.keys().hasOnly(['displayName', 'email', 'role', 'createdAt']));
+      allow update: if isSuperAdmin()
+        || (isOwner(uid) && request.resource.data.role == resource.data.role);
+      allow delete: if isSuperAdmin();
+    }
+
     match /events/{eventId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isStaff();
     }
 
-    // Sermons — public read; admin write
     match /sermons/{sermonId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isStaff();
     }
 
-
-
-    // Site settings (church info, giving) — public read; admin write
     match /siteSettings/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isStaff();
     }
 
-    // Youth videos — public read; admin write
     match /youthVideos/{videoId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isStaff();
     }
 
+    match /ministries/{ministryId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
 
-    // Youth page content — public read; admin write
     match /youthPageContent/{docId} {
       allow read: if true;
-      allow write: if isAdmin();
+      allow write: if isStaff();
     }
 
-    // Church profile updates — authenticated users submit; admin manages
     match /churchProfileUpdates/{docId} {
       allow create: if isAuthenticated();
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if isStaff();
     }
 
-    // Contact messages — authenticated users create; admin reads/updates
     match /contactMessages/{msgId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if isSuperAdmin();
     }
 
-    // Prayer requests — anyone can submit; admin reads/updates
     match /prayerRequests/{reqId} {
       allow create: if true;
-      allow read, update, delete: if isAdmin();
+      allow read, update, delete: if isSuperAdmin();
     }
   }
 }

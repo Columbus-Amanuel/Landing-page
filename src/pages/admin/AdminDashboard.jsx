@@ -1,80 +1,75 @@
 import { Link } from 'react-router-dom';
 import {
-  BuildingLibraryIcon,
-  CalendarDaysIcon,
-  MicrophoneIcon,
-  BanknotesIcon,
-  UserGroupIcon,
-  EnvelopeIcon,
-} from '@heroicons/react/24/outline';
-import { useLanguage } from '../../contexts/LanguageContext';
+  Building2,
+  CalendarDays,
+  Mic,
+  Heart,
+  Sparkles,
+  Inbox,
+  Users,
+  ArrowRight,
+} from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import Container from '@/components/common/Container';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { ROUTES } from '@/constants/routes';
+import { isSuperAdminRole } from '@/lib/roles';
 
-const sections = [
-  {
-    to: '/admin/church-info',
-    icon: BuildingLibraryIcon,
-    label: 'Church Info',
-    desc: 'Address, phone, service times, story, beliefs, and home page values',
-  },
-  {
-    to: '/admin/events',
-    icon: CalendarDaysIcon,
-    label: 'Events',
-    desc: 'Create, edit, and delete upcoming church events',
-  },
-  {
-    to: '/admin/sermons',
-    icon: MicrophoneIcon,
-    label: 'Sermons',
-    desc: 'Upload and manage sermons with audio, video, and notes',
-  },
-  {
-    to: '/admin/giving',
-    icon: BanknotesIcon,
-    label: 'Giving',
-    desc: 'Edit giving funds, online payment link, and mailing address',
-  },
-  {
-    to: '/admin/youth',
-    icon: UserGroupIcon,
-    label: 'Youth & Children',
-    desc: 'Manage Youth & Children page content and YouTube videos',
-  },
-  {
-    to: '/admin/messages',
-    icon: EnvelopeIcon,
-    label: 'Messages',
-    desc: 'View contact form submissions and prayer requests',
-  },
+const TILES = [
+  { key: 'churchInfo', icon: Building2, to: ROUTES.adminChurchInfo },
+  { key: 'events', icon: CalendarDays, to: ROUTES.adminEvents },
+  { key: 'sermons', icon: Mic, to: ROUTES.adminSermons },
+  { key: 'giving', icon: Heart, to: ROUTES.adminGiving },
+  { key: 'ministries', icon: Sparkles, to: ROUTES.adminMinistries },
+  { key: 'messages', icon: Inbox, to: ROUTES.adminMessages, superOnly: true },
+  { key: 'users', icon: Users, to: ROUTES.adminUsers, superOnly: true },
 ];
 
 export default function AdminDashboard() {
-  const { language } = useLanguage();
-
+  const { t } = useLanguage();
+  const { profile } = useAuth();
   return (
-    <div>
-      <h1 className="admin-page-title">
-        {language === 'am' ? 'ዳሽቦርድ' : 'Dashboard'}
-      </h1>
-      <p className="admin-page-subtitle">
-        {language === 'am'
-          ? 'ከዚህ በታች ያሉትን ክፍሎች ጠቅ ያድርጉ።'
-          : 'Select a section below to manage your church website content.'}
-      </p>
-      <div className="admin-dashboard-grid">
-        {sections.map((section) => {
-          const Icon = section.icon;
-          return (
-            <Link key={section.to} to={section.to} className="admin-dashboard-card">
-              <div className="admin-dashboard-card-icon-wrap" aria-hidden>
-                <Icon className="admin-dashboard-card-icon" />
-              </div>
-              <h3>{section.label}</h3>
-              <p>{section.desc}</p>
-            </Link>
-          );
-        })}
+    <Container size="xl" className="px-0">
+      <header className="mb-10">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+          {t('admin.welcome')}
+        </p>
+        <h1 className="mt-1 font-hero text-3xl font-semibold text-primary md:text-4xl">
+          {t('admin.dashboard.title')}
+          {profile?.displayName ? `, ${profile.displayName.split(' ')[0]}` : ''}
+        </h1>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          {t('admin.dashboard.subtitle')}
+        </p>
+      </header>
+
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {TILES.filter((tile) => !tile.superOnly || isSuperAdminRole(profile?.role)).map((tile) => (
+          <Link
+            key={tile.key}
+            to={tile.to}
+            className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-xl"
+          >
+            <Card className="h-full transition-all group-hover:border-primary/40 group-hover:shadow-float">
+              <CardContent className="flex flex-col gap-3 p-6">
+                <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <tile.icon className="h-5 w-5" />
+                </span>
+                <h3 className="font-display text-xl font-semibold text-primary">
+                  {t(`admin.nav.${tile.key}`)}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {t(`admin.tiles.${tile.key}`)}
+                </p>
+                <span className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-accent">
+                  {t('admin.dashboard.open')} <ArrowRight className="h-3.5 w-3.5" />
+                </span>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
-    </div>
+    </Container>
   );
 }

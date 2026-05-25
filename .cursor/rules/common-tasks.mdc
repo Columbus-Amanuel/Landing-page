@@ -7,12 +7,12 @@ alwaysApply: true
 
 ## Adding a New Page
 
-1. Create `src/pages/NewPage.jsx` with the standard page pattern (page-hero + section + container).
-2. Add a route in `src/App.jsx` inside the Layout `<Routes>` block.
-3. Add a nav link label to both translation files (`nav.newPage`).
-4. Add the route in `src/components/layout/Navbar.jsx` — either a top-level `NavLink`, an entry in `ministriesItems` / `mediaItems`, or a new dropdown group; update `ministriesActive` / `mediaActive` (or equivalent) if the new path belongs to a group. (Youth & Children lives under the **Ministries** dropdown; **Connect** on mobile groups Contact + Give.)
-5. Optionally add a footer link in `src/components/layout/Footer.jsx`.
-6. Add CSS classes in `src/index.css` if needed.
+1. Create `src/pages/NewPage.jsx`. Compose from the standard primitives: `<PageHero />` (or full-bleed hero `<section>`), then `<Section><Container>…</Container></Section>` wrappers with shadcn `Card`s inside.
+2. Register the path in `src/constants/routes.js` (`ROUTES.newPage = '/new-page'`).
+3. Add the route element in `src/App.jsx` inside the Layout `<Routes>` block, importing `ROUTES.newPage`.
+4. Register the link in `src/constants/nav.js` — either in `PRIMARY_NAV`, `MINISTRIES_NAV`, `MEDIA_NAV`, or `CONNECT_NAV`. Both `Navbar` (desktop) and `MobileNav` (Sheet drawer) read from these arrays so they never drift.
+5. Add translation keys for the link label (`nav.newPage`) in both `en/translations.json` and `am/translations.json`.
+6. Optionally add a footer link in `src/components/layout/Footer.jsx` (it also pulls from `ROUTES`).
 
 ## Adding a New Firestore Collection
 
@@ -26,13 +26,19 @@ alwaysApply: true
 1. Add the key in `src/i18n/en/translations.json`.
 2. Add the matching key with Amharic text in `src/i18n/am/translations.json`.
 3. Access in components via `t('section.key')`.
+4. For bilingual *content* (Firestore doc fields like `title` / `titleAm`), use `pickLocalized(obj, 'title')` from `useLanguage()` instead of inline ternaries.
 
-## Adding a New UI Component
+## Adding a New UI Primitive (shadcn-style)
 
-1. Create in `src/components/ui/ComponentName.jsx`.
-2. Use `export default function ComponentName()` pattern.
-3. Style with classes in `src/index.css`.
-4. Import and use where needed.
+1. Create `src/components/ui/component-name.jsx`. Wrap the appropriate Radix primitive and define variants with `cva`. Always merge the caller's `className` through `cn(...)`.
+2. Re-use brand tokens (`bg-primary`, `text-accent`, etc.) — do not hard-code colors.
+3. Export both the component(s) and any variant helpers (e.g. `buttonVariants`).
+4. Document props with a JSDoc block.
+
+## Adding a Domain Component
+
+1. Create `src/components/common/ComponentName.jsx` composing the ui primitives.
+2. Keep page-specific subcomponents inside the page file unless they're reused in 2+ places.
 
 ## Protecting a Route
 
@@ -45,8 +51,17 @@ For admin-only: `<ProtectedRoute adminOnly>`.
 ## Working with Firestore Dates
 
 - Firestore stores dates as `Timestamp` objects.
-- Convert before rendering: `const jsDate = doc.date?.toDate ? doc.date.toDate() : new Date(doc.date)`.
-- Format with `date-fns`: `format(jsDate, 'MMMM d, yyyy')`.
+- Normalize with `toDate(value)` from `src/lib/format.js`.
+- Display with `formatDate(date, pattern)` / `formatTime(date)` (thin `date-fns` wrappers).
+
+## Showing Action Feedback (toasts)
+
+```js
+import { toast } from 'sonner';
+toast.success('Saved');
+toast.error('Could not save. Please try again.');
+```
+The `<Toaster />` is already mounted once in `App.jsx`; never mount another.
 
 ## Running Locally
 

@@ -1,225 +1,362 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { submitContactForm, submitPrayerRequest } from '../services/contactService';
+import { toast } from 'sonner';
+import { CheckCircle2, Mail, Phone, MapPin, Clock, Send, HeartHandshake } from 'lucide-react';
+import PageHero from '@/components/common/PageHero';
+import Section from '@/components/common/Section';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
-  CheckCircleIcon,
-  ClockIcon,
-  EnvelopeIcon,
-  MapPinIcon,
-  PhoneIcon,
-} from '@heroicons/react/24/outline';
-import { useSiteSettings } from '../contexts/SiteSettingsContext';
-import { useLanguage } from '../contexts/LanguageContext';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { submitContactForm, submitPrayerRequest } from '@/services/contactService';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSiteSettings } from '@/contexts/SiteSettingsContext';
+import { EMAIL_REGEX } from '@/lib/validators';
+import { toMapsHref, toMailtoHref, toTelHref, formatPhoneDisplay } from '@/lib/format';
+
+const SUBJECT_OPTIONS = [
+  { value: 'general', labelEn: 'General Inquiry', labelAm: 'አጠቃላይ ጥያቄ' },
+  { value: 'visit', labelEn: 'Planning a visit', labelAm: 'ጉብኝት ማቀድ' },
+  { value: 'pastoral', labelEn: 'Pastoral care', labelAm: 'የፓስተር አገልግሎት' },
+  { value: 'volunteer', labelEn: 'Volunteer', labelAm: 'በበጎ ፈቃደኝነት' },
+  { value: 'other', labelEn: 'Other', labelAm: 'ሌላ' },
+];
+
+function ContactInfoItem({ icon: IconComponent, label, children }) {
+  return (
+    <div className="flex items-start gap-3">
+      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+        <IconComponent className="h-4 w-4" />
+      </span>
+      <div className="flex-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+        <div className="mt-1 text-sm text-foreground">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+function ContactInfo() {
+  const { t, pickLocalized, language } = useLanguage();
+  const { churchInfo } = useSiteSettings();
+  const fullAddress = [churchInfo.address, churchInfo.city, churchInfo.state, churchInfo.zip]
+    .filter(Boolean)
+    .join(', ');
+
+  return (
+    <Card className="bg-muted/40">
+      <CardContent className="space-y-5 p-7">
+        <h3 className="font-display text-xl font-semibold text-primary">
+          {t('contact.getInTouch')}
+        </h3>
+
+        {fullAddress && (
+          <ContactInfoItem icon={MapPin} label={t('contact.address')}>
+            <a href={toMapsHref(fullAddress)} target="_blank" rel="noopener noreferrer" className="hover:text-primary">
+              {fullAddress}
+            </a>
+          </ContactInfoItem>
+        )}
+
+        {churchInfo.phone && (
+          <ContactInfoItem icon={Phone} label={t('contact.phone')}>
+            <a href={toTelHref(churchInfo.phone)} className="hover:text-primary">
+              {formatPhoneDisplay(churchInfo.phone)}
+            </a>
+          </ContactInfoItem>
+        )}
+
+        {churchInfo.email && (
+          <ContactInfoItem icon={Mail} label={t('contact.email')}>
+            <a href={toMailtoHref(churchInfo.email)} className="hover:text-primary">
+              {churchInfo.email}
+            </a>
+          </ContactInfoItem>
+        )}
+
+        <ContactInfoItem icon={Clock} label={t('contact.serviceTimes')}>
+          <ul className="space-y-1">
+            {(churchInfo.serviceTimes || []).map((s, idx) => (
+              <li key={idx}>
+                <span className="font-semibold">{pickLocalized(s, 'day')}</span> · {s.time}
+              </li>
+            ))}
+          </ul>
+        </ContactInfoItem>
+
+        {churchInfo.pastorName && (
+          <ContactInfoItem icon={HeartHandshake} label={language === 'am' ? 'የፓስተር አገልግሎት' : 'Pastoral contact'}>
+            <p className="font-semibold">{pickLocalized(churchInfo, 'pastorName')}</p>
+            <p className="text-muted-foreground">{pickLocalized(churchInfo, 'pastorRole')}</p>
+          </ContactInfoItem>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Contact() {
-  const [activeTab, setActiveTab] = useState('contact');
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const { churchInfo } = useSiteSettings();
   const { t, language } = useLanguage();
+  const [mode, setMode] = useState('contact');
+  const [submitted, setSubmitted] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const am = language === 'am';
+  const contactForm = useForm({
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      subject: 'general',
+      message: '',
+    },
+  });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm();
+  const prayerForm = useForm({
+    defaultValues: { name: '', email: '', request: '', isPrivate: false },
+  });
 
-  const onSubmitContact = async (data) => {
+  const onContactSubmit = async (values) => {
     setSubmitting(true);
     try {
-      await submitContactForm(data);
-      setSubmitted(true);
-      reset();
+      await submitContactForm(values);
+      setSubmitted('contact');
+      contactForm.reset();
+      toast.success(t('contact.contactThanks'));
     } catch {
-      alert(am ? 'ችግር ተፈጥሯል። እንደገና ይሞክሩ።' : 'Something went wrong. Please try again.');
+      toast.error(language === 'am' ? 'መልዕክት መላክ አልተቻለም።' : 'Could not send your message.');
     } finally {
       setSubmitting(false);
     }
   };
 
-  const onSubmitPrayer = async (data) => {
+  const onPrayerSubmit = async (values) => {
     setSubmitting(true);
     try {
-      await submitPrayerRequest(data);
-      setSubmitted(true);
-      reset();
+      await submitPrayerRequest(values);
+      setSubmitted('prayer');
+      prayerForm.reset();
+      toast.success(t('contact.prayerThanks'));
     } catch {
-      alert(am ? 'ችግር ተፈጥሯል። እንደገና ይሞክሩ።' : 'Something went wrong. Please try again.');
+      toast.error(language === 'am' ? 'ጥያቄ መላክ አልተቻለም።' : 'Could not submit your prayer request.');
     } finally {
       setSubmitting(false);
     }
   };
-
-  const { address, city, state, zip, phone, email, serviceTimes } = churchInfo;
-  const fullAddress = [address, city && state ? `${city}, ${state}` : city || state, zip].filter(Boolean).join(' ');
 
   if (submitted) {
     return (
-      <div className="page-contact">
-        <section className="section">
-          <div className="container container-narrow text-center">
-            <div className="success-state">
-              <CheckCircleIcon className="success-icon" aria-hidden />
-              <h2>{t('contact.thankYouTitle')}</h2>
-              <p>{activeTab === 'contact' ? t('contact.contactThanks') : t('contact.prayerThanks')}</p>
-              <button className="btn btn-primary" onClick={() => setSubmitted(false)}>
+      <>
+        <PageHero title={t('contact.thankYouTitle')} />
+        <Section containerSize="md">
+          <Card>
+            <CardContent className="flex flex-col items-center gap-4 px-8 py-16 text-center">
+              <CheckCircle2 className="h-14 w-14 text-success" />
+              <h2 className="font-display text-2xl font-semibold text-primary">
+                {t('contact.thankYouTitle')}
+              </h2>
+              <p className="max-w-md text-muted-foreground">
+                {submitted === 'contact' ? t('contact.contactThanks') : t('contact.prayerThanks')}
+              </p>
+              <Button onClick={() => setSubmitted(null)} className="mt-2">
                 {t('contact.sendAnother')}
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
+              </Button>
+            </CardContent>
+          </Card>
+        </Section>
+      </>
     );
   }
 
   return (
-    <div className="page-contact">
-      <section className="page-hero">
-        <h1>{t('contact.heroTitle')}</h1>
-        <p>{t('contact.heroSubtitle')}</p>
-      </section>
+    <>
+      <PageHero title={t('contact.heroTitle')} subtitle={t('contact.heroSubtitle')} />
 
-      <section className="section">
-        <div className="container">
-          <div className="contact-grid">
-            {/* Form */}
-            <div className="contact-form-wrapper">
-              <div className="tab-group">
-                <button className={`tab ${activeTab === 'contact' ? 'active' : ''}`} onClick={() => setActiveTab('contact')}>
-                  {t('contact.contactTab')}
-                </button>
-                <button className={`tab ${activeTab === 'prayer' ? 'active' : ''}`} onClick={() => setActiveTab('prayer')}>
-                  {t('contact.prayerTab')}
-                </button>
-              </div>
+      <Section>
+        <div className="grid gap-10 lg:grid-cols-[1fr_22rem]">
+          <Card>
+            <CardContent className="p-8">
+              <Tabs value={mode} onValueChange={setMode}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="contact">{t('contact.contactTab')}</TabsTrigger>
+                  <TabsTrigger value="prayer">{t('contact.prayerTab')}</TabsTrigger>
+                </TabsList>
 
-              {activeTab === 'contact' ? (
-                <form onSubmit={handleSubmit(onSubmitContact)} className="form">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>{am ? 'የመጀመሪያ ስም' : 'First Name'} *</label>
-                      <input {...register('firstName', { required: t('common.required') })} className="form-input" />
-                      {errors.firstName && <span className="form-error">{errors.firstName.message}</span>}
+                <TabsContent value="contact">
+                  <form
+                    onSubmit={contactForm.handleSubmit(onContactSubmit)}
+                    className="flex flex-col gap-5"
+                  >
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="firstName">
+                          {language === 'am' ? 'ስም' : 'First name'}
+                        </Label>
+                        <Input
+                          id="firstName"
+                          aria-invalid={Boolean(contactForm.formState.errors.firstName)}
+                          {...contactForm.register('firstName', { required: t('common.required') })}
+                        />
+                        {contactForm.formState.errors.firstName && (
+                          <p className="text-xs text-destructive">
+                            {contactForm.formState.errors.firstName.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="lastName">
+                          {language === 'am' ? 'የአባት ስም' : 'Last name'}
+                        </Label>
+                        <Input
+                          id="lastName"
+                          aria-invalid={Boolean(contactForm.formState.errors.lastName)}
+                          {...contactForm.register('lastName', { required: t('common.required') })}
+                        />
+                        {contactForm.formState.errors.lastName && (
+                          <p className="text-xs text-destructive">
+                            {contactForm.formState.errors.lastName.message}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="form-group">
-                      <label>{am ? 'የአባት ስም' : 'Last Name'} *</label>
-                      <input {...register('lastName', { required: t('common.required') })} className="form-input" />
-                      {errors.lastName && <span className="form-error">{errors.lastName.message}</span>}
+
+                    <div className="grid gap-5 sm:grid-cols-2">
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          aria-invalid={Boolean(contactForm.formState.errors.email)}
+                          {...contactForm.register('email', {
+                            required: t('common.required'),
+                            pattern: { value: EMAIL_REGEX, message: language === 'am' ? 'ትክክለኛ ኢሜል ያስገቡ።' : 'Enter a valid email.' },
+                          })}
+                        />
+                        {contactForm.formState.errors.email && (
+                          <p className="text-xs text-destructive">
+                            {contactForm.formState.errors.email.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex flex-col gap-2">
+                        <Label htmlFor="phone">{language === 'am' ? 'ስልክ (አማራጭ)' : 'Phone (optional)'}</Label>
+                        <Input id="phone" type="tel" {...contactForm.register('phone')} />
+                      </div>
                     </div>
-                  </div>
-                  <div className="form-group">
-                    <label>{t('contact.email')} *</label>
-                    <input type="email" {...register('email', { required: t('common.required') })} className="form-input" />
-                    {errors.email && <span className="form-error">{errors.email.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>{t('contact.phone')}</label>
-                    <input type="tel" {...register('phone')} className="form-input" />
-                  </div>
-                  <div className="form-group">
-                    <label>{am ? 'ርዕሰ ጉዳይ' : 'Subject'} *</label>
-                    <select {...register('subject', { required: t('common.required') })} className="form-input">
-                      <option value="">{am ? 'ርዕሰ ጉዳይ ይምረጡ…' : 'Select a topic…'}</option>
-                      <option value="General Inquiry">{am ? 'አጠቃላይ ጥያቄ' : 'General Inquiry'}</option>
-                      <option value="Membership">{am ? 'አባልነት' : 'Membership'}</option>
-                      <option value="Volunteering">{am ? 'በፈቃደኝነት ማገልገል' : 'Volunteering'}</option>
-                      <option value="Baptism">{am ? 'ጥምቀት' : 'Baptism'}</option>
-                      <option value="Counseling">{am ? 'ምክር' : 'Counseling'}</option>
-                      <option value="Other">{am ? 'ሌላ' : 'Other'}</option>
-                    </select>
-                    {errors.subject && <span className="form-error">{errors.subject.message}</span>}
-                  </div>
-                  <div className="form-group">
-                    <label>{am ? 'መልዕክት' : 'Message'} *</label>
-                    <textarea rows={5} {...register('message', { required: t('common.required') })} className="form-input" />
-                    {errors.message && <span className="form-error">{errors.message.message}</span>}
-                  </div>
-                  <button type="submit" disabled={submitting} className="btn btn-primary btn-full">
-                    {submitting ? t('contact.sending') : t('contact.sendMessage')}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleSubmit(onSubmitPrayer)} className="form">
-                  <div className="form-group">
-                    <label>{am ? 'ስምዎ' : 'Your Name'}</label>
-                    <input {...register('name')} className="form-input" placeholder={am ? 'ሳይታወቅ ካስፈለገ' : 'Anonymous if preferred'} />
-                  </div>
-                  <div className="form-group">
-                    <label>{t('contact.email')} ({am ? 'አማራጭ' : 'optional'})</label>
-                    <input type="email" {...register('email')} className="form-input" />
-                  </div>
-                  <div className="form-group">
-                    <label>{am ? 'የጸሎት ልመና' : 'Prayer Request'} *</label>
-                    <textarea
-                      rows={6}
-                      {...register('request', { required: am ? 'ልመናዎን ያጋሩ' : 'Please share your request' })}
-                      className="form-input"
-                      placeholder={am ? 'የጸሎት ልመናዎን እዚህ ያጋሩ…' : 'Share your prayer request here…'}
-                    />
-                    {errors.request && <span className="form-error">{errors.request.message}</span>}
-                  </div>
-                  <div className="form-group form-checkbox">
-                    <input type="checkbox" id="private" {...register('isPrivate')} />
-                    <label htmlFor="private">
-                      {am ? 'ልመናውን ሚስጥራዊ ያድርጉ (ለፓስተሩ ብቻ)' : "Keep this request private (pastor's eyes only)"}
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="subject">{language === 'am' ? 'ርዕስ' : 'Subject'}</Label>
+                      <Select
+                        defaultValue="general"
+                        onValueChange={(v) => contactForm.setValue('subject', v)}
+                      >
+                        <SelectTrigger id="subject">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SUBJECT_OPTIONS.map((opt) => (
+                            <SelectItem key={opt.value} value={opt.value}>
+                              {language === 'am' ? opt.labelAm : opt.labelEn}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="message">{language === 'am' ? 'መልዕክት' : 'Message'}</Label>
+                      <Textarea
+                        id="message"
+                        rows={5}
+                        aria-invalid={Boolean(contactForm.formState.errors.message)}
+                        {...contactForm.register('message', { required: t('common.required') })}
+                      />
+                      {contactForm.formState.errors.message && (
+                        <p className="text-xs text-destructive">
+                          {contactForm.formState.errors.message.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <Button type="submit" size="lg" disabled={submitting}>
+                      <Send /> {submitting ? t('contact.sending') : t('contact.sendMessage')}
+                    </Button>
+                  </form>
+                </TabsContent>
+
+                <TabsContent value="prayer">
+                  <form
+                    onSubmit={prayerForm.handleSubmit(onPrayerSubmit)}
+                    className="flex flex-col gap-5"
+                  >
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="prayerName">{language === 'am' ? 'ሙሉ ስም' : 'Your name'}</Label>
+                      <Input
+                        id="prayerName"
+                        aria-invalid={Boolean(prayerForm.formState.errors.name)}
+                        {...prayerForm.register('name', { required: t('common.required') })}
+                      />
+                      {prayerForm.formState.errors.name && (
+                        <p className="text-xs text-destructive">
+                          {prayerForm.formState.errors.name.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="prayerEmail">{language === 'am' ? 'ኢሜል (አማራጭ)' : 'Email (optional)'}</Label>
+                      <Input id="prayerEmail" type="email" {...prayerForm.register('email')} />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Label htmlFor="request">{language === 'am' ? 'ጥያቄዎ' : 'Your request'}</Label>
+                      <Textarea
+                        id="request"
+                        rows={6}
+                        aria-invalid={Boolean(prayerForm.formState.errors.request)}
+                        {...prayerForm.register('request', { required: t('common.required') })}
+                      />
+                      {prayerForm.formState.errors.request && (
+                        <p className="text-xs text-destructive">
+                          {prayerForm.formState.errors.request.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <label className="flex items-start gap-3 rounded-md border border-border bg-muted/30 p-3 text-sm">
+                      <Checkbox
+                        id="isPrivate"
+                        onCheckedChange={(checked) => prayerForm.setValue('isPrivate', Boolean(checked))}
+                      />
+                      <span className="text-muted-foreground">
+                        {language === 'am'
+                          ? 'ጥያቄዬ በምስጢር ይያዝ።'
+                          : 'Keep this request private — only the pastoral team will see it.'}
+                      </span>
                     </label>
-                  </div>
-                  <button type="submit" disabled={submitting} className="btn btn-primary btn-full">
-                    {submitting ? t('contact.submitting') : t('contact.submitPrayer')}
-                  </button>
-                </form>
-              )}
-            </div>
 
-            {/* Contact Info sidebar */}
-            <div className="contact-info">
-              <h3>{t('contact.getInTouch')}</h3>
-              {fullAddress && (
-                <div className="contact-info-item">
-                  <MapPinIcon className="contact-info-icon" aria-hidden />
-                  <div>
-                    <strong>{t('contact.address')}</strong>
-                    <p>{address}</p>
-                    {city && <p>{city}{state ? `, ${state}` : ''}{zip ? ` ${zip}` : ''}</p>}
-                  </div>
-                </div>
-              )}
-              {phone && (
-                <div className="contact-info-item">
-                  <PhoneIcon className="contact-info-icon" aria-hidden />
-                  <div>
-                    <strong>{t('contact.phone')}</strong>
-                    <a href={`tel:${phone.replace(/\D/g, '')}`}>{phone}</a>
-                  </div>
-                </div>
-              )}
-              {email && (
-                <div className="contact-info-item">
-                  <EnvelopeIcon className="contact-info-icon" aria-hidden />
-                  <div>
-                    <strong>{t('contact.email')}</strong>
-                    <a href={`mailto:${email}`}>{email}</a>
-                  </div>
-                </div>
-              )}
-              {serviceTimes && serviceTimes.length > 0 && (
-                <div className="contact-info-item">
-                  <ClockIcon className="contact-info-icon" aria-hidden />
-                  <div>
-                    <strong>{t('contact.serviceTimes')}</strong>
-                    {serviceTimes.map((st, i) => (
-                      <p key={i}>{am && st.dayAm ? st.dayAm : st.day}: {st.time}</p>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+                    <Button type="submit" size="lg" disabled={submitting}>
+                      <Send /> {submitting ? t('contact.submitting') : t('contact.submitPrayer')}
+                    </Button>
+                  </form>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+
+          <ContactInfo />
         </div>
-      </section>
-    </div>
+      </Section>
+    </>
   );
 }
