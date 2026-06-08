@@ -54,6 +54,13 @@ For admin-only: `<ProtectedRoute adminOnly>`.
 - Normalize with `toDate(value)` from `src/lib/format.js`.
 - Display with `formatDate(date, pattern)` / `formatTime(date)` (thin `date-fns` wrappers).
 
+## Uploading Media (Admin)
+
+1. Open **Admin → Media library** (`/admin/media`).
+2. Files are stored in Firebase Storage at `media/{timestamp}_{filename}` (public read, staff write).
+3. Use **Copy URL** and paste into event `imageUrl`, sermon fields, or other CMS inputs.
+4. Service: `src/services/mediaService.js` (`listMediaFiles`, `uploadMediaFile`, `deleteMediaFile`).
+
 ## Showing Action Feedback (toasts)
 
 ```js

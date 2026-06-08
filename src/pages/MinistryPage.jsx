@@ -127,7 +127,7 @@ export default function MinistryPage({ fixedSlug } = {}) {
           <Section
             key="programs"
             eyebrow={language === 'am' ? 'ቡድኖች' : 'How we gather'}
-            title={language === 'am' ? 'የእድሜ ቡድኖች' : 'Programs by age'}
+            title={language === 'am' ? 'መርሃ ግብር' : 'Programs'}
           >
             <div className="grid gap-6 md:grid-cols-3">
               {ministry.ministries.map((m, idx) => (

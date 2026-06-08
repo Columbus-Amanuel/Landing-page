@@ -28,6 +28,7 @@ export const ROUTES = {
   adminMinistryEdit: '/admin/ministries/:ministryId',
   adminMessages: '/admin/messages',
   adminUsers: '/admin/users',
+  adminMedia: '/admin/media',
 };
 
 /** Build a concrete detail URL ("/events/abc") from a route template + id. */

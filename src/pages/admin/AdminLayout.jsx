@@ -10,6 +10,7 @@ import {
   Inbox,
   Menu,
   Users,
+  ImageIcon,
 } from 'lucide-react';
 import {
   Sheet,
@@ -35,6 +36,7 @@ import AdminMinistryEdit from './AdminMinistryEdit';
 import AdminYouth from './AdminYouth';
 import AdminMessages from './AdminMessages';
 import AdminUsers from './AdminUsers';
+import AdminMedia from './AdminMedia';
 
 const ICONS = {
   dashboard: LayoutGrid,
@@ -45,6 +47,7 @@ const ICONS = {
   ministries: Sparkles,
   messages: Inbox,
   users: Users,
+  media: ImageIcon,
 };
 
 function SidebarLinks({ onSelect }) {
@@ -124,6 +127,7 @@ export default function AdminLayout() {
           <Route path="events" element={<AdminEvents />} />
           <Route path="sermons" element={<AdminSermons />} />
           <Route path="giving" element={<AdminGiving />} />
+          <Route path="media" element={<AdminMedia />} />
           <Route path="ministries" element={<AdminMinistries />} />
           <Route path="ministries/:ministryId" element={<AdminMinistryEdit />} />
           <Route path="youth" element={<AdminYouth />} />

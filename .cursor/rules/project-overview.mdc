@@ -58,7 +58,7 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 │   │   ├── (public)         # Home, About, Events, EventDetail, Sermons, SermonDetail,
 │   │   │                    # Contact, Give, YouthChildren, Login, Register, ProfileUpdate, NotFound
 │   │   └── admin/           # AdminLayout, AdminDashboard, AdminChurchInfo, AdminEvents,
-│   │                        # AdminSermons, AdminGiving, AdminYouth, AdminMessages
+│   │                        # AdminSermons, AdminGiving, AdminMedia, AdminYouth, AdminMessages
 │   └── services/            # firebase.js, authService, eventsService, sermonsService,
 │                            # contactService, missingDataService, siteSettingsService,
 │                            # youthVideosService
@@ -97,6 +97,7 @@ A bilingual (English / Amharic) church website for **Ethiopian Emmanuel United C
 | `/admin/sermons` | AdminSermons | Yes (admin) |
 | `/admin/giving` | AdminGiving | Yes (admin) |
 | `/admin/youth` | AdminYouth | Yes (admin) |
+| `/admin/media` | AdminMedia | Yes (admin) |
 | `/admin/messages` | AdminMessages | Yes (admin) |
 | `*` | NotFound (404) | No |
 

@@ -233,6 +233,7 @@
       "events": "Events",
       "sermons": "Sermons",
       "giving": "Giving",
+      "media": "Media library",
       "ministries": "Ministries",
       "youth": "Youth & children",
       "messages": "Messages",
@@ -243,6 +244,7 @@
       "events": "Create, edit, and remove upcoming events.",
       "sermons": "Manage the sermon library, including videos and notes.",
       "giving": "Configure online giving, funds, and scripture text.",
+      "media": "Upload images and files to Firebase Storage and copy public URLs.",
       "ministries": "Add ministry pages, choose which sections each one shows, and manage videos per ministry.",
       "youth": "Youth & children page content, programs, and videos.",
       "messages": "View contact submissions and prayer requests.",
@@ -263,6 +265,23 @@
       "serviceTimes": "Service times",
       "values": "Mission values",
       "beliefs": "Core beliefs"
+    },
+    "media": {
+      "title": "Media library",
+      "subtitle": "Upload images, videos, audio, and documents. Copy the URL to use on events, pages, or elsewhere.",
+      "dropzone": "Drag files here or click to browse",
+      "dropzoneHint": "Images, video, audio, and documents — up to {maxMb} MB per file",
+      "chooseFiles": "Choose files",
+      "uploading": "Uploading…",
+      "uploaded": "Uploaded",
+      "uploadedSuccess": "Upload complete.",
+      "copyUrl": "Copy URL",
+      "open": "Open",
+      "copied": "URL copied to clipboard.",
+      "empty": "No files uploaded yet.",
+      "error": {
+        "tooLarge": "File is too large. Maximum size is 50 MB."
+      }
     },
     "events": {
       "title": "Events",
@@ -372,6 +391,16 @@
     },
     "messages": {
       "title": "Inbox",
+      "subtitle": "Contact submissions and prayer requests from visitors.",
+      "contactTab": "Contact",
+      "prayerTab": "Prayer",
+      "markRead": "Mark as read",
+      "resolve": "Resolved",
+      "private": "Confidential",
+      "emptyContact": "No contact messages yet.",
+      "emptyPrayer": "No prayer requests yet."
+    },
+    "users": {
       "title": "Users",
       "subtitle": "Browse member profiles and set access levels. Only super-admins can open this page.",
       "loadError": "Could not load users",

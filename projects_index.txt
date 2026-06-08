@@ -1,0 +1,58 @@
+blockly
+testFlight notification-4194f.firebaseapp.com EUCC temporary -free
+Ebible  https://ebible-f0986.web.app/  + audio bible for both amharic and english
+visa-officer - free 
+Visa-cloud  - visa-cloud.web.app - Bible Trivia - Not working.
+US-Friend -https://us-friend.web.app/ - WIMCA 
+Visa-angular - ai first chat - not working (API key disabled)
+audio-bible  -https://audio-bible-f83fb.web.app/ - audio bible
+Myfirstreact - myfirstreact-4bdcc.web.app - another varity vers
+startchat - free
+
+
+blockly-main - free 
+sekeleton-experiment - experimental - firestore only - free
+bible-sm - The book : https://self-made-d8428.web.app/home
+bdmap fire base - BDMap realtime db
+gpt-chat - Free - test page
+boot-swap - boot-swap-cad74.web.app
+blockly-web-organizer - Waiting for releas - free
+GTDApp - Gtd sceleton
+No project linked
+No project linked
+
+AddisuDalemu:
+
+
+eucc-dev - free - 
+screen-bible - https://screen-bible.web.app/ - Screen bible
+actClear-web-app -https://actclear.app/ - act clear app
+story-reader -free - 
+Somali-bible - free - 
+project-32 - test free- 
+agents-court - agent coart - 
+addisualemu - free - 
+bible-brilliant - free  - 
+Llm-forest - https://llm-forest.web.app/ - 
+
+
+= Solid projects ================================================================
+
+blockly
+Ebible  https://ebible-f0986.web.app/  + audio bible for both amharic and english
+Visa-cloud  - visa-cloud.web.app - Bible Trivia - Not working.
+US-Friend -https://us-friend.web.app/ - WIMCA 
+audio-bible  -https://audio-bible-f83fb.web.app/ - audio bible
+bible-sm - The book : https://self-made-d8428.web.app/home
+boot-swap - boot-swap-cad74.web.app
+GTDApp - Gtd sceleton
+
+AddisuDalemu:
+screen-bible - https://screen-bible.web.app/ - Screen bible
+actClear-web-app -https://actclear.app/ - act clear app
+agents-court - agent coart -  data only
+Llm-forest - https://llm-forest.web.app/ - 
+
+ActClear: 
+
+Eucc-online: https://dev.eucconline.com/ -- https://eucconline.com/

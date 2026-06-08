@@ -168,6 +168,7 @@ Admin check reads from `users/{uid}.role == 'admin'`.
 | `sermons/audio/{sermonId}/{filename}` | Yes | Admin |
 | `events/{allPaths}` | Yes | Admin |
 | `profiles/{uid}/{allPaths}` | Yes | Owner or admin |
+| `media/{allPaths}` | Yes | Staff (admin / super-admin) |
 
 ## Firestore Indexes
 
@@ -187,6 +188,7 @@ Admin check reads from `users/{uid}.role == 'admin'`.
 | `missingDataService.js` | Submit church profile updates |
 | `siteSettingsService.js` | Read/write `siteSettings/churchInfo` and `siteSettings/giving` |
 | `youthVideosService.js` | CRUD for `youthVideos` (create/update/delete), `youthPageContent/main` (merge write with `sanitizeYouthPageContentForSave` / `normalizeYouthPageContent`), `getYoutubeVideoId` for thumbnails/embeds |
+| `mediaService.js` | List / upload / delete files under Storage `media/` (admin Media library page) |
 
 ### `youthPageContent/main` (single document)
 

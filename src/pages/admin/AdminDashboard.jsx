@@ -7,6 +7,7 @@ import {
   Sparkles,
   Inbox,
   Users,
+  ImageIcon,
   ArrowRight,
 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +22,7 @@ const TILES = [
   { key: 'events', icon: CalendarDays, to: ROUTES.adminEvents },
   { key: 'sermons', icon: Mic, to: ROUTES.adminSermons },
   { key: 'giving', icon: Heart, to: ROUTES.adminGiving },
+  { key: 'media', icon: ImageIcon, to: ROUTES.adminMedia },
   { key: 'ministries', icon: Sparkles, to: ROUTES.adminMinistries },
   { key: 'messages', icon: Inbox, to: ROUTES.adminMessages, superOnly: true },
   { key: 'users', icon: Users, to: ROUTES.adminUsers, superOnly: true },

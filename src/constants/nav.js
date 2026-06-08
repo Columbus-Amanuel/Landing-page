@@ -26,6 +26,7 @@ export const ADMIN_NAV = [
   { key: 'events', to: ROUTES.adminEvents, labelKey: 'admin.nav.events' },
   { key: 'sermons', to: ROUTES.adminSermons, labelKey: 'admin.nav.sermons' },
   { key: 'giving', to: ROUTES.adminGiving, labelKey: 'admin.nav.giving' },
+  { key: 'media', to: ROUTES.adminMedia, labelKey: 'admin.nav.media' },
   { key: 'ministries', to: ROUTES.adminMinistries, labelKey: 'admin.nav.ministries' },
   {
     key: 'messages',
