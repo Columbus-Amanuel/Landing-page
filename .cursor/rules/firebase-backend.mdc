@@ -22,10 +22,29 @@ alwaysApply: false
   uid: string,
   email: string,
   displayName: string,
-  role: "member" | "admin",
-  createdAt: Timestamp
+  role: "member" | "admin" | "super-admin",
+  phone?, address?, city?, state?, zip?, dateOfBirth?, occupation?,
+  ministryInterests?, bio?, emergencyContactName?, emergencyContactPhone?,
+  createdAt: Timestamp,
+  updatedAt?: Timestamp
 }
 ```
+
+### `userMinistries/{uid}_{ministryId}`
+Junction docs linking members to ministries with a per-ministry role. Managed from **Admin → Users** (super-admin).
+
+```
+{
+  uid: string,
+  ministryId: string,   // ministries/{id}
+  role: "member" | "leader" | "coordinator" | "volunteer",
+  note?: string,
+  createdAt: Timestamp,
+  updatedAt: Timestamp
+}
+```
+
+Service: `src/services/userMinistriesService.js` (`listUserMinistries`, `replaceUserMinistries`). Role constants in `src/lib/ministryRoles.js`.
 
 ### `events/{eventId}`
 ```
@@ -189,6 +208,9 @@ Admin check reads from `users/{uid}.role == 'admin'`.
 | `siteSettingsService.js` | Read/write `siteSettings/churchInfo` and `siteSettings/giving` |
 | `youthVideosService.js` | CRUD for `youthVideos` (create/update/delete), `youthPageContent/main` (merge write with `sanitizeYouthPageContentForSave` / `normalizeYouthPageContent`), `getYoutubeVideoId` for thumbnails/embeds |
 | `mediaService.js` | List / upload / delete files under Storage `media/` (admin Media library page) |
+| `usersAdminService.js` | Paginated `userIndex` directory, profile fetch, role + profile updates (super-admin) |
+| `userMinistriesService.js` | CRUD-style `userMinistries` junction (member ↔ ministry + role) |
+| `ministriesService.js` | CRUD for `ministries` CMS pages + nav builder |
 
 ### `youthPageContent/main` (single document)
 

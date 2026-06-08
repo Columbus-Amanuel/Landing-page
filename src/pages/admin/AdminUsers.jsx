@@ -1,11 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Save, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -13,6 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import MemberProfileForm from '@/components/common/MemberProfileForm';
+import UserMinistriesEditor, { UserMinistriesList } from '@/components/common/UserMinistriesEditor';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
@@ -20,14 +30,50 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { formatDate, toDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { ASSIGNABLE_ROLES, getRoleAbbrev, normalizeUserRole, ROLES } from '@/lib/roles';
+import { ASSIGNABLE_ROLES, normalizeUserRole, ROLES } from '@/lib/roles';
 import {
   fetchUserDetail,
   fetchUserDirectoryPage,
   rebuildUserDirectoryIndex,
+  updateUserProfile,
   updateUserRole,
   USER_DIRECTORY_PAGE_SIZE,
 } from '@/services/usersAdminService';
+import { listAllMinistriesAdmin } from '@/services/ministriesService';
+import { listUserMinistries, replaceUserMinistries } from '@/services/userMinistriesService';
+
+const emptyProfile = {
+  displayName: '',
+  phone: '',
+  address: '',
+  city: '',
+  state: '',
+  zip: '',
+  dateOfBirth: '',
+  occupation: '',
+  ministryInterests: '',
+  bio: '',
+  emergencyContactName: '',
+  emergencyContactPhone: '',
+};
+
+function profileToFormValues(detail) {
+  return {
+    ...emptyProfile,
+    displayName: detail?.displayName || '',
+    phone: detail?.phone || '',
+    address: detail?.address || '',
+    city: detail?.city || '',
+    state: detail?.state || '',
+    zip: detail?.zip || '',
+    dateOfBirth: detail?.dateOfBirth || '',
+    occupation: detail?.occupation || '',
+    ministryInterests: detail?.ministryInterests || '',
+    bio: detail?.bio || '',
+    emergencyContactName: detail?.emergencyContactName || '',
+    emergencyContactPhone: detail?.emergencyContactPhone || '',
+  };
+}
 
 function AdminPageHeader({ title, description }) {
   return (
@@ -46,6 +92,251 @@ function roleLabelKey(role) {
   return 'admin.users.role.member';
 }
 
+function roleBadgeVariant(role) {
+  const r = normalizeUserRole(role);
+  if (r === ROLES.SUPER_ADMIN) return 'accent';
+  if (r === ROLES.ADMIN) return 'default';
+  return 'secondary';
+}
+
+function membershipToEditorRow(row) {
+  return {
+    ministryId: row.ministryId,
+    role: row.role,
+    note: row.note || '',
+  };
+}
+
+function cleanMembershipsForSave(rows) {
+  return rows
+    .filter((row) => row.ministryId)
+    .map(({ ministryId, role, note }) => ({ ministryId, role, note }));
+}
+
+function UserProfileModal({
+  open,
+  onOpenChange,
+  detail,
+  detailLoading,
+  detailError,
+  draftRole,
+  onDraftRoleChange,
+  roleDirty,
+  saving,
+  onSaveRole,
+  listTitle,
+  ministries,
+  memberships,
+  t,
+}) {
+  const renderProfileField = (labelKey, value) => (
+    <div>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t(labelKey)}</p>
+      <p className="mt-0.5 text-sm text-foreground">{value && String(value).trim() ? value : '—'}</p>
+    </div>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[min(90dvh,40rem)] max-w-lg overflow-y-auto">
+        {detailError && (
+          <ErrorState title={t('admin.users.detailError')} description={detailError.message} />
+        )}
+        {detailLoading && !detail && !detailError && (
+          <div className="flex justify-center py-12">
+            <LoadingSpinner size="md" />
+          </div>
+        )}
+        {detail && (
+          <div className="space-y-5">
+            <DialogHeader className="text-left">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                {t('admin.users.profile')}
+              </p>
+              <DialogTitle className="mt-1 font-display text-xl md:text-2xl">
+                {detail.displayName || detail.email || detail.id || listTitle}
+              </DialogTitle>
+            </DialogHeader>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              {renderProfileField('admin.users.field.email', detail.email)}
+              {renderProfileField('admin.users.field.phone', detail.phone)}
+              {renderProfileField('admin.users.field.city', detail.city)}
+              {renderProfileField('admin.users.field.state', detail.state)}
+              {renderProfileField('admin.users.field.uid', detail.uid || detail.id)}
+              {renderProfileField(
+                'admin.users.field.joined',
+                formatDate(toDate(detail.createdAt), 'MMM d, yyyy') || '—',
+              )}
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <Label htmlFor="user-role">{t('admin.users.accessLevel')}</Label>
+              <Select value={draftRole} onValueChange={onDraftRoleChange}>
+                <SelectTrigger id="user-role" className="max-w-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ASSIGNABLE_ROLES.map((r) => (
+                    <SelectItem key={r} value={r}>
+                      {t(roleLabelKey(r))}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">{t('admin.users.accessLevelHint')}</p>
+              <Button type="button" disabled={!roleDirty || saving} onClick={onSaveRole}>
+                {t('admin.users.saveRole')}
+              </Button>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('admin.users.ministries.section')}
+              </p>
+              <UserMinistriesList memberships={memberships} ministries={ministries} />
+            </div>
+
+            {(detail.bio || detail.ministryInterests) && (
+              <>
+                <Separator />
+                <div className="grid gap-4">
+                  {detail.bio ? renderProfileField('admin.users.field.bio', detail.bio) : null}
+                  {detail.ministryInterests
+                    ? renderProfileField('admin.users.field.ministry', detail.ministryInterests)
+                    : null}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [memberships, setMemberships] = useState([]);
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+    defaultValues: emptyProfile,
+  });
+
+  useEffect(() => {
+    if (!open || !userId) {
+      setLoadError(null);
+      setError('');
+      setMemberships([]);
+      return;
+    }
+
+    let cancelled = false;
+    setLoading(true);
+    setLoadError(null);
+    Promise.all([fetchUserDetail(userId), listUserMinistries(userId)])
+      .then(([detail, userMemberships]) => {
+        if (cancelled) return;
+        if (!detail) {
+          setLoadError(new Error(t('admin.users.detailError')));
+          return;
+        }
+        setEmail(detail.email || '');
+        reset(profileToFormValues(detail));
+        const rows = userMemberships.map(membershipToEditorRow);
+        setMemberships(rows.length ? rows : [{ ministryId: '', role: 'member', note: '' }]);
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, userId, reset, t]);
+
+  const onSubmit = async (values) => {
+    if (!userId) return;
+    setError('');
+    setSubmitting(true);
+    try {
+      const ministryPayload = cleanMembershipsForSave(memberships);
+      await updateUserProfile(userId, values);
+      await replaceUserMinistries(userId, ministryPayload);
+      onSaved(userId, values, ministryPayload);
+      onOpenChange(false);
+      toast.success(t('admin.flash.saved'));
+    } catch (err) {
+      setError(err?.message || t('profileUpdate.saveError'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="flex max-h-[min(92dvh,44rem)] max-w-2xl flex-col gap-0 overflow-hidden p-0">
+        <DialogHeader className="shrink-0 border-b border-border px-6 py-4 text-left">
+          <DialogTitle className="font-display text-xl md:text-2xl">{t('admin.users.editTitle')}</DialogTitle>
+          <p className="text-sm text-muted-foreground">{t('admin.users.editSubtitle')}</p>
+        </DialogHeader>
+
+        {loadError && (
+          <div className="px-6 py-6">
+            <ErrorState title={t('admin.users.detailError')} description={loadError.message} />
+          </div>
+        )}
+        {loading && !loadError && (
+          <div className="flex justify-center px-6 py-12">
+            <LoadingSpinner size="md" />
+          </div>
+        )}
+        {!loading && !loadError && userId && (
+          <MemberProfileForm
+            email={email}
+            register={register}
+            errors={errors}
+            onSubmit={handleSubmit(onSubmit)}
+            submitting={submitting}
+            error={error}
+            stickyFooter
+            afterFields={(
+              <UserMinistriesEditor
+                ministries={ministries}
+                memberships={memberships}
+                onChange={setMemberships}
+                disabled={submitting}
+              />
+            )}
+            footer={(
+              <DialogFooter className="gap-2 sm:justify-end">
+                <Button type="button" variant="outline" disabled={submitting} onClick={() => onOpenChange(false)}>
+                  {t('admin.cancel')}
+                </Button>
+                <Button type="submit" disabled={submitting}>
+                  <Save className="h-4 w-4" />
+                  {submitting ? t('common.loading') : t('profileUpdate.save')}
+                </Button>
+              </DialogFooter>
+            )}
+          />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function AdminUsers() {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -55,12 +346,19 @@ export default function AdminUsers() {
   const [listLoading, setListLoading] = useState(true);
   const [listError, setListError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
+  const [editId, setEditId] = useState(null);
   const [detail, setDetail] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState(null);
   const [draftRole, setDraftRole] = useState(ROLES.MEMBER);
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
+  const [allMinistries, setAllMinistries] = useState([]);
+  const [viewMemberships, setViewMemberships] = useState([]);
+
+  useEffect(() => {
+    listAllMinistriesAdmin().then(setAllMinistries).catch(() => setAllMinistries([]));
+  }, []);
 
   const loadFirstPage = useCallback(async () => {
     setListLoading(true);
@@ -69,12 +367,7 @@ export default function AdminUsers() {
       const { items, lastDoc, hasMore } = await fetchUserDirectoryPage(USER_DIRECTORY_PAGE_SIZE, null);
       setPages([{ rows: items, lastDoc, hasMoreAfter: hasMore }]);
       setPageIdx(0);
-      if (items.length) {
-        setSelectedId((prev) => (prev && items.some((r) => r.id === prev) ? prev : items[0].id));
-      } else {
-        setSelectedId(null);
-        setDetail(null);
-      }
+      setSelectedId((prev) => (prev && items.some((r) => r.id === prev) ? prev : null));
     } catch (err) {
       setListError(err);
       setPages([]);
@@ -90,6 +383,7 @@ export default function AdminUsers() {
   useEffect(() => {
     if (!selectedId) {
       setDetail(null);
+      setDetailError(null);
       return;
     }
     let cancelled = false;
@@ -104,6 +398,24 @@ export default function AdminUsers() {
       })
       .finally(() => {
         if (!cancelled) setDetailLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (!selectedId) {
+      setViewMemberships([]);
+      return;
+    }
+    let cancelled = false;
+    listUserMinistries(selectedId)
+      .then((rows) => {
+        if (!cancelled) setViewMemberships(rows);
+      })
+      .catch(() => {
+        if (!cancelled) setViewMemberships([]);
       });
     return () => {
       cancelled = true;
@@ -184,12 +496,41 @@ export default function AdminUsers() {
     }
   };
 
-  const renderProfileField = (labelKey, value) => (
-    <div>
-      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t(labelKey)}</p>
-      <p className="mt-0.5 text-sm text-foreground">{value && String(value).trim() ? value : '—'}</p>
-    </div>
-  );
+  const handleProfileSaved = (uid, values, ministryPayload = []) => {
+    const displayName = (values.displayName || '').trim();
+    setPages((prev) =>
+      prev.map((p, i) =>
+        i === pageIdx
+          ? {
+              ...p,
+              rows: p.rows.map((r) =>
+                r.id === uid ? { ...r, displayName: displayName || r.displayName } : r,
+              ),
+            }
+          : p,
+      ),
+    );
+    if (selectedId === uid) {
+      setDetail((prev) => (prev ? { ...prev, ...values, displayName: displayName || prev.displayName } : prev));
+      setViewMemberships(
+        ministryPayload.map((row) => ({
+          id: `${uid}_${row.ministryId}`,
+          uid,
+          ministryId: row.ministryId,
+          role: row.role,
+          note: row.note || null,
+        })),
+      );
+    }
+  };
+
+  const handleModalOpenChange = (open) => {
+    if (!open) setSelectedId(null);
+  };
+
+  const handleEditOpenChange = (open) => {
+    if (!open) setEditId(null);
+  };
 
   const selectedRow = currentRows.find((r) => r.id === selectedId);
   const listTitle = selectedRow?.displayName || selectedRow?.email || selectedId || '';
@@ -233,161 +574,170 @@ export default function AdminUsers() {
         </Button>
       </div>
 
-      <div className="grid min-h-0 gap-4 lg:grid-cols-[minmax(10.5rem,13rem)_minmax(0,1fr)] lg:items-start">
-        <Card className="flex max-h-[min(42dvh,18rem)] min-h-0 flex-col overflow-hidden sm:max-h-[min(48dvh,22rem)] lg:sticky lg:top-[calc(var(--navbar-height)+1rem)] lg:max-h-[calc(100dvh-var(--navbar-height)-2rem)]">
-          <CardContent className="flex min-h-0 flex-1 flex-col gap-0 p-0">
-            <div className="flex shrink-0 items-center justify-between gap-1 border-b border-border px-1 py-1">
+      <Card>
+        <CardContent className="p-0">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[40rem] text-left text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/40">
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t('admin.users.col.name')}
+                  </th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t('admin.users.col.email')}
+                  </th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t('admin.users.col.role')}
+                  </th>
+                  <th className="hidden px-4 py-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground sm:table-cell">
+                    {t('admin.users.col.joined')}
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    {t('admin.users.col.edit')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {listLoading && pages.length > 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-10 text-center">
+                      <LoadingSpinner size="md" />
+                    </td>
+                  </tr>
+                ) : (
+                  currentRows.map((u) => {
+                    const nr = normalizeUserRole(u.role);
+                    const isSelf = user?.uid === u.id;
+                    const displayName = u.displayName || '—';
+                    const email = u.email || '—';
+                    const joined = formatDate(toDate(u.createdAt), 'MMM d, yyyy') || '—';
+
+                    return (
+                      <tr
+                        key={u.id}
+                        tabIndex={0}
+                        role="button"
+                        onClick={() => setSelectedId(u.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedId(u.id);
+                          }
+                        }}
+                        className={cn(
+                          'cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset',
+                          selectedId === u.id && 'bg-primary/5',
+                        )}
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex min-w-0 items-center gap-2">
+                            <span className="truncate font-medium text-primary">{displayName}</span>
+                            {isSelf && (
+                              <Badge
+                                variant="secondary"
+                                className="shrink-0 px-1.5 py-0 text-[10px] font-semibold uppercase"
+                              >
+                                {t('admin.users.you')}
+                              </Badge>
+                            )}
+                          </div>
+                        </td>
+                        <td className="max-w-[14rem] truncate px-4 py-3 text-muted-foreground" title={email}>
+                          {email}
+                        </td>
+                        <td className="px-4 py-3">
+                          <Badge variant={roleBadgeVariant(nr)} className="text-[11px]">
+                            {t(roleLabelKey(nr))}
+                          </Badge>
+                        </td>
+                        <td className="hidden whitespace-nowrap px-4 py-3 text-muted-foreground sm:table-cell">
+                          {joined}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 gap-1 px-2"
+                            aria-label={`${t('admin.edit')} ${displayName}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditId(u.id);
+                            }}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            <span className="hidden sm:inline">{t('admin.edit')}</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
+            <span className="text-xs text-muted-foreground">
+              {t('admin.users.pageLabel')}
+              {' '}
+              {pageIdx + 1}
+            </span>
+            <div className="flex items-center gap-1">
               <Button
                 type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
                 disabled={!hasPrevPage || listLoading}
                 onClick={goPrevPage}
                 aria-label={t('admin.users.prevPage')}
               >
                 <ChevronLeft className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('admin.users.prevPage')}</span>
               </Button>
-              <span className="min-w-0 truncate text-center text-[11px] text-muted-foreground">
-                {t('admin.users.pageLabel')}
-                {' '}
-                {pageIdx + 1}
-              </span>
               <Button
                 type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 shrink-0"
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1 px-2"
                 disabled={!(pageIdx + 1 < pages.length || hasNextPage) || listLoading}
                 onClick={goNextPage}
                 aria-label={t('admin.users.nextPage')}
               >
+                <span className="hidden sm:inline">{t('admin.users.nextPage')}</span>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-              {listLoading && pages.length > 0 ? (
-                <div className="flex justify-center py-6">
-                  <LoadingSpinner size="md" />
-                </div>
-              ) : (
-                <ul className="divide-y divide-border">
-                  {currentRows.map((u) => {
-                    const nr = normalizeUserRole(u.role);
-                    const isSelf = user?.uid === u.id;
-                    const label = u.displayName || u.email || u.id;
-                    const abbrev = getRoleAbbrev(u.role);
-                    return (
-                      <li key={u.id}>
-                        <button
-                          type="button"
-                          onClick={() => setSelectedId(u.id)}
-                          className={cn(
-                            'flex w-full min-w-0 items-center gap-1.5 px-2 py-1 text-left text-sm transition-colors hover:bg-muted/60',
-                            u.id === selectedId && 'bg-primary/8',
-                          )}
-                        >
-                          <span className="min-w-0 flex-1 truncate font-medium leading-tight text-foreground">
-                            {label}
-                          </span>
-                          {isSelf && (
-                            <Badge
-                              variant="secondary"
-                              className="shrink-0 px-1 py-0 text-[9px] font-semibold uppercase leading-none"
-                            >
-                              {t('admin.users.you')}
-                            </Badge>
-                          )}
-                          <span
-                            className="shrink-0 font-mono text-[10px] font-semibold tabular-nums text-muted-foreground"
-                            title={t(roleLabelKey(nr))}
-                          >
-                            {abbrev}
-                          </span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="min-h-[12rem]">
-          <CardContent className="space-y-5 p-5 md:p-6">
-            {!selectedId && (
-              <p className="text-sm text-muted-foreground">{t('admin.users.selectMember')}</p>
-            )}
-            {selectedId && detailError && (
-              <ErrorState title={t('admin.users.detailError')} description={detailError.message} />
-            )}
-            {selectedId && detailLoading && !detail && !detailError && (
-              <div className="flex justify-center py-12">
-                <LoadingSpinner size="md" />
-              </div>
-            )}
-            {selectedId && detail && (
-              <>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
-                    {t('admin.users.profile')}
-                  </p>
-                  <h2 className="mt-1 font-display text-xl font-semibold text-primary md:text-2xl">
-                    {detail.displayName || detail.email || detail.id || listTitle}
-                  </h2>
-                </div>
+      <UserProfileModal
+        open={Boolean(selectedId)}
+        onOpenChange={handleModalOpenChange}
+        detail={detail}
+        detailLoading={detailLoading}
+        detailError={detailError}
+        draftRole={draftRole}
+        onDraftRoleChange={setDraftRole}
+        roleDirty={roleDirty}
+        saving={saving}
+        onSaveRole={handleSaveRole}
+        listTitle={listTitle}
+        ministries={allMinistries}
+        memberships={viewMemberships}
+        t={t}
+      />
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  {renderProfileField('admin.users.field.email', detail.email)}
-                  {renderProfileField('admin.users.field.phone', detail.phone)}
-                  {renderProfileField('admin.users.field.city', detail.city)}
-                  {renderProfileField('admin.users.field.state', detail.state)}
-                  {renderProfileField('admin.users.field.uid', detail.uid || detail.id)}
-                  {renderProfileField(
-                    'admin.users.field.joined',
-                    formatDate(toDate(detail.createdAt), 'MMM d, yyyy') || '—',
-                  )}
-                </div>
-
-                <Separator />
-
-                <div className="space-y-3">
-                  <Label htmlFor="user-role">{t('admin.users.accessLevel')}</Label>
-                  <Select value={draftRole} onValueChange={setDraftRole}>
-                    <SelectTrigger id="user-role" className="max-w-xs">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {ASSIGNABLE_ROLES.map((r) => (
-                        <SelectItem key={r} value={r}>
-                          {t(roleLabelKey(r))}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">{t('admin.users.accessLevelHint')}</p>
-                  <Button type="button" disabled={!roleDirty || saving} onClick={handleSaveRole}>
-                    {t('admin.users.saveRole')}
-                  </Button>
-                </div>
-
-                {(detail.bio || detail.ministryInterests) && (
-                  <>
-                    <Separator />
-                    <div className="grid gap-4">
-                      {detail.bio ? renderProfileField('admin.users.field.bio', detail.bio) : null}
-                      {detail.ministryInterests
-                        ? renderProfileField('admin.users.field.ministry', detail.ministryInterests)
-                        : null}
-                    </div>
-                  </>
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+      <UserEditModal
+        open={Boolean(editId)}
+        onOpenChange={handleEditOpenChange}
+        userId={editId}
+        onSaved={handleProfileSaved}
+        ministries={allMinistries}
+        t={t}
+      />
     </div>
   );
 }

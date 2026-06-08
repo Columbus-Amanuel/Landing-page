@@ -7,6 +7,7 @@ import {
   limit,
   orderBy,
   query,
+  setDoc,
   startAfter,
   updateDoc,
   writeBatch,
@@ -50,6 +51,55 @@ export async function fetchUserDetail(uid) {
   const snap = await getDoc(doc(db, 'users', uid));
   if (!snap.exists()) return null;
   return { ...snap.data(), id: snap.id };
+}
+
+function trimOrNull(value) {
+  if (value == null || typeof value !== 'string') return null;
+  const s = value.trim();
+  return s.length ? s : null;
+}
+
+/**
+ * Super-admin update of a member's extended profile (Firestore only; does not touch Auth).
+ * @param {string} uid
+ * @param {Record<string, string>} fields
+ */
+export async function updateUserProfile(uid, fields) {
+  const userRef = doc(db, 'users', uid);
+  const idxRef = doc(db, USER_INDEX_COLLECTION, uid);
+  const userSnap = await getDoc(userRef);
+  if (!userSnap.exists()) {
+    throw new Error('User not found');
+  }
+
+  const u = userSnap.data();
+  const displayName = (fields.displayName || '').trim() || u.displayName || 'Member';
+
+  await updateDoc(userRef, {
+    displayName,
+    phone: trimOrNull(fields.phone),
+    address: trimOrNull(fields.address),
+    city: trimOrNull(fields.city),
+    state: trimOrNull(fields.state),
+    zip: trimOrNull(fields.zip),
+    dateOfBirth: trimOrNull(fields.dateOfBirth),
+    occupation: trimOrNull(fields.occupation),
+    ministryInterests: trimOrNull(fields.ministryInterests),
+    bio: trimOrNull(fields.bio),
+    emergencyContactName: trimOrNull(fields.emergencyContactName),
+    emergencyContactPhone: trimOrNull(fields.emergencyContactPhone),
+    updatedAt: serverTimestamp(),
+  });
+
+  await setDoc(
+    idxRef,
+    {
+      displayName,
+      email: u.email || '',
+      role: u.role || 'member',
+    },
+    { merge: true },
+  );
 }
 
 /** @param {string} uid @param {'member' | 'admin' | 'super-admin'} role */

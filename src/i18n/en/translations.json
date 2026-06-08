@@ -418,6 +418,15 @@
       "syncDirectoryHint": "If this list is empty or missing people who registered before the directory was added, rebuild it once from full profiles (may take a moment).",
       "syncDone": "Member directory updated",
       "selectMember": "Select a member in the list to load their full profile.",
+      "editTitle": "Edit member profile",
+      "editSubtitle": "Update contact and personal details for this member.",
+      "col": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Access level",
+        "joined": "Joined",
+        "edit": "Edit"
+      },
       "detailError": "Could not load profile",
       "field": {
         "email": "Email",
@@ -433,6 +442,25 @@
         "member": "Member",
         "admin": "Admin",
         "superAdmin": "Super-admin"
+      },
+      "ministries": {
+        "section": "Ministries",
+        "hint": "Assign which ministries this member serves in and their role in each.",
+        "ministry": "Ministry",
+        "role": "Role in ministry",
+        "note": "Note",
+        "notePlaceholder": "Optional detail (e.g. Bible study group A)",
+        "selectMinistry": "Select ministry",
+        "add": "Add ministry",
+        "remove": "Remove ministry",
+        "empty": "No ministry assignments yet.",
+        "of": "of"
+      },
+      "ministryRole": {
+        "member": "Member",
+        "leader": "Leader",
+        "coordinator": "Coordinator",
+        "volunteer": "Volunteer"
       }
     }
   }

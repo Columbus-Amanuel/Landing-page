@@ -80,6 +80,15 @@ service cloud.firestore {
       allow write: if isStaff();
     }
 
+    // User ↔ ministry membership (role per ministry: member, leader, etc.)
+    match /userMinistries/{membershipId} {
+      allow get: if isSuperAdmin()
+        || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow list: if isSuperAdmin()
+        || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if isSuperAdmin();
+    }
+
     match /youthPageContent/{docId} {
       allow read: if true;
       allow write: if isStaff();
