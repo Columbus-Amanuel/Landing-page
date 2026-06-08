@@ -1,4 +1,9 @@
 import {
+  createUserWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from 'firebase/auth';
+import {
   collection,
   doc,
   documentId,
@@ -13,8 +18,8 @@ import {
   writeBatch,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
-import { ASSIGNABLE_ROLES } from '@/lib/roles';
+import { db, getSecondaryAuth } from './firebase';
+import { ASSIGNABLE_ROLES, ROLES } from '@/lib/roles';
 
 /** Lightweight directory docs for paginated admin lists (minimal fields). */
 export const USER_INDEX_COLLECTION = 'userIndex';
@@ -41,6 +46,63 @@ export async function fetchUserDirectoryPage(pageSize = USER_DIRECTORY_PAGE_SIZE
   const lastDoc = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
   const hasMore = snap.docs.length === pageSize;
   return { items, lastDoc, hasMore };
+}
+
+/**
+ * Load userIndex rows for admin pickers (family links, etc.). Caps total rows.
+ * @param {number} [max]
+ */
+export async function fetchAllUserIndexEntries(max = 500) {
+  const items = [];
+  let cursor = null;
+  while (items.length < max) {
+    const pageSize = Math.min(100, max - items.length);
+    const { items: pageItems, lastDoc, hasMore } = await fetchUserDirectoryPage(pageSize, cursor);
+    items.push(...pageItems);
+    if (!hasMore || !lastDoc) break;
+    cursor = lastDoc;
+  }
+  return items;
+}
+
+/**
+ * Create a Firebase Auth account + Firestore profile without signing out the admin.
+ * New accounts always start as `member`; change access level afterward if needed.
+ *
+ * @param {{ email: string, password: string, displayName: string }} input
+ * @returns {Promise<{ id: string, email: string, displayName: string, role: string }>}
+ */
+export async function createMemberAccount({ email, password, displayName }) {
+  const trimmedEmail = (email || '').trim().toLowerCase();
+  const name = (displayName || '').trim() || (trimmedEmail.includes('@') ? trimmedEmail.split('@')[0] : 'Member');
+  const secondaryAuth = getSecondaryAuth();
+
+  try {
+    const credential = await createUserWithEmailAndPassword(secondaryAuth, trimmedEmail, password);
+    await updateProfile(credential.user, { displayName: name });
+    const uid = credential.user.uid;
+    const ts = serverTimestamp();
+
+    const batch = writeBatch(db);
+    batch.set(doc(db, 'users', uid), {
+      uid,
+      email: trimmedEmail,
+      displayName: name,
+      role: ROLES.MEMBER,
+      createdAt: ts,
+    });
+    batch.set(doc(db, USER_INDEX_COLLECTION, uid), {
+      displayName: name,
+      email: trimmedEmail,
+      role: ROLES.MEMBER,
+      createdAt: ts,
+    });
+    await batch.commit();
+
+    return { id: uid, email: trimmedEmail, displayName: name, role: ROLES.MEMBER };
+  } finally {
+    await signOut(secondaryAuth).catch(() => {});
+  }
 }
 
 /**

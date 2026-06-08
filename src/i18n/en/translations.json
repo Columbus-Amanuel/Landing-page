@@ -440,6 +440,17 @@
       "syncDirectoryHint": "If this list is empty or missing people who registered before the directory was added, rebuild it once from full profiles (may take a moment).",
       "syncDone": "Member directory updated",
       "selectMember": "Select a member in the list to load their full profile.",
+      "createTitle": "Add member",
+      "createSubtitle": "Create a sign-in account for a new church member. They can sign in with this email and password.",
+      "createSubmit": "Add member",
+      "createPassword": "Password",
+      "createConfirmPassword": "Confirm password",
+      "createSuccess": "Member account created.",
+      "createError": "Could not create the account. Please try again.",
+      "createEmailInUse": "That email is already registered.",
+      "createWeakPassword": "Password must be at least 6 characters.",
+      "createInvalidEmail": "Enter a valid email address.",
+      "createPasswordMismatch": "Passwords do not match.",
       "editTitle": "Edit member profile",
       "editSubtitle": "Update contact and personal details for this member.",
       "col": {
@@ -483,6 +494,42 @@
         "leader": "Leader",
         "coordinator": "Coordinator",
         "volunteer": "Volunteer"
+      },
+      "family": {
+        "section": "Family",
+        "hint": "Link this member to other people in the church. Reciprocal relationships are saved automatically (e.g. child ↔ parent).",
+        "member": "Family member",
+        "relationship": "Relationship",
+        "note": "Note",
+        "notePlaceholder": "Optional detail",
+        "selectMember": "Select member",
+        "add": "Add family link",
+        "remove": "Remove family link",
+        "empty": "No family links yet."
+      },
+      "familyRole": {
+        "spouse": "Spouse",
+        "parent": "Parent",
+        "child": "Child",
+        "sibling": "Sibling",
+        "guardian": "Guardian",
+        "dependent": "Dependent",
+        "other": "Other"
+      },
+      "familyTree": {
+        "section": "Family tree",
+        "hint": "Dashed cards are inferred relatives not yet added to the system.",
+        "empty": "Add family links above to build a tree.",
+        "focus": "This member",
+        "parent": "Parent",
+        "child": "Child",
+        "sibling": "Sibling",
+        "spouse": "Spouse",
+        "ghostMother": "Mother (not in system)",
+        "ghostFather": "Father (not in system)",
+        "ghostOtherParent": "Other parent (not in system)",
+        "legendMember": "Member in system",
+        "legendGhost": "Inferred — not in system"
       }
     }
   }

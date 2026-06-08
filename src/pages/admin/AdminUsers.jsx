@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { ChevronLeft, ChevronRight, Pencil, Save, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, Save, UserPlus, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -23,6 +25,8 @@ import {
 } from '@/components/ui/select';
 import MemberProfileForm from '@/components/common/MemberProfileForm';
 import UserMinistriesEditor, { UserMinistriesList } from '@/components/common/UserMinistriesEditor';
+import UserFamilyEditor, { UserFamilyList } from '@/components/common/UserFamilyEditor';
+import FamilyTreeView from '@/components/common/FamilyTreeView';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
@@ -32,6 +36,8 @@ import { formatDate, toDate } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { ASSIGNABLE_ROLES, normalizeUserRole, ROLES } from '@/lib/roles';
 import {
+  createMemberAccount,
+  fetchAllUserIndexEntries,
   fetchUserDetail,
   fetchUserDirectoryPage,
   rebuildUserDirectoryIndex,
@@ -39,8 +45,14 @@ import {
   updateUserRole,
   USER_DIRECTORY_PAGE_SIZE,
 } from '@/services/usersAdminService';
+import { EMAIL_REGEX } from '@/lib/validators';
 import { listAllMinistriesAdmin } from '@/services/ministriesService';
 import { listUserMinistries, replaceUserMinistries } from '@/services/userMinistriesService';
+import {
+  fetchFamilyTreeContext,
+  listUserFamilyLinks,
+  replaceUserFamilyLinks,
+} from '@/services/userFamilyService';
 
 const emptyProfile = {
   displayName: '',
@@ -113,6 +125,20 @@ function cleanMembershipsForSave(rows) {
     .map(({ ministryId, role, note }) => ({ ministryId, role, note }));
 }
 
+function familyToEditorRow(row) {
+  return {
+    toUserId: row.toUserId,
+    relationship: row.relationship,
+    note: row.note || '',
+  };
+}
+
+function cleanFamilyForSave(rows) {
+  return rows
+    .filter((row) => row.toUserId)
+    .map(({ toUserId, relationship, note }) => ({ toUserId, relationship, note }));
+}
+
 function UserProfileModal({
   open,
   onOpenChange,
@@ -127,6 +153,9 @@ function UserProfileModal({
   listTitle,
   ministries,
   memberships,
+  familyLinks,
+  familyTreeContext,
+  allUsers,
   t,
 }) {
   const renderProfileField = (labelKey, value) => (
@@ -138,7 +167,7 @@ function UserProfileModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90dvh,40rem)] max-w-lg overflow-y-auto">
+      <DialogContent className="max-h-[min(90dvh,44rem)] max-w-2xl overflow-y-auto">
         {detailError && (
           <ErrorState title={t('admin.users.detailError')} description={detailError.message} />
         )}
@@ -201,6 +230,31 @@ function UserProfileModal({
               <UserMinistriesList memberships={memberships} ministries={ministries} />
             </div>
 
+            <Separator />
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('admin.users.family.section')}
+              </p>
+              <UserFamilyList links={familyLinks} users={allUsers} />
+            </div>
+
+            <Separator />
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                {t('admin.users.familyTree.section')}
+              </p>
+              {familyTreeContext?.rootUid && (
+                <FamilyTreeView
+                  rootUid={familyTreeContext.rootUid}
+                  rootLinks={familyTreeContext.rootLinks}
+                  related={familyTreeContext.related}
+                  users={allUsers}
+                />
+              )}
+            </div>
+
             {(detail.bio || detail.ministryInterests) && (
               <>
                 <Separator />
@@ -219,13 +273,148 @@ function UserProfileModal({
   );
 }
 
-function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
+function AddUserModal({ open, onOpenChange, onCreated, t }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm({
+    defaultValues: { displayName: '', email: '', password: '', confirmPassword: '' },
+  });
+  const password = watch('password');
+
+  useEffect(() => {
+    if (!open) {
+      setError('');
+      reset({ displayName: '', email: '', password: '', confirmPassword: '' });
+    }
+  }, [open, reset]);
+
+  const onSubmit = async (values) => {
+    setError('');
+    setSubmitting(true);
+    try {
+      const created = await createMemberAccount(values);
+      onCreated(created);
+      onOpenChange(false);
+      toast.success(t('admin.users.createSuccess'));
+    } catch (err) {
+      if (err?.code === 'auth/email-already-in-use') {
+        setError(t('admin.users.createEmailInUse'));
+      } else if (err?.code === 'auth/weak-password') {
+        setError(t('admin.users.createWeakPassword'));
+      } else if (err?.code === 'auth/invalid-email') {
+        setError(t('admin.users.createInvalidEmail'));
+      } else {
+        setError(err?.message || t('admin.users.createError'));
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>{t('admin.users.createTitle')}</DialogTitle>
+          <p className="text-sm text-muted-foreground">{t('admin.users.createSubtitle')}</p>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="new-user-name">{t('profileUpdate.fullName')}</Label>
+            <Input
+              id="new-user-name"
+              autoComplete="name"
+              disabled={submitting}
+              aria-invalid={Boolean(errors.displayName)}
+              {...register('displayName', { required: t('common.required') })}
+            />
+            {errors.displayName && (
+              <p className="text-xs text-destructive">{errors.displayName.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="new-user-email">{t('profileUpdate.email')}</Label>
+            <Input
+              id="new-user-email"
+              type="email"
+              autoComplete="email"
+              disabled={submitting}
+              aria-invalid={Boolean(errors.email)}
+              {...register('email', {
+                required: t('common.required'),
+                pattern: { value: EMAIL_REGEX, message: t('admin.users.createInvalidEmail') },
+              })}
+            />
+            {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="new-user-password">{t('admin.users.createPassword')}</Label>
+            <Input
+              id="new-user-password"
+              type="password"
+              autoComplete="new-password"
+              disabled={submitting}
+              aria-invalid={Boolean(errors.password)}
+              {...register('password', {
+                required: t('common.required'),
+                minLength: { value: 6, message: t('admin.users.createWeakPassword') },
+              })}
+            />
+            {errors.password && (
+              <p className="text-xs text-destructive">{errors.password.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="new-user-confirm">{t('admin.users.createConfirmPassword')}</Label>
+            <Input
+              id="new-user-confirm"
+              type="password"
+              autoComplete="new-password"
+              disabled={submitting}
+              aria-invalid={Boolean(errors.confirmPassword)}
+              {...register('confirmPassword', {
+                required: t('common.required'),
+                validate: (value) => value === password || t('admin.users.createPasswordMismatch'),
+              })}
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+            )}
+          </div>
+
+          <DialogFooter className="gap-2 sm:justify-end">
+            <Button type="button" variant="outline" disabled={submitting} onClick={() => onOpenChange(false)}>
+              {t('admin.cancel')}
+            </Button>
+            <Button type="submit" disabled={submitting}>
+              <UserPlus className="h-4 w-4" />
+              {submitting ? t('common.loading') : t('admin.users.createSubmit')}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, allUsers, t }) {
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [email, setEmail] = useState('');
   const [memberships, setMemberships] = useState([]);
+  const [familyLinks, setFamilyLinks] = useState([]);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: emptyProfile,
@@ -236,14 +425,15 @@ function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
       setLoadError(null);
       setError('');
       setMemberships([]);
+      setFamilyLinks([]);
       return;
     }
 
     let cancelled = false;
     setLoading(true);
     setLoadError(null);
-    Promise.all([fetchUserDetail(userId), listUserMinistries(userId)])
-      .then(([detail, userMemberships]) => {
+    Promise.all([fetchUserDetail(userId), listUserMinistries(userId), listUserFamilyLinks(userId)])
+      .then(([detail, userMemberships, userFamily]) => {
         if (cancelled) return;
         if (!detail) {
           setLoadError(new Error(t('admin.users.detailError')));
@@ -253,6 +443,8 @@ function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
         reset(profileToFormValues(detail));
         const rows = userMemberships.map(membershipToEditorRow);
         setMemberships(rows.length ? rows : [{ ministryId: '', role: 'member', note: '' }]);
+        const familyRows = userFamily.map(familyToEditorRow);
+        setFamilyLinks(familyRows.length ? familyRows : [{ toUserId: '', relationship: 'child', note: '' }]);
       })
       .catch((err) => {
         if (!cancelled) setLoadError(err);
@@ -272,9 +464,11 @@ function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
     setSubmitting(true);
     try {
       const ministryPayload = cleanMembershipsForSave(memberships);
+      const familyPayload = cleanFamilyForSave(familyLinks);
       await updateUserProfile(userId, values);
       await replaceUserMinistries(userId, ministryPayload);
-      onSaved(userId, values, ministryPayload);
+      await replaceUserFamilyLinks(userId, familyPayload);
+      onSaved(userId, values, ministryPayload, familyPayload);
       onOpenChange(false);
       toast.success(t('admin.flash.saved'));
     } catch (err) {
@@ -312,12 +506,21 @@ function UserEditModal({ open, onOpenChange, userId, onSaved, ministries, t }) {
             error={error}
             stickyFooter
             afterFields={(
-              <UserMinistriesEditor
-                ministries={ministries}
-                memberships={memberships}
-                onChange={setMemberships}
-                disabled={submitting}
-              />
+              <>
+                <UserMinistriesEditor
+                  ministries={ministries}
+                  memberships={memberships}
+                  onChange={setMemberships}
+                  disabled={submitting}
+                />
+                <UserFamilyEditor
+                  userId={userId}
+                  users={allUsers}
+                  links={familyLinks}
+                  onChange={setFamilyLinks}
+                  disabled={submitting}
+                />
+              </>
             )}
             footer={(
               <DialogFooter className="gap-2 sm:justify-end">
@@ -354,10 +557,15 @@ export default function AdminUsers() {
   const [saving, setSaving] = useState(false);
   const [rebuilding, setRebuilding] = useState(false);
   const [allMinistries, setAllMinistries] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [viewMemberships, setViewMemberships] = useState([]);
+  const [viewFamilyLinks, setViewFamilyLinks] = useState([]);
+  const [viewFamilyTreeContext, setViewFamilyTreeContext] = useState(null);
+  const [addUserOpen, setAddUserOpen] = useState(false);
 
   useEffect(() => {
     listAllMinistriesAdmin().then(setAllMinistries).catch(() => setAllMinistries([]));
+    fetchAllUserIndexEntries().then(setAllUsers).catch(() => setAllUsers([]));
   }, []);
 
   const loadFirstPage = useCallback(async () => {
@@ -407,15 +615,25 @@ export default function AdminUsers() {
   useEffect(() => {
     if (!selectedId) {
       setViewMemberships([]);
+      setViewFamilyLinks([]);
+      setViewFamilyTreeContext(null);
       return;
     }
     let cancelled = false;
-    listUserMinistries(selectedId)
-      .then((rows) => {
-        if (!cancelled) setViewMemberships(rows);
+    Promise.all([listUserMinistries(selectedId), fetchFamilyTreeContext(selectedId)])
+      .then(([ministryRows, familyContext]) => {
+        if (!cancelled) {
+          setViewMemberships(ministryRows);
+          setViewFamilyLinks(familyContext.rootLinks);
+          setViewFamilyTreeContext(familyContext);
+        }
       })
       .catch(() => {
-        if (!cancelled) setViewMemberships([]);
+        if (!cancelled) {
+          setViewMemberships([]);
+          setViewFamilyLinks([]);
+          setViewFamilyTreeContext(null);
+        }
       });
     return () => {
       cancelled = true;
@@ -496,7 +714,7 @@ export default function AdminUsers() {
     }
   };
 
-  const handleProfileSaved = (uid, values, ministryPayload = []) => {
+  const handleProfileSaved = (uid, values, ministryPayload = [], familyPayload = []) => {
     const displayName = (values.displayName || '').trim();
     setPages((prev) =>
       prev.map((p, i) =>
@@ -521,6 +739,10 @@ export default function AdminUsers() {
           note: row.note || null,
         })),
       );
+      setViewFamilyLinks(familyPayload);
+      fetchFamilyTreeContext(uid)
+        .then(setViewFamilyTreeContext)
+        .catch(() => setViewFamilyTreeContext(null));
     }
   };
 
@@ -530,6 +752,12 @@ export default function AdminUsers() {
 
   const handleEditOpenChange = (open) => {
     if (!open) setEditId(null);
+  };
+
+  const handleUserCreated = async (created) => {
+    await loadFirstPage();
+    fetchAllUserIndexEntries().then(setAllUsers).catch(() => {});
+    setEditId(created.id);
   };
 
   const selectedRow = currentRows.find((r) => r.id === selectedId);
@@ -550,11 +778,21 @@ export default function AdminUsers() {
       <div>
         <AdminPageHeader title={t('admin.users.title')} description={t('admin.users.subtitle')} />
         <EmptyState icon={Users} title={t('admin.users.empty')} description={t('admin.users.syncDirectoryHint')} />
-        <div className="mt-6 flex justify-center">
-          <Button type="button" disabled={rebuilding} onClick={handleRebuildDirectory}>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          <Button type="button" onClick={() => setAddUserOpen(true)}>
+            <UserPlus className="h-4 w-4" />
+            {t('admin.users.createSubmit')}
+          </Button>
+          <Button type="button" variant="outline" disabled={rebuilding} onClick={handleRebuildDirectory}>
             {rebuilding ? t('common.loading') : t('admin.users.syncDirectory')}
           </Button>
         </div>
+        <AddUserModal
+          open={addUserOpen}
+          onOpenChange={setAddUserOpen}
+          onCreated={handleUserCreated}
+          t={t}
+        />
       </div>
     );
   }
@@ -569,9 +807,15 @@ export default function AdminUsers() {
           {' '}
           {t('admin.users.perPage')}
         </p>
-        <Button type="button" variant="outline" size="sm" disabled={rebuilding} onClick={handleRebuildDirectory}>
-          {rebuilding ? t('common.loading') : t('admin.users.syncDirectory')}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" size="sm" onClick={() => setAddUserOpen(true)}>
+            <UserPlus className="h-4 w-4" />
+            {t('admin.users.createSubmit')}
+          </Button>
+          <Button type="button" variant="outline" size="sm" disabled={rebuilding} onClick={handleRebuildDirectory}>
+            {rebuilding ? t('common.loading') : t('admin.users.syncDirectory')}
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -727,6 +971,9 @@ export default function AdminUsers() {
         listTitle={listTitle}
         ministries={allMinistries}
         memberships={viewMemberships}
+        familyLinks={viewFamilyLinks}
+        familyTreeContext={viewFamilyTreeContext}
+        allUsers={allUsers}
         t={t}
       />
 
@@ -736,6 +983,14 @@ export default function AdminUsers() {
         userId={editId}
         onSaved={handleProfileSaved}
         ministries={allMinistries}
+        allUsers={allUsers}
+        t={t}
+      />
+
+      <AddUserModal
+        open={addUserOpen}
+        onOpenChange={setAddUserOpen}
+        onCreated={handleUserCreated}
         t={t}
       />
     </div>

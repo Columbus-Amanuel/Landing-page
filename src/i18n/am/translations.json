@@ -440,6 +440,17 @@
       "syncDirectoryHint": "ዝርዝሩ ባዶ ከሆነ ወይም ከዚህ በፊት የተመዘገቡ ሰዎች ከጎደሉ፣ አንድ ጊዜ ከሙሉ መገለጫ ዳግም ይገንቡ (ጥቂት ጊዜ ሊወስድ ይችላል)።",
       "syncDone": "የአባላት ዝርዝር ተዘምኗል",
       "selectMember": "ሙሉ መገለጫ ለመጫን ከዝርዝሩ አባል ይምረጡ።",
+      "createTitle": "አባል ጨምር",
+      "createSubtitle": "ለአዲስ የቤተክርስቲያን አባል የመግቢያ መለያ ይፍጠሩ። በዚህ ኢሜይል እና የይለፍ ቃል መግባት ይችላሉ።",
+      "createSubmit": "አባል ጨምር",
+      "createPassword": "የይለፍ ቃል",
+      "createConfirmPassword": "የይለፍ ቃል ያረጋግጡ",
+      "createSuccess": "የአባል መለያ ተፈጥሯል።",
+      "createError": "መለያ መፍጠር አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
+      "createEmailInUse": "ይህ ኢሜይል አስቀድሞ ተመዝግቧል።",
+      "createWeakPassword": "የይለፍ ቃል ቢያንስ 6 ቁምፊ መሆን አለበት።",
+      "createInvalidEmail": "ትክክለኛ ኢሜይል ያስገቡ።",
+      "createPasswordMismatch": "የይለፍ ቃሎች አይዛመዱም።",
       "editTitle": "የአባል መገለጫ አስተካክል",
       "editSubtitle": "ለዚህ አባል የእውቂያ እና የግል ዝርዝሮችን ያዘምኑ።",
       "col": {
@@ -483,6 +494,42 @@
         "leader": "መሪ",
         "coordinator": "አስተባባሪ",
         "volunteer": "በጎ ፈቃደኛ"
+      },
+      "family": {
+        "section": "ቤተሰብ",
+        "hint": "ይህን አባል ከቤተክርስቲያኑ ሌሎች ሰዎች ጋር ያገናኙ። ተገላቢጦሽ ግንኙነቶች በራስ-ሰር ይቀመጣሉ (ለምሳሌ ልጅ ↔ ወላጅ)።",
+        "member": "የቤተሰብ አባል",
+        "relationship": "ግንኙነት",
+        "note": "ማስታወሻ",
+        "notePlaceholder": "አማራጭ ዝርዝር",
+        "selectMember": "አባል ይምረጡ",
+        "add": "የቤተሰብ ግንኙነት ጨምር",
+        "remove": "የቤተሰብ ግንኙነት አስወግድ",
+        "empty": "ገና የቤተሰብ ግንኙነት የለም።"
+      },
+      "familyRole": {
+        "spouse": "ባል/ሚስት",
+        "parent": "ወላጅ",
+        "child": "ልጅ",
+        "sibling": "ወንድም/እህት",
+        "guardian": "አሳዳጊ",
+        "dependent": "ተደጋጋሚ",
+        "other": "ሌላ"
+      },
+      "familyTree": {
+        "section": "የቤተሰብ ዛፍ",
+        "hint": "ከቆየ መስመር ያላቸው ካርዶች በስርዓቱ ውስጥ እስካሁን ያልተጨመሩ የቤተሰብ አባላት ናቸው።",
+        "empty": "ዛፍ ለመገንባት ከላይ የቤተሰብ ግንኙነቶችን ያክሉ።",
+        "focus": "ይህ አባል",
+        "parent": "ወላጅ",
+        "child": "ልጅ",
+        "sibling": "ወንድም/እህት",
+        "spouse": "ባል/ሚስት",
+        "ghostMother": "እናት (በስርዓት ውስጥ የለችም)",
+        "ghostFather": "አባት (በስርዓት ውስጥ የለውም)",
+        "ghostOtherParent": "ሌላ ወላጅ (በስርዓት ውስጥ የለም)",
+        "legendMember": "በስርዓቱ ያለ አባል",
+        "legendGhost": "የተገመተ — በስርዓት ውስጥ የለም"
       }
     }
   }

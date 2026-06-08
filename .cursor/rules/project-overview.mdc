@@ -126,6 +126,7 @@ Admin routes use `AdminLayout` (sidebar + `<Routes>`) inside the main Layout.
 | `youthVideos` | Yes | Admin only |
 | `youthPageContent` | Yes | Admin only |
 | `userMinistries` | Owner or super-admin | Super-admin only |
+| `userFamilyLinks` | Involved members or super-admin | Super-admin only |
 | `userIndex` | Super-admin only | Super-admin (registration creates own row) |
 | `ministries` | Yes | Admin only |
 

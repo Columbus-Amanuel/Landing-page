@@ -35,9 +35,10 @@ service cloud.firestore {
       // for super-admins; `list` only checks the caller role via get(self).
       allow get: if isOwner(uid) || isSuperAdmin();
       allow list: if isSuperAdmin();
-      allow create: if isAuthenticated()
-        && request.auth.uid == uid
-        && request.resource.data.role == 'member';
+      allow create: if isSuperAdmin()
+        || (isAuthenticated()
+            && request.auth.uid == uid
+            && request.resource.data.role == 'member');
       allow update: if isSuperAdmin()
         || (isOwner(uid) && request.resource.data.role == resource.data.role);
       allow delete: if isSuperAdmin();
@@ -86,6 +87,19 @@ service cloud.firestore {
         || (isAuthenticated() && resource.data.uid == request.auth.uid);
       allow list: if isSuperAdmin()
         || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // User ↔ user family links (spouse, parent, child, etc.; reciprocal links synced in service)
+    match /userFamilyLinks/{linkId} {
+      allow get: if isSuperAdmin()
+        || (isAuthenticated()
+            && (resource.data.fromUserId == request.auth.uid
+                || resource.data.toUserId == request.auth.uid));
+      allow list: if isSuperAdmin()
+        || (isAuthenticated()
+            && (resource.data.fromUserId == request.auth.uid
+                || resource.data.toUserId == request.auth.uid));
       allow create, update, delete: if isSuperAdmin();
     }
 
