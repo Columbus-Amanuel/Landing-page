@@ -397,8 +397,30 @@
       "markRead": "Mark as read",
       "resolve": "Resolved",
       "private": "Confidential",
-      "emptyContact": "No contact messages yet.",
-      "emptyPrayer": "No prayer requests yet."
+      "assignTo": "Assigned to",
+      "unassigned": "Unassigned",
+      "resolvedBy": "Resolved by {name} · {date}",
+      "filter": {
+        "open": "Open",
+        "resolved": "Resolved",
+        "all": "All"
+      },
+      "status": {
+        "unread": "Unread",
+        "read": "Read",
+        "active": "Active",
+        "resolved": "Resolved"
+      },
+      "emptyContact": {
+        "open": "No open contact messages.",
+        "resolved": "No resolved contact messages.",
+        "all": "No contact messages yet."
+      },
+      "emptyPrayer": {
+        "open": "No active prayer requests.",
+        "resolved": "No resolved prayer requests.",
+        "all": "No prayer requests yet."
+      }
     },
     "users": {
       "title": "Users",

@@ -397,8 +397,30 @@
       "markRead": "የተነበበ ምልክት",
       "resolve": "ተፈጽሟል",
       "private": "በምስጢር",
-      "emptyContact": "ገና የእውቂያ መልዕክት የለም።",
-      "emptyPrayer": "ገና የጸሎት ጥያቄ የለም።"
+      "assignTo": "Assigned to",
+      "unassigned": "Unassigned",
+      "resolvedBy": "Resolved by {name} · {date}",
+      "filter": {
+        "open": "ክፍት",
+        "resolved": "ተፈጽሟል",
+        "all": "ሁሉም"
+      },
+      "status": {
+        "unread": "Unread",
+        "read": "Read",
+        "active": "Active",
+        "resolved": "Resolved"
+      },
+      "emptyContact": {
+        "open": "ክፍት የእውቂያ መልዕክት የለም።",
+        "resolved": "የተፈጸመ የእውቂያ መልዕክት የለም።",
+        "all": "ገና የእውቂያ መልዕክት የለም።"
+      },
+      "emptyPrayer": {
+        "open": "ንቁ የጸሎት ጥያቄ የለም።",
+        "resolved": "የተፈጸመ የጸሎት ጥያቄ የለም።",
+        "all": "ገና የጸሎት ጥያቄ የለም።"
+      }
     },
     "users": {
       "title": "ተጠቃሚዎች",
