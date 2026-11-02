@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Concept C — Faces of Emmanuel</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&family=Noto+Sans+Ethiopic:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--bg:#FFFFFF;--soft:#F4F1EC;--green:#0E7A4E;--yellow:#FFC93C;--red:#E0402F;}
+*{box-sizing:border-box;margin:0;padding:0}a,.btn{white-space:nowrap}
+body{width:1440px;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif}
+.am{font-family:'Noto Sans Ethiopic',sans-serif}
+.g{font-family:'Bricolage Grotesque',sans-serif}
+.wrap{max-width:1300px;margin:0 auto;padding:0 40px}
+.bar{background:var(--green);color:#fff;font-size:14px;font-weight:600;text-align:center;padding:10px}
+.bar b{background:var(--yellow);color:var(--ink);padding:2px 8px;border-radius:6px;margin-right:8px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.brand{display:flex;gap:10px;align-items:center;font-family:'Bricolage Grotesque';font-weight:800;font-size:20px}.brand img{width:44px}
+.links{display:flex;gap:6px;background:var(--soft);padding:6px;border-radius:999px;font-size:14px;font-weight:600}
+.links a{padding:9px 16px;border-radius:999px}.links .on{background:var(--ink);color:#fff}
+.act{display:flex;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 22px;border-radius:999px;font-weight:700;font-size:15px;border:2px solid var(--ink)}
+.btn.k{background:var(--ink);color:#fff}.btn.y{background:var(--yellow)}.btn.gr{background:var(--green);border-color:var(--green);color:#fff}
+.lang{font-size:13px;font-weight:700;border:2px solid var(--ink);border-radius:999px;padding:11px 14px}
+.hero{padding:40px 0 30px}
+.hero h1{font-family:'Bricolage Grotesque';font-size:150px;line-height:.88;letter-spacing:-.04em;font-weight:800}
+.hero h1 .hl{background:var(--yellow);padding:0 18px;border-radius:24px;display:inline-block;transform:rotate(-1.5deg)}
+.hero .row{display:flex;justify-content:space-between;align-items:end;margin-top:26px;gap:40px}
+.hero p{font-size:20px;line-height:1.55;max-width:560px;color:#333}
+.hero p .am{display:block;font-size:17px;color:var(--green);font-weight:700;margin-bottom:6px}
+.mosaic{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:200px 200px;gap:14px;margin-top:40px}
+.m{border-radius:24px;position:relative;overflow:hidden}
+.m span{position:absolute;left:12px;bottom:12px;font-size:12px;font-weight:600;background:#fff;padding:5px 10px;border-radius:999px}
+.m1{grid-column:span 2;grid-row:span 2;background:linear-gradient(150deg,#a86a3f,#4b2a17)}
+.m2{background:linear-gradient(160deg,#e3a65b,#9c5a2a)}
+.m3{grid-column:span 2;background:linear-gradient(200deg,#5a7c63,#22392a)}
+.m4{background:var(--yellow);display:flex;flex-direction:column;justify-content:center;padding:22px}
+.m4 b{font-family:'Bricolage Grotesque';font-size:52px;line-height:1}.m4 small{font-weight:600}
+.m5{background:var(--red);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:22px}
+.m5 b{font-family:'Bricolage Grotesque';font-size:28px;line-height:1.1}
+.m6{background:linear-gradient(140deg,#7a4b8d,#3a2147)}
+.m7{grid-column:span 2;background:linear-gradient(120deg,#c8875a,#6e3e22)}
+section{padding:110px 0}
+.kick{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;background:var(--soft);padding:8px 14px;border-radius:999px;margin-bottom:20px}
+h2.g{font-size:72px;line-height:.95;letter-spacing:-.03em;font-weight:800}
+.times{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:50px}
+.t{border-radius:28px;padding:34px;min-height:250px;display:flex;flex-direction:column;justify-content:space-between}
+.t .day{font-weight:700;font-size:15px}.t .day .am{opacity:.7;margin-left:6px}
+.t .h{font-family:'Bricolage Grotesque';font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1}
+.t1{background:var(--green);color:#fff}.t2{background:var(--soft)}.t3{background:var(--ink);color:#fff}
+.t3 .h{font-size:40px}
+.voices{background:var(--soft)}
+.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:50px}
+.v{background:#fff;border-radius:28px;padding:30px;display:flex;flex-direction:column;gap:22px}
+.v q{font-size:20px;line-height:1.5;font-weight:500;quotes:"“" "”"}
+.who{display:flex;gap:12px;align-items:center}
+.who i{width:48px;height:48px;border-radius:50%;background:linear-gradient(140deg,#b9814f,#5c341c)}
+.who b{display:block}.who small{color:#666}
+.pill{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:50px}
+.p{border:2px solid var(--ink);border-radius:28px;padding:28px}
+.p .no{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;margin-bottom:40px}
+.p h4{font-family:'Bricolage Grotesque';font-size:26px;line-height:1.05;font-weight:700}
+.p .am{color:var(--green);font-weight:700;font-size:14px;margin:8px 0}
+.p p{color:#444;line-height:1.5;font-size:15px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:50px}
+.ev{display:flex;gap:20px;align-items:center;padding:22px;border-radius:24px;background:var(--soft);margin-bottom:14px}
+.ev .d{width:86px;height:86px;border-radius:20px;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ev .d b{font-family:'Bricolage Grotesque';font-size:34px;line-height:1}.ev .d small{font-weight:700;font-size:12px;color:var(--red)}
+.ev h5{font-size:20px;font-weight:700}.ev p{color:#555}
+.contact{background:var(--green);color:#fff;border-radius:32px;padding:44px;display:flex;flex-direction:column;gap:18px}
+.contact h3{font-family:'Bricolage Grotesque';font-size:44px;line-height:1;font-weight:800}
+.contact .r{display:flex;justify-content:space-between;border-top:1px solid rgba(255,255,255,.25);padding-top:16px;font-size:17px}
+.contact .r span{opacity:.7}
+footer{background:var(--ink);color:#fff;padding:60px 0}
+footer .big{font-family:'Bricolage Grotesque';font-size:96px;font-weight:800;letter-spacing:-.04em;line-height:.9}
+footer .big .am{font-family:'Noto Sans Ethiopic';font-size:40px;color:var(--yellow);display:block;margin-top:20px;letter-spacing:0}
+</style></head><body>
+<div class="bar"><b>This Sunday</b>Worship at 2:00 PM · 1055 McNaughten Rd · First time? We'll save you a seat →</div>
+<div class="wrap">
+<nav>
+ <div class="brand"><img src="logo.png">EEUCC</div>
+ <div class="links"><a class="on">Home</a><a>About</a><a>Sermons</a><a>Events</a><a>Ministries ▾</a><a>Contact</a></div>
+ <div class="act"><span class="lang">EN · <span class="am">አማ</span></span><a class="btn">Sign in</a><a class="btn k">Give</a></div>
+</nav>
+<div class="hero">
+ <h1 class="g">We're a family.<br><span class="hl">Come meet us.</span></h1>
+ <div class="row">
+  <p><span class="am">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ</span>Ethiopian Emmanuel United Church of Columbus — a Christ-centered Ethiopian church community in Columbus, Ohio.</p>
+  <div style="display:flex;gap:10px"><a class="btn gr">Plan your visit →</a><a class="btn">▶ Watch sermons</a><a class="btn y">☏ Let us call you</a></div>
+ </div>
+ <div class="mosaic">
+  <div class="m m1"><span>Photo: Sunday worship</span></div>
+  <div class="m m2"><span>Photo: kids</span></div>
+  <div class="m m3"><span>Photo: choir</span></div>
+  <div class="m m4"><b>Sun<br>2 PM</b><small>Main worship</small></div>
+  <div class="m m5"><b>Amharic &amp; English, one family.</b></div>
+  <div class="m m6"><span>Photo: youth</span></div>
+  <div class="m m7"><span>Photo: fellowship meal</span></div>
+ </div>
+</div>
+</div>
+<section><div class="wrap">
+ <span class="kick">Service times · <span class="am">የአምልኮ ሰዓቶች</span></span>
+ <h2 class="g">Pull up a chair.</h2>
+ <div class="times">
+  <div class="t t1"><div class="day">Sunday<span class="am">እሁድ</span></div><div><div class="h">2–4 PM</div><p style="margin-top:8px;opacity:.85">Main Worship Service</p></div></div>
+  <div class="t t2"><div class="day">Monday &amp; Tuesday<span class="am">ሰኞ እና ማክሰኞ</span></div><div><div class="h">7–9 PM</div><p style="margin-top:8px;color:#555">Bible Study</p></div></div>
+  <div class="t t3"><div class="day">First time here?</div><div><div class="h">We'll meet you at the door.</div><a class="btn y" style="margin-top:20px">Plan your visit →</a></div></div>
+ </div>
+</div></section>
+<section class="voices"><div class="wrap">
+ <span class="kick" style="background:#fff">Our people</span>
+ <h2 class="g">Why we call this home.</h2>
+ <div class="vg">
+  <div class="v"><q>Member story goes here — a short quote about finding community at Emmanuel.</q><div class="who"><i></i><div><b>Member name</b><small>Member since 20XX</small></div></div></div>
+  <div class="v"><q>A family's story — what Sunday worship and Bible study mean to them.</q><div class="who"><i style="background:linear-gradient(140deg,#d29a63,#7a4524)"></i><div><b>Family name</b><small>Parents of two</small></div></div></div>
+  <div class="v"><q>A youth voice — why they bring their friends to youth fellowship.</q><div class="who"><i style="background:linear-gradient(140deg,#8d6a9e,#3a2147)"></i><div><b>Youth member</b><small>Youth ministry</small></div></div></div>
+ </div>
+</div></section>
+<section><div class="wrap">
+ <span class="kick">Our mission · <span class="am">ተልዕኮአችን</span></span>
+ <h2 class="g" style="max-width:1100px">We exist to glorify God through worship, prayer, biblical teaching &amp; discipleship.</h2>
+ <div class="pill">
+  <div class="p"><div class="no" style="background:var(--yellow)">01</div><h4>Spirit-Filled Worship</h4><div class="am">አምልኮ</div><p>Worshiping Jesus Christ together as a church family.</p></div>
+  <div class="p"><div class="no" style="background:var(--green);color:#fff">02</div><h4>Biblical Foundation</h4><div class="am">የእግዚአብሔር ቃል</div><p>Built on the authority of the Holy Scriptures.</p></div>
+  <div class="p"><div class="no" style="background:var(--red);color:#fff">03</div><h4>Family Discipleship</h4><div class="am">ቤተሰብ</div><p>Growing families and children in Christian faith.</p></div>
+  <div class="p"><div class="no" style="background:var(--ink);color:#fff">04</div><h4>Ethiopian Community</h4><div class="am">ማህበረሰብ</div><p>Serving locally while connected to a global church body.</p></div>
+ </div>
+</div></section>
+<section style="padding-top:0"><div class="wrap split">
+ <div><span class="kick">Upcoming · <span class="am">ዝግጅቶች</span></span><h2 class="g" style="margin-bottom:30px">See you there.</h2>
+  <div class="ev"><div class="d"><b>09</b><small>NOV</small></div><div><h5>Sunday Worship Service</h5><p>2:00 PM · Main sanctuary</p></div></div>
+  <div class="ev"><div class="d"><b>15</b><small>NOV</small></div><div><h5>Youth Fellowship Night</h5><p>6:00 PM · Fellowship hall</p></div></div>
+  <div class="ev"><div class="d"><b>23</b><small>NOV</small></div><div><h5>Thanksgiving Prayer Gathering</h5><p>5:00 PM · All families welcome</p></div></div>
+ </div>
+ <div class="contact"><span class="kick" style="background:rgba(255,255,255,.15);align-self:flex-start">Visit &amp; connect · <span class="am">ያግኙን</span></span>
+  <h3>Find us &amp; reach pastoral care</h3>
+  <div class="r"><span>Address</span>1055 McNaughten Rd, Columbus, OH 43213</div>
+  <div class="r"><span>Pastor</span>Pastor Gedlu Tsige · Senior Pastor</div>
+  <div class="r"><span>Phone</span>(614) 999-2488</div>
+  <div class="r"><span>Email</span>info@eucconline.com</div>
+  <div style="display:flex;gap:10px;margin-top:10px"><a class="btn y">Send a message</a><a class="btn" style="border-color:#fff;color:#fff">Open in Maps ↗</a></div>
+ </div>
+</div></section>
+<footer><div class="wrap"><div class="big">Ethiopian Emmanuel<br>United Church of Columbus<span class="am">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን</span></div></div></footer>
+</body></html>
