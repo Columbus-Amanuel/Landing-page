@@ -3,7 +3,9 @@
 
 /* ===========================================================
    EEUCC Columbus — design tokens (Tailwind v4 + shadcn/ui)
-   Brand: royal blue + cross red. Bilingual EN / AM.
+   Brand: colors sampled from the church seal — royal blue (#2C48B1),
+   brick red (#C9443E) and deep navy ink — on a warm paper background.
+   Bilingual EN / AM.
    Colors expressed as HSL channels so `hsl(var(--token) / <alpha-value>)`
    in @theme can produce Tailwind opacity utilities (bg-primary/40).
    =========================================================== */
@@ -49,9 +51,15 @@
   --color-sidebar-foreground: hsl(var(--sidebar-foreground));
   --color-sidebar-accent: hsl(var(--sidebar-accent));
 
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
-  --font-display: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-hero: 'Fraunces', 'Noto Serif Ethiopic', Georgia, 'Times New Roman', serif;
+  --color-navy: hsl(var(--navy));
+  --color-navy-foreground: hsl(var(--navy-foreground));
+
+  /* "Fidel poster" type system: Archivo (variable width) + Ethiopic fallback */
+  --font-sans: 'Archivo', 'Noto Sans Ethiopic', system-ui, -apple-system, sans-serif;
+  --font-display: 'Archivo', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  --font-hero: 'Archivo', 'Noto Sans Ethiopic', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Noto Sans Ethiopic', ui-monospace, monospace;
+  --font-ethiopic: 'Noto Sans Ethiopic', 'Archivo', sans-serif;
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -64,26 +72,26 @@
 }
 
 :root {
-  /* Light theme — neutral cool background with brand royal-blue */
-  --background: 220 22% 98%;
-  --foreground: 220 28% 14%;
+  /* Light theme — warm paper, navy ink, seal blue + seal red */
+  --background: 48 18% 95%;      /* #F4F3EF paper */
+  --foreground: 229 55% 12%;     /* #0E1430 navy ink */
 
   --card: 0 0% 100%;
-  --card-foreground: 220 28% 14%;
+  --card-foreground: 229 55% 12%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 220 28% 14%;
+  --popover-foreground: 229 55% 12%;
 
-  --primary: 213 70% 36%;        /* #1c529d royal blue (seal) */
+  --primary: 227 60% 43%;        /* #2C48B1 seal blue */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 222 20% 94%;
-  --secondary-foreground: 220 28% 18%;
+  --secondary: 48 14% 90%;
+  --secondary-foreground: 229 55% 14%;
 
-  --muted: 222 18% 92%;
-  --muted-foreground: 220 14% 38%;
+  --muted: 48 14% 90%;
+  --muted-foreground: 229 16% 36%;
 
-  --accent: 1 67% 49%;            /* #cf2a27 cross red (seal) */
+  --accent: 3 56% 52%;           /* #C9443E seal red */
   --accent-foreground: 0 0% 100%;
 
   --destructive: 0 70% 45%;
@@ -92,18 +100,21 @@
   --success: 158 64% 40%;
   --warning: 35 86% 47%;
 
-  --border: 222 22% 87%;
-  --input: 222 22% 87%;
-  --ring: 213 70% 36%;
+  --border: 229 18% 82%;
+  --input: 229 18% 82%;
+  --ring: 227 60% 43%;
 
-  --navbar: 222 22% 94%;
-  --navbar-foreground: 220 28% 18%;
+  --navbar: 48 18% 95%;
+  --navbar-foreground: 229 55% 12%;
 
-  --sidebar: 213 70% 30%;
+  --navy: 228 64% 18%;           /* #101C4A deep navy bands */
+  --navy-foreground: 48 18% 95%;
+
+  --sidebar: 227 60% 34%;
   --sidebar-foreground: 0 0% 100%;
-  --sidebar-accent: 1 67% 49%;
+  --sidebar-accent: 3 56% 52%;
 
-  --radius: 0.75rem;
+  --radius: 0.25rem;
   --navbar-height: 4.5rem;
 }
 
@@ -117,8 +128,8 @@
   --popover: 220 28% 12%;
   --popover-foreground: 220 14% 92%;
 
-  --primary: 213 70% 60%;
-  --primary-foreground: 220 28% 8%;
+  --primary: 227 70% 66%;
+  --primary-foreground: 228 64% 10%;
 
   --secondary: 220 18% 18%;
   --secondary-foreground: 220 14% 92%;
@@ -142,6 +153,9 @@
   --sidebar: 220 28% 12%;
   --sidebar-foreground: 220 14% 92%;
   --sidebar-accent: 1 70% 60%;
+
+  --navy: 228 50% 6%;
+  --navy-foreground: 220 14% 92%;
 }
 
 /* Base layer — minimal global resets, font wiring */
@@ -181,8 +195,67 @@
 
 /* Utility helpers */
 @layer utilities {
-  .font-display { font-family: var(--font-display); font-optical-sizing: auto; }
-  .font-hero    { font-family: var(--font-hero); font-optical-sizing: auto; }
+  .font-display { font-family: var(--font-display); font-stretch: 88%; }
+  .font-hero    { font-family: var(--font-hero); font-stretch: 75%; letter-spacing: -0.015em; }
+
+  /* Poster display face: extra-condensed, heavy, uppercase. */
+  .font-poster {
+    font-family: var(--font-hero);
+    font-stretch: 62%;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    line-height: 0.84;
+    text-transform: uppercase;
+  }
+  .font-mono-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .font-ethiopic { font-family: var(--font-ethiopic); }
+
+  /* Hollow (outlined) display text. */
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 2px currentColor;
+  }
+  .text-outline-primary {
+    color: transparent;
+    -webkit-text-stroke: 2px hsl(var(--primary));
+  }
+
+  /* Vertical column rules, like a poster layout grid. */
+  .bg-poster-grid {
+    background-image: repeating-linear-gradient(
+      90deg,
+      hsl(var(--foreground) / 0.07) 0 1px,
+      transparent 1px 120px
+    );
+  }
+
+  /* Blue duotone wash for photos/video so imagery matches the seal colors. */
+  .duotone { position: relative; isolation: isolate; }
+  .duotone > img,
+  .duotone > iframe { filter: grayscale(1) contrast(1.05); }
+  .duotone::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--primary));
+    mix-blend-mode: multiply;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+  }
+  .duotone.duotone-off > img,
+  .duotone.duotone-off > iframe { filter: none; }
+  .duotone.duotone-off::after { opacity: 0; }
+
+  /* Scrolling band. */
+  .animate-marquee { animation: marquee 40s linear infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee { animation: none; }
+  }
 
   .text-balance { text-wrap: balance; }
 
@@ -193,4 +266,9 @@
       linear-gradient(90deg, hsl(var(--primary) / 0.06) 1px, transparent 1px);
     background-size: 64px 64px;
   }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }

@@ -5,7 +5,6 @@ import { useSiteSettings } from '@/contexts/SiteSettingsContext';
 import { ROUTES } from '@/constants/routes';
 import { toMapsHref, toTelHref, toMailtoHref, formatPhoneDisplay } from '@/lib/format';
 import { Separator } from '@/components/ui/separator';
-import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { FacebookIcon, YoutubeIcon, InstagramIcon } from '@/components/common/SocialIcons';
 
 function FooterSocial({ href, label, icon: IconComponent }) {
@@ -16,7 +15,7 @@ function FooterSocial({ href, label, icon: IconComponent }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-9 w-9 items-center justify-center rounded-full border border-primary-foreground/20 text-primary-foreground/80 transition-colors hover:border-accent hover:bg-accent/15 hover:text-accent"
+      className="flex h-10 w-10 items-center justify-center border-2 border-navy-foreground/30 text-navy-foreground/80 transition-colors hover:border-accent hover:bg-accent hover:text-accent-foreground"
     >
       <IconComponent className="h-4 w-4" />
     </a>
@@ -32,19 +31,23 @@ export default function Footer() {
     .join(', ');
 
   return (
-    <footer className="relative isolate overflow-hidden bg-primary text-primary-foreground">
-      <div className="absolute inset-0 bg-grid opacity-[0.15]" aria-hidden="true" />
-      <div className="absolute -left-32 top-12 h-72 w-72 rounded-full bg-primary-foreground/5 blur-3xl" aria-hidden="true" />
+    <footer className="relative isolate overflow-hidden border-t-2 border-foreground bg-navy text-navy-foreground">
+      <span
+        aria-hidden="true"
+        className="font-ethiopic pointer-events-none absolute -right-[0.12em] -top-[0.28em] -z-10 select-none text-[24rem] font-black leading-none text-primary/30 md:text-[36rem]"
+      >
+        አ
+      </span>
 
       <div className="relative mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="lg:col-span-1">
-            <Link to={ROUTES.home} className="inline-flex items-center gap-2 font-display text-xl font-semibold">
-              <BrandCrossIcon className="text-accent" size={22} />
-              {churchInfo.shortName || 'EEUCC'}
+            <Link to={ROUTES.home} className="inline-flex items-center gap-3">
+              <img src="/logo.png" alt="" className="h-14 w-14 rounded-full bg-white object-contain" />
+              <span className="font-poster text-5xl">{churchInfo.shortName || 'EEUCC'}</span>
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-primary-foreground/75">
+            <p className="mt-5 max-w-xs text-sm leading-relaxed text-navy-foreground/75">
               {pickLocalized(churchInfo, 'tagline')}
             </p>
             <div className="mt-5 flex gap-2">
@@ -56,10 +59,10 @@ export default function Footer() {
 
           {/* Quick links */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            <h3 className="font-mono-label border-t-2 border-navy-foreground pt-3 font-semibold text-accent">
               {language === 'am' ? 'አገናኞች' : 'Explore'}
             </h3>
-            <ul className="mt-5 flex flex-col gap-3 text-sm text-primary-foreground/80">
+            <ul className="mt-5 flex flex-col gap-3 text-sm text-navy-foreground/80">
               <li><Link to={ROUTES.about} className="transition-colors hover:text-accent">{t('nav.about')}</Link></li>
               <li><Link to={ROUTES.sermons} className="transition-colors hover:text-accent">{t('nav.sermons')}</Link></li>
               <li><Link to={ROUTES.events} className="transition-colors hover:text-accent">{t('nav.events')}</Link></li>
@@ -77,18 +80,18 @@ export default function Footer() {
 
           {/* Service times */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            <h3 className="font-mono-label border-t-2 border-navy-foreground pt-3 font-semibold text-accent">
               {t('about.serviceTimes')}
             </h3>
-            <ul className="mt-5 flex flex-col gap-3 text-sm text-primary-foreground/80">
+            <ul className="mt-5 flex flex-col gap-3 text-sm text-navy-foreground/80">
               {(churchInfo.serviceTimes || []).map((entry, idx) => (
                 <li key={`${entry.day}-${idx}`} className="flex flex-col gap-0.5">
-                  <span className="font-semibold text-primary-foreground">
+                  <span className="font-hero font-black uppercase text-navy-foreground">
                     {pickLocalized(entry, 'day')}
                   </span>
                   <span>{entry.time}</span>
                   {entry.note && (
-                    <span className="text-xs text-primary-foreground/60">
+                    <span className="text-xs text-navy-foreground/60">
                       {pickLocalized(entry, 'note')}
                     </span>
                   )}
@@ -99,12 +102,12 @@ export default function Footer() {
 
           {/* Visit */}
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+            <h3 className="font-mono-label border-t-2 border-navy-foreground pt-3 font-semibold text-accent">
               {language === 'am' ? 'ይጎብኙን' : 'Visit'}
             </h3>
             <ul className="mt-5 flex flex-col gap-3 text-sm">
               {addressLine && (
-                <li className="flex items-start gap-2 text-primary-foreground/80">
+                <li className="flex items-start gap-2 text-navy-foreground/80">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
                   <a
                     href={toMapsHref(addressLine)}
@@ -117,7 +120,7 @@ export default function Footer() {
                 </li>
               )}
               {churchInfo.phone && (
-                <li className="flex items-center gap-2 text-primary-foreground/80">
+                <li className="flex items-center gap-2 text-navy-foreground/80">
                   <Phone className="h-4 w-4 shrink-0 text-accent" />
                   <a href={toTelHref(churchInfo.phone)} className="hover:text-accent">
                     {formatPhoneDisplay(churchInfo.phone)}
@@ -125,7 +128,7 @@ export default function Footer() {
                 </li>
               )}
               {churchInfo.email && (
-                <li className="flex items-center gap-2 text-primary-foreground/80">
+                <li className="flex items-center gap-2 text-navy-foreground/80">
                   <Mail className="h-4 w-4 shrink-0 text-accent" />
                   <a href={toMailtoHref(churchInfo.email)} className="hover:text-accent">
                     {churchInfo.email}
@@ -136,11 +139,11 @@ export default function Footer() {
           </div>
         </div>
 
-        <Separator className="my-10 bg-primary-foreground/15" />
+        <Separator className="my-10 bg-navy-foreground/20" />
 
-        <div className="flex flex-col items-start gap-3 text-xs text-primary-foreground/60 md:flex-row md:items-center md:justify-between">
+        <div className="font-mono-label flex flex-col items-start gap-3 text-navy-foreground/60 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} {churchInfo.name}. {language === 'am' ? 'መብቱ የተጠበቀ ነው።' : 'All rights reserved.'}</p>
-          <p className="font-display text-sm tracking-wide text-primary-foreground/75">
+          <p className="text-navy-foreground/80">
             {language === 'am' ? 'በፍቅርና በሰላም' : 'In love and peace'}
           </p>
         </div>

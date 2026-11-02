@@ -29,9 +29,9 @@ export default function NavDropdown({ label, items }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         className={cn(
-          'group inline-flex items-center gap-1 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-          'hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-          groupActive ? 'text-primary' : 'text-muted-foreground',
+          'font-mono-label group inline-flex items-center gap-1 px-2.5 py-2 transition-colors',
+          'hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          groupActive ? 'text-accent' : 'text-foreground',
         )}
       >
         {label}

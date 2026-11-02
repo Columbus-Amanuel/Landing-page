@@ -12,7 +12,7 @@ export default function LanguageToggle({ className }) {
       role="group"
       aria-label="Language"
       className={cn(
-        'inline-flex items-center rounded-full border border-border bg-secondary/60 p-0.5 text-xs font-semibold',
+        'font-mono-label inline-flex items-center border-2 border-foreground p-0.5 font-semibold',
         className,
       )}
     >
@@ -21,9 +21,9 @@ export default function LanguageToggle({ className }) {
         onClick={() => changeLanguage('en')}
         aria-pressed={language === 'en'}
         className={cn(
-          'rounded-full px-3 py-1 transition-colors',
+          'px-2.5 py-1 transition-colors',
           language === 'en'
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'bg-foreground text-background'
             : 'text-muted-foreground hover:text-foreground',
         )}
       >
@@ -34,9 +34,9 @@ export default function LanguageToggle({ className }) {
         onClick={() => changeLanguage('am')}
         aria-pressed={language === 'am'}
         className={cn(
-          'rounded-full px-3 py-1 transition-colors',
+          'font-ethiopic px-2.5 py-1 normal-case transition-colors',
           language === 'am'
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'bg-foreground text-background'
             : 'text-muted-foreground hover:text-foreground',
         )}
       >

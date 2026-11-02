@@ -89,7 +89,8 @@
     "contactLabDirections": "Open in Google Maps",
     "contactLabPastorLabel": "Pastoral contact",
     "contactLabPastorFallback": "Pastoral office",
-    "contactLabMessage": "Send a message"
+    "contactLabMessage": "Send a message",
+    "galleryTitle": "Life at Emmanuel"
   },
   "about": {
     "heroTitle": "About EEUCC",

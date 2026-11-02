@@ -16,7 +16,6 @@ import { logoutUser } from '@/services/authService';
 import { ROUTES } from '@/constants/routes';
 import { PRIMARY_NAV, CONNECT_NAV } from '@/constants/nav';
 import LanguageToggle from '@/components/common/LanguageToggle';
-import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
 import { isStaffRole } from '@/lib/roles';
 import { useState } from 'react';
@@ -41,9 +40,9 @@ function MobileGroup({ titleKey, items, onSelect, t, language }) {
               onClick={onSelect}
               className={({ isActive }) =>
                 cn(
-                  'block rounded-md px-3 py-2.5 text-base font-medium transition-colors',
+                  'block border-l-4 border-transparent px-3 py-2.5 font-hero text-lg font-black uppercase tracking-tight transition-colors',
                   isActive
-                    ? 'bg-primary/10 text-primary'
+                    ? 'border-accent bg-primary/10 text-primary'
                     : 'text-foreground hover:bg-secondary',
                   item.emphasize &&
                     'bg-accent text-accent-foreground hover:bg-accent/90 mt-1',
@@ -96,8 +95,8 @@ export default function MobileNav() {
       <SheetContent side="right" className="flex w-[88%] max-w-sm flex-col gap-6 px-5">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
-            <BrandCrossIcon className="text-primary" size={22} />
-            <span className="font-display text-base">{t('common.churchName')}</span>
+            <img src="/logo.png" alt="" className="h-9 w-9 shrink-0 rounded-full bg-white object-contain" />
+            <span className="font-hero text-base font-black uppercase tracking-tight">{t('common.churchName')}</span>
           </SheetTitle>
         </SheetHeader>
 

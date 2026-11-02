@@ -18,14 +18,13 @@ import { ROUTES } from '@/constants/routes';
 import { PRIMARY_NAV, CONNECT_NAV } from '@/constants/nav';
 import { getInitials } from '@/lib/format';
 import LanguageToggle from '@/components/common/LanguageToggle';
-import BrandCrossIcon from '@/components/common/BrandCrossIcon';
 import { cn } from '@/lib/utils';
 import { getRoleAbbrev, isStaffRole } from '@/lib/roles';
 import NavDropdown from './NavDropdown';
 import MobileNav from './MobileNav';
 
 const NAV_LINK_BASE =
-  'relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+  'font-mono-label relative inline-flex items-center px-2.5 py-2 transition-colors hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
 
 function NavItem({ to, labelKey, end }) {
   const { t } = useLanguage();
@@ -34,7 +33,7 @@ function NavItem({ to, labelKey, end }) {
       to={to}
       end={end}
       className={({ isActive }) =>
-        cn(NAV_LINK_BASE, isActive ? 'text-primary' : 'text-muted-foreground')
+        cn(NAV_LINK_BASE, isActive ? 'text-accent' : 'text-foreground')
       }
     >
       {({ isActive }) => (
@@ -43,7 +42,7 @@ function NavItem({ to, labelKey, end }) {
           {isActive && (
             <span
               aria-hidden="true"
-              className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-accent"
+              className="absolute inset-x-2.5 -bottom-0.5 h-0.5 bg-accent"
             />
           )}
         </>
@@ -59,8 +58,8 @@ function GiveLink() {
       to={ROUTES.give}
       className={({ isActive }) =>
         cn(
-          'inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-soft transition-colors hover:bg-primary/90',
-          isActive && 'bg-primary/90',
+          'font-mono-label inline-flex h-10 items-center bg-accent px-5 font-semibold text-accent-foreground transition-colors hover:bg-accent/90',
+          isActive && 'bg-accent/90',
         )
       }
     >
@@ -152,27 +151,29 @@ export default function Navbar() {
   const contactLink = CONNECT_NAV.find((item) => item.key === 'contact');
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border bg-navbar/95 backdrop-blur supports-[backdrop-filter]:bg-navbar/85">
+    <header className="sticky top-0 z-40 w-full border-b-2 border-foreground bg-navbar/95 backdrop-blur supports-[backdrop-filter]:bg-navbar/90">
       <div className="mx-auto flex h-[var(--navbar-height)] max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
         <Link
           to={ROUTES.home}
-          className="flex min-w-0 max-sm:flex-1 items-center gap-3 font-display text-base font-semibold text-primary transition-opacity hover:opacity-90"
+          className="flex min-w-0 max-sm:flex-1 items-center gap-3 text-primary transition-opacity hover:opacity-90"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-primary">
-            <BrandCrossIcon size={20} />
-          </span>
+          <img
+            src="/logo.png"
+            alt=""
+            className="h-11 w-11 shrink-0 rounded-full bg-white object-contain"
+          />
           <span className="flex min-w-0 flex-col justify-center leading-tight">
-            <span className="truncate text-[0.65rem] font-medium uppercase tracking-[0.22em] text-muted-foreground">
+            <span className="font-mono-label truncate text-[0.65rem] text-muted-foreground">
               EuccOnline.com
             </span>
-            <span className="text-sm sm:text-base">
+            <span className="font-hero text-sm font-black uppercase tracking-tight sm:text-base">
               <span className="block truncate sm:hidden">{t('common.churchNameShort')}</span>
               <span className="hidden truncate sm:block">{t('common.churchName')}</span>
             </span>
           </span>
         </Link>
 
-        <nav className="ml-6 hidden items-center gap-1 lg:flex">
+        <nav className="ml-4 hidden items-center gap-0.5 xl:ml-8 lg:flex">
           {PRIMARY_NAV.map(({ key, ...item }) => (
             <NavItem key={key} {...item} />
           ))}
@@ -197,7 +198,12 @@ export default function Navbar() {
               <UserMenu />
             </div>
           ) : (
-            <Button asChild size="sm" className="hidden lg:inline-flex">
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
+              className="font-mono-label hidden h-10 rounded-none border-2 border-foreground px-4 hover:bg-foreground hover:text-background lg:inline-flex"
+            >
               <Link to={ROUTES.login}>{t('common.signIn')}</Link>
             </Button>
           )}
