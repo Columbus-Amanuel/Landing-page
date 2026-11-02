@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Concept E — The Manuscript</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Noto+Serif+Ethiopic:wght@400;600;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--vel:#EFE4CE;--vel2:#E6D7BA;--ink:#1A1410;--ver:#B3261E;--gold:#B08A3E;--blue:#24366B}
+*{box-sizing:border-box;margin:0;padding:0}a{white-space:nowrap}
+body{width:1440px;overflow:hidden;color:var(--ink);font-family:'Cormorant Garamond',serif;
+ background:radial-gradient(ellipse at 20% 10%,#f6eedd,transparent 60%),radial-gradient(ellipse at 90% 80%,#e3d2b1,transparent 55%),var(--vel)}
+.am{font-family:'Noto Serif Ethiopic',serif}
+.sans{font-family:'Inter',sans-serif}
+.page{display:grid;grid-template-columns:230px minmax(0,1fr) 260px;min-height:100%}
+/* left margin: table of contents nav */
+.toc{padding:48px 0 0 48px;position:relative}
+.toc img{width:64px;margin-bottom:30px}
+.toc ol{list-style:none;display:flex;flex-direction:column;gap:18px}
+.toc li{display:flex;gap:14px;align-items:baseline;font-size:20px}
+.toc li .n{font-family:'Noto Serif Ethiopic';color:var(--ver);font-size:15px;width:22px}
+.toc li.on{font-style:italic}.toc li.on:after{content:"";flex:1;border-bottom:1px solid var(--ver);margin-left:6px;max-width:40px}
+.toc .lang{margin-top:44px;font-size:14px;letter-spacing:.2em}.toc .lang b{color:var(--ver)}
+.rule-v{position:absolute;right:0;top:48px;bottom:0;width:1px;background:linear-gradient(var(--ink),var(--ink)) 0 0/1px 100%,transparent;opacity:.25}
+/* main column */
+main{padding:48px 70px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;font-family:'Inter';font-size:12px;letter-spacing:.25em;text-transform:uppercase;padding-bottom:22px;border-bottom:1px solid rgba(26,20,16,.25)}
+.topbar .r{display:flex;gap:26px;align-items:center}
+.give{background:var(--ver);color:var(--vel);padding:10px 18px;letter-spacing:.2em}
+.incipit{display:grid;grid-template-columns:300px minmax(0,1fr);gap:10px;margin-top:60px;align-items:start}
+.dropcap{font-family:'Noto Serif Ethiopic';font-weight:900;font-size:360px;line-height:.82;color:var(--ver);position:relative}
+.dropcap:after{content:"";position:absolute;left:-14px;top:-10px;width:290px;height:310px;border:1px solid var(--gold);outline:1px solid var(--gold);outline-offset:6px;z-index:-1}
+.incipit .t1{font-family:'Noto Serif Ethiopic';font-size:30px;color:var(--ver);letter-spacing:.02em;margin-top:8px}
+.incipit h1{font-size:88px;font-weight:500;line-height:.95;letter-spacing:-.01em;margin-top:14px}
+.incipit h1 i{color:var(--blue)}
+.incipit p{font-size:24px;line-height:1.45;margin-top:28px;max-width:560px}
+.incipit p:first-letter{color:var(--ver);font-size:34px}
+.ctas{display:flex;gap:28px;margin-top:34px;font-family:'Inter';font-size:14px;letter-spacing:.14em;text-transform:uppercase;align-items:center}
+.ctas .p{background:var(--ink);color:var(--vel);padding:18px 28px}
+.ctas a:not(.p){border-bottom:1px solid var(--ink);padding-bottom:4px}
+/* illuminated miniature */
+.mini{margin:90px 0 0 120px;width:640px;position:relative}
+.frame{padding:16px;background:
+ repeating-linear-gradient(45deg,var(--ver) 0 6px,var(--vel) 6px 9px,var(--ink) 9px 15px,var(--vel) 15px 18px);}
+.frame .in{padding:8px;background:var(--gold)}
+.frame .img{height:420px;background:radial-gradient(circle at 45% 35%,#a8764c,#4b2b19 70%,#24140b);position:relative}
+.frame .img span{position:absolute;inset:auto 16px 16px;color:#f0e2c8;font-style:italic;font-size:18px;text-align:center;opacity:.8}
+.cap{font-style:italic;font-size:18px;margin-top:14px;display:flex;justify-content:space-between}
+.cap b{font-family:'Noto Serif Ethiopic';font-style:normal;color:var(--ver);font-weight:600}
+/* folio spread */
+.folio{margin:130px -40px 0;display:grid;grid-template-columns:1fr 1fr;background:var(--vel2);box-shadow:0 30px 60px -30px rgba(60,40,20,.5);position:relative}
+.folio:before{content:"";position:absolute;left:50%;top:0;bottom:0;width:60px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(80,55,30,.25),transparent)}
+.leaf{padding:60px 56px}
+.leaf .h{font-family:'Inter';font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ver);margin-bottom:22px}
+.leaf .am-body{font-family:'Noto Serif Ethiopic';font-size:24px;line-height:1.9}
+.leaf .en-body{font-size:28px;line-height:1.45;font-style:italic}
+.verses{margin-top:34px;display:flex;flex-direction:column;gap:20px}
+.verse{display:grid;grid-template-columns:44px 1fr;gap:10px}
+.verse .n{font-family:'Noto Serif Ethiopic';color:var(--ver);font-size:24px}
+.verse b{font-size:24px;font-weight:600}.verse p{font-size:19px;line-height:1.4;opacity:.8}
+/* ledger */
+.ledger{margin-top:130px}
+.ledger h2{font-size:64px;font-weight:500;text-align:center}
+.ledger h2 small{display:block;font-family:'Noto Serif Ethiopic';font-size:22px;color:var(--ver)}
+.orn{text-align:center;color:var(--ver);letter-spacing:.6em;margin:14px 0 40px}
+.li{display:flex;align-items:baseline;gap:18px;font-size:28px;padding:16px 0}
+.li .d{font-family:'Inter';font-size:13px;letter-spacing:.2em;color:var(--ver);width:110px}
+.li .dots{flex:1;border-bottom:2px dotted rgba(26,20,16,.4);transform:translateY(-6px)}
+.li .w{font-style:italic;font-size:22px}
+/* colophon */
+.colophon{margin:140px 0 0;padding:70px 0 90px;border-top:1px solid rgba(26,20,16,.25);display:grid;grid-template-columns:1fr 220px;gap:40px;align-items:center}
+.colophon .h{font-family:'Inter';font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--ver)}
+.colophon p{font-size:32px;line-height:1.45;margin-top:16px}
+.colophon p i{color:var(--blue)}
+.seal{width:200px;height:200px;border-radius:50%;background:var(--ver);color:var(--vel);display:grid;place-items:center;text-align:center;box-shadow:inset 0 0 0 8px var(--ver),inset 0 0 0 10px var(--vel),inset 0 0 0 16px var(--ver);transform:rotate(-8deg)}
+.seal b{font-size:42px;font-weight:600;letter-spacing:.06em;display:block}.seal small{font-family:'Inter';font-size:10px;letter-spacing:.2em}
+/* right margin: marginalia */
+.marg{padding:150px 48px 0 30px;position:relative}
+.marg:before{content:"";position:absolute;left:0;top:48px;bottom:0;width:1px;background:var(--ink);opacity:.25}
+.note{margin-bottom:60px;position:relative}
+.note:before{content:"☩";position:absolute;left:-44px;top:-2px;color:var(--ver);font-size:22px;background:var(--vel);width:28px;text-align:center}
+.note .k{font-family:'Inter';font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--ver)}
+.note .k .am{letter-spacing:0;font-size:13px}
+.note .v{font-size:40px;font-weight:500;line-height:1;margin:8px 0 4px}
+.note p{font-style:italic;font-size:18px;opacity:.8}
+.note.call{border:1px solid var(--ink);padding:20px;margin-top:20px}
+.note.call:before{display:none}
+.note.call a{display:block;margin-top:12px;font-family:'Inter';font-size:12px;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid;width:max-content}
+</style></head><body>
+<div class="page">
+ <aside class="toc"><div class="rule-v"></div>
+  <img src="logo.png">
+  <ol>
+   <li class="on"><span class="n">፩</span>Home</li><li><span class="n">፪</span>About</li><li><span class="n">፫</span>Sermons</li><li><span class="n">፬</span>Events</li><li><span class="n">፭</span>Ministries</li><li><span class="n">፮</span>Contact</li>
+  </ol>
+  <div class="lang sans"><b>EN</b> &nbsp;/&nbsp; <span class="am">አማ</span></div>
+ </aside>
+ <main>
+  <div class="topbar"><span>Columbus, Ohio · Est. in faith</span><div class="r"><a>Sign in</a><a class="give">Give</a></div></div>
+  <div class="incipit">
+   <div class="dropcap">አ</div>
+   <div>
+    <div class="t1">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን</div>
+    <h1>Ethiopian Emmanuel <i>United Church</i> of Columbus</h1>
+    <p>A Christ-centered Ethiopian church community in Columbus, Ohio — where the old words are still sung, in Amharic and in English, by one family.</p>
+    <div class="ctas"><a class="p">Plan your visit</a><a>Watch sermons</a><a>Let us call you</a></div>
+   </div>
+  </div>
+  <figure class="mini"><div class="frame"><div class="in"><div class="img"><span>Plate I — your congregation in worship</span></div></div></div>
+   <figcaption class="cap"><span>Sunday worship, McNaughten Road</span><b>አምልኮ</b></figcaption></figure>
+  <div class="folio">
+   <div class="leaf"><div class="h">ተልዕኮአችን</div>
+    <p class="am-body">በአምልኮ፣ በጸሎት፣ በቃሉ ትምህርት እና በደቀመዝሙርነት እግዚአብሔርን ለማክበር እንኖራለን።</p>
+    <div class="verses">
+     <div class="verse"><span class="n">፩</span><div><b>Spirit-Filled Worship</b><p>Worshiping Jesus Christ together as a church family.</p></div></div>
+     <div class="verse"><span class="n">፪</span><div><b>Biblical Foundation</b><p>Built on the authority of the Holy Scriptures.</p></div></div>
+    </div></div>
+   <div class="leaf"><div class="h">Our mission</div>
+    <p class="en-body">“We exist to glorify God through worship, prayer, biblical teaching, and discipleship in our Ethiopian and broader Columbus community.”</p>
+    <div class="verses">
+     <div class="verse"><span class="n">፫</span><div><b>Family Discipleship</b><p>Growing families and children in Christian faith.</p></div></div>
+     <div class="verse"><span class="n">፬</span><div><b>Ethiopian Community</b><p>Serving locally while connected to a global church body.</p></div></div>
+    </div></div>
+  </div>
+  <section class="ledger"><h2><small>ዝግጅቶች</small>The calendar</h2><div class="orn">✦ ✦ ✦</div>
+   <div class="li"><span class="d">09 NOV</span>Sunday Worship Service<span class="dots"></span><span class="w">2:00 PM</span></div>
+   <div class="li"><span class="d">15 NOV</span>Youth Fellowship Night<span class="dots"></span><span class="w">6:00 PM</span></div>
+   <div class="li"><span class="d">23 NOV</span>Thanksgiving Prayer Gathering<span class="dots"></span><span class="w">5:00 PM</span></div>
+  </section>
+  <section class="colophon">
+   <div><div class="h">Colophon · ያግኙን</div>
+    <p>Found at <i>1055 McNaughten Rd, Columbus, OH 43213.</i> Shepherded by <i>Pastor Gedlu Tsige</i>, Senior Pastor — reachable at (614) 999-2488 or info@eucconline.com.</p>
+    <div class="ctas"><a class="p">Send a message</a><a>Open in Google Maps</a></div></div>
+   <div class="seal"><div><b>EEUCC</b><small>COLUMBUS · OHIO</small></div></div>
+  </section>
+ </main>
+ <aside class="marg">
+  <div class="note"><div class="k">Sunday · <span class="am">እሁድ</span></div><div class="v">2–4 PM</div><p>Main worship service</p></div>
+  <div class="note"><div class="k">Mon &amp; Tue · <span class="am">ሰኞ ማክሰኞ</span></div><div class="v">7–9 PM</div><p>Bible study</p></div>
+  <div class="note"><div class="k">Where</div><p style="font-size:20px;font-style:normal;margin-top:6px">1055 McNaughten Rd<br>Columbus, OH</p></div>
+  <div class="note call"><div class="k">First visit?</div><p>Leave your number and someone from the church will call you.</p><a>Let us call you →</a></div>
+ </aside>
+</div>
+</body></html>

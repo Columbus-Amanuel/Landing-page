@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Concept G — Fidel Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400;62..125,600;62..125,900&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+Ethiopic:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#ECE9E2;--ink:#0D0D0D;--red:#FF3D1F;--grid:rgba(13,13,13,.09)}
+*{box-sizing:border-box;margin:0;padding:0}a{white-space:nowrap}
+body{width:1440px;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'Archivo',sans-serif}
+.am{font-family:'Noto Sans Ethiopic',sans-serif}
+.mono{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.board{position:relative;background-image:repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 120px);}
+.blk{position:absolute}
+/* poster 1 */
+.p1{height:1200px;border-bottom:2px solid var(--ink);overflow:hidden}
+.fidel{position:absolute;right:-120px;top:-180px;font-family:'Noto Sans Ethiopic';font-weight:900;font-size:1250px;line-height:1;color:var(--red);letter-spacing:-.05em}
+.logo-box{left:30px;top:30px;display:flex;gap:12px;align-items:center}
+.logo-box img{width:54px}
+.logo-box b{font-stretch:125%;font-weight:900;font-size:22px;letter-spacing:-.02em}
+.top-r{right:30px;top:36px;display:flex;gap:18px;align-items:center;z-index:3}
+.top-r .give{background:var(--ink);color:var(--paper);padding:12px 22px}
+.name{left:30px;top:300px;width:820px;z-index:2}
+.name h1{font-stretch:62%;font-weight:900;font-size:158px;line-height:.82;letter-spacing:-.02em;text-transform:uppercase}
+.name h1 span{display:block}
+.name h1 .o{color:transparent;-webkit-text-stroke:2px var(--ink)}
+.meta1{left:30px;top:200px}
+.meta1 .am{font-size:22px;font-weight:700;margin-top:4px}
+.rot{left:870px;top:370px;transform:rotate(90deg);transform-origin:0 0;z-index:2}
+.rot span{font-size:14px;font-weight:600;letter-spacing:.4em;text-transform:uppercase;background:var(--paper);padding:6px 10px}
+.lede{left:30px;top:1020px;width:460px;font-size:20px;line-height:1.4;font-weight:600;z-index:2}
+.ctas{left:600px;top:960px;display:flex;flex-direction:column;gap:10px;z-index:2}
+.ctas a{display:flex;justify-content:space-between;width:330px;padding:16px 18px;border:2px solid var(--ink);font-weight:900;font-stretch:110%;font-size:18px;text-transform:uppercase;background:var(--paper)}
+.ctas a.p{background:var(--ink);color:var(--paper)}
+.photo{right:60px;top:640px;width:400px;height:480px;background:linear-gradient(180deg,#2b2b2b,#0d0d0d);filter:grayscale(1);z-index:2}
+.photo span{position:absolute;left:12px;bottom:12px;color:var(--paper)}
+.photo:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.04) 0 2px,transparent 2px 4px)}
+/* poster 2 — time */
+.p2{height:760px;border-bottom:2px solid var(--ink);background:var(--ink);color:var(--paper);overflow:hidden}
+.p2 .huge{position:absolute;left:20px;top:40px;font-stretch:62%;font-weight:900;font-size:560px;line-height:.82;letter-spacing:-.04em;color:var(--red)}
+.p2 .huge small{font-size:180px;color:var(--paper);vertical-align:top;margin-left:10px}
+.p2 .lbl{position:absolute}
+.p2 .side{position:absolute;right:30px;top:60px;width:380px;border-top:2px solid var(--paper);padding-top:16px}
+.p2 .side h3{font-stretch:62%;font-weight:900;font-size:64px;line-height:.9;text-transform:uppercase;margin:8px 0 16px}
+.p2 .side .row{display:flex;justify-content:space-between;border-top:1px solid rgba(236,233,226,.3);padding:14px 0;font-size:18px;font-weight:600}
+.p2 .side .row .am{font-weight:400;opacity:.7}
+.p2 .side a{display:block;margin-top:24px;background:var(--red);color:var(--ink);padding:18px;font-weight:900;font-stretch:110%;text-transform:uppercase;font-size:18px;text-align:center}
+.p2 .bottom{position:absolute;left:30px;bottom:30px;right:30px;display:flex;justify-content:space-between}
+/* poster 3 — mission grid */
+.p3{height:960px;border-bottom:2px solid var(--ink)}
+.p3 .q{left:240px;top:110px;width:960px;font-stretch:80%;font-weight:600;font-size:62px;line-height:1.02;letter-spacing:-.02em}
+.p3 .q em{font-style:normal;background:var(--red);padding:0 8px}
+.p3 .num{position:absolute;left:30px;top:110px}
+.cell{position:absolute;width:240px;border-top:2px solid var(--ink);padding-top:14px}
+.cell .n{font-stretch:62%;font-weight:900;font-size:120px;line-height:.85}
+.cell h4{font-weight:900;font-stretch:110%;font-size:22px;text-transform:uppercase;margin:16px 0 4px;line-height:1.05}
+.cell .am{font-size:15px;font-weight:700;color:var(--red)}
+.cell p{font-size:15px;line-height:1.45;margin-top:8px}
+.c1{left:120px;top:560px}.c2{left:480px;top:620px}.c3{left:840px;top:520px}.c4{left:1080px;top:680px}
+.cell.c2 .n,.cell.c4 .n{color:var(--red)}
+/* poster 4 — events + contact */
+.p4{height:1000px;overflow:hidden}
+.ev{position:absolute;left:30px;top:60px;width:700px}
+.ev h2{font-stretch:62%;font-weight:900;font-size:150px;line-height:.82;text-transform:uppercase}
+.ev h2 .am{display:block;font-size:34px;color:var(--red);font-weight:900;margin-bottom:10px}
+.ev .r{display:grid;grid-template-columns:120px 1fr auto;border-top:2px solid var(--ink);padding:18px 0;align-items:baseline;font-weight:600;font-size:22px}
+.ev .r:first-of-type{margin-top:40px}
+.ev .r b{font-stretch:62%;font-weight:900;font-size:44px}
+.card{position:absolute;right:30px;top:60px;width:560px;height:880px;background:var(--red);padding:30px;display:flex;flex-direction:column}
+.card .addr{font-stretch:62%;font-weight:900;font-size:92px;line-height:.88;text-transform:uppercase;margin:20px 0 auto}
+.card .ln{display:flex;justify-content:space-between;border-top:2px solid var(--ink);padding:16px 0;font-size:20px;font-weight:600}
+.card a{background:var(--ink);color:var(--paper);padding:20px;text-align:center;font-weight:900;font-stretch:110%;text-transform:uppercase;font-size:18px;margin-top:10px}
+.foot{position:absolute;left:30px;bottom:40px;width:700px;display:flex;justify-content:space-between;align-items:end}
+.foot .am{font-size:26px;font-weight:900}
+</style></head><body>
+<div class="board p1">
+ <div class="fidel">አ</div>
+ <div class="blk logo-box"><img src="logo.png"><b>EEUCC</b></div>
+ <div class="blk top-r mono"><a>Home</a><a>About</a><a>Sermons</a><a>Events</a><a>Ministries</a><a>Contact</a><span>|</span><a>EN/<span class="am">አማ</span></a><a>Sign in</a><a class="give">Give</a></div>
+ <div class="blk meta1"><div class="mono">[ 001 ] — Columbus, Ohio — Est. in faith</div><div class="am">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን</div></div>
+ <div class="blk name"><h1><span>Ethiopian</span><span class="o">Emmanuel</span><span>United</span><span>Church <span class="o" style="display:inline">of</span></span><span>Columbus</span></h1></div>
+ <div class="blk rot"><span>Amharic + English · one church</span></div>
+ <div class="blk photo"><span class="mono">IMG_001 — Sunday worship</span></div>
+ <div class="blk lede">A Christ-centered Ethiopian church community in Columbus, Ohio.</div>
+ <div class="blk ctas"><a class="p">Plan your visit <span>→</span></a><a>Watch sermons <span>▶</span></a><a>Let us call you <span>☏</span></a></div>
+</div>
+<div class="board p2">
+ <div class="huge">2:00<small>PM</small></div>
+ <div class="side"><div class="mono">[ 002 ] Service times · የአምልኮ ሰዓቶች</div><h3>Every Sunday. Every week.</h3>
+  <div class="row"><span>Sunday <span class="am">እሁድ</span></span><span>2:00–4:00 PM</span></div>
+  <div class="row" style="opacity:.75;font-weight:400"><span>Main worship service</span></div>
+  <div class="row"><span>Mon + Tue <span class="am">ሰኞ ማክሰኞ</span></span><span>7:00–9:00 PM</span></div>
+  <div class="row" style="opacity:.75;font-weight:400"><span>Bible study</span></div>
+  <a>Plan your visit →</a></div>
+ <div class="bottom mono"><span>1055 McNaughten Rd</span><span>Columbus OH 43213</span><span>Doors open — come early</span></div>
+</div>
+<div class="board p3">
+ <div class="num mono">[ 003 ]<br>Mission<br><span class="am" style="font-size:14px">ተልዕኮአችን</span></div>
+ <div class="blk q">We exist to <em>glorify God</em> through worship, prayer, biblical teaching, and discipleship in our Ethiopian and broader Columbus community.</div>
+ <div class="cell c1"><div class="n">01</div><h4>Spirit-Filled Worship</h4><div class="am">አምልኮ</div><p>Worshiping Jesus Christ together as a church family.</p></div>
+ <div class="cell c2"><div class="n">02</div><h4>Biblical Foundation</h4><div class="am">የእግዚአብሔር ቃል</div><p>Built on the authority of the Holy Scriptures.</p></div>
+ <div class="cell c3"><div class="n">03</div><h4>Family Discipleship</h4><div class="am">ቤተሰብ</div><p>Growing families and children in Christian faith.</p></div>
+ <div class="cell c4"><div class="n">04</div><h4>Ethiopian Community</h4><div class="am">ማህበረሰብ</div><p>Serving locally while connected to a global church body.</p></div>
+</div>
+<div class="board p4">
+ <div class="ev"><div class="mono">[ 004 ]</div><h2><span class="am">ዝግጅቶች</span>Coming up</h2>
+  <div class="r"><b>09.11</b><span>Sunday Worship Service</span><span class="mono">2:00 PM</span></div>
+  <div class="r"><b>15.11</b><span>Youth Fellowship Night</span><span class="mono">6:00 PM</span></div>
+  <div class="r"><b>23.11</b><span>Thanksgiving Prayer Gathering</span><span class="mono">5:00 PM</span></div>
+  <div class="r" style="border-bottom:2px solid var(--ink)"><span class="mono" style="grid-column:span 3">All events →</span></div>
+ </div>
+ <div class="card"><div class="mono">[ 005 ] Find us · ያግኙን</div>
+  <div class="addr">1055 McNaughten Rd</div>
+  <div class="ln"><span>Pastor Gedlu Tsige</span><span>Senior Pastor</span></div>
+  <div class="ln"><span>Phone</span><span>(614) 999-2488</span></div>
+  <div class="ln"><span>Email</span><span>info@eucconline.com</span></div>
+  <div class="ln"><span>Map</span><span>Columbus, OH 43213 ↗</span></div>
+  <a>Send a message</a></div>
+ <div class="foot"><span class="am">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን</span><span class="mono">eucconline.com</span></div>
+</div>
+</body></html>

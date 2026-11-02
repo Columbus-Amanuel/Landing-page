@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Concept H — Carved in Stone (Lalibela)</title>
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Syne:wght@400;500;600;700&family=Noto+Serif+Ethiopic:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bone:#EFE3D0;--sand:#C98454;--rust:#7A321C;--deep:#2A140B;--stone:#A9663F;--sky:#E8D6BC}
+*{box-sizing:border-box;margin:0;padding:0}a{white-space:nowrap}
+body{width:1440px;background:var(--bone);color:var(--deep);font-family:'Syne',sans-serif}
+.gl{font-family:'Gloock',serif}
+.am{font-family:'Noto Serif Ethiopic',serif}
+.cap{font-size:12px;letter-spacing:.28em;text-transform:uppercase;font-weight:600}
+/* HERO: top-down cross carved in rock */
+.hero{position:relative;height:1100px;overflow:hidden;
+ background:radial-gradient(circle at 50% 52%,#d79466 0,#b8703f 30%,#93502c 60%,#6e3619 100%)}
+.hero:before{content:"";position:absolute;inset:0;opacity:.35;background:
+ repeating-radial-gradient(circle at 30% 40%,transparent 0 3px,rgba(60,25,10,.25) 3px 4px),
+ repeating-linear-gradient(115deg,transparent 0 14px,rgba(255,220,180,.07) 14px 16px)}
+.cross{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%)}
+.edge{position:absolute;z-index:3;color:var(--bone)}
+.e-top{top:32px;left:50%;transform:translateX(-50%);display:flex;gap:40px;font-size:14px;letter-spacing:.2em;text-transform:uppercase;font-weight:600}
+.e-top .on{border-bottom:1px solid}
+.e-tl{left:40px;top:28px;display:flex;align-items:center;gap:12px}
+.e-tl img{width:48px;background:var(--bone);border-radius:50%;padding:3px}
+.e-tl b{font-family:'Gloock';font-size:22px;font-weight:400}
+.e-tr{right:40px;top:28px;display:flex;gap:14px;align-items:center;font-size:14px;font-weight:600}
+.e-tr .give{background:var(--bone);color:var(--rust);padding:12px 22px;border-radius:999px}
+.e-tr .si{border:1px solid rgba(239,227,208,.6);padding:11px 20px;border-radius:999px}
+.q{position:absolute;z-index:3;color:var(--bone)}
+.q-tl{left:60px;top:200px;width:420px}
+.q-tl .am{font-size:26px;line-height:1.5;opacity:.9}
+.q-tl h1{font-family:'Gloock';font-weight:400;font-size:74px;line-height:.98;margin-top:16px}
+.q-tr{right:60px;top:220px;width:300px;text-align:right}
+.q-tr .t{font-family:'Gloock';font-size:110px;line-height:.9}
+.q-tr .t small{font-size:40px}
+.q-bl{left:60px;bottom:110px;width:400px}
+.q-bl p{font-size:18px;line-height:1.6;opacity:.9;margin-bottom:24px}
+.q-bl .b{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.btn{display:inline-flex;gap:10px;align-items:center;padding:16px 26px;border-radius:999px;font-weight:700;font-size:15px}
+.btn.l{background:var(--bone);color:var(--rust)}.btn.o{border:1px solid rgba(239,227,208,.6);color:var(--bone)}
+.q-br{right:60px;bottom:110px;width:330px;text-align:right}
+.q-br .gl{font-size:34px;line-height:1.15}
+.vert{position:absolute;z-index:3;color:var(--bone);font-size:12px;letter-spacing:.4em;text-transform:uppercase;font-weight:600;opacity:.8}
+.v-l{left:22px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:0 0}
+.v-r{right:22px;top:50%;transform:rotate(90deg) translateX(50%);transform-origin:100% 0}
+.lang{position:absolute;z-index:3;left:50%;bottom:36px;transform:translateX(-50%);display:flex;background:rgba(42,20,11,.35);border-radius:999px;padding:5px;color:var(--bone);font-weight:700;font-size:13px}
+.lang span{padding:8px 16px;border-radius:999px}.lang span:first-child{background:var(--bone);color:var(--rust)}
+/* section 2: diagonal timeline of times */
+.times{position:relative;height:860px;background:var(--bone);overflow:hidden}
+.times .diag{position:absolute;left:-100px;right:-100px;top:380px;height:2px;background:var(--rust);transform:rotate(-12deg)}
+.tnode{position:absolute;width:420px}
+.tnode .dot{width:28px;height:28px;border-radius:50%;background:var(--rust);box-shadow:0 0 0 10px var(--bone),0 0 0 11px var(--rust)}
+.tnode .cap{color:var(--rust);margin-top:26px}
+.tnode .t{font-family:'Gloock';font-size:92px;line-height:.95;margin-top:8px}
+.tnode p{font-size:18px;margin-top:8px}
+.n1{left:160px;top:420px}.n2{left:620px;top:200px}
+.times .title{position:absolute;right:80px;bottom:80px;text-align:right}
+.times .title .am{font-size:24px;color:var(--rust)}
+.times .title h2{font-family:'Gloock';font-weight:400;font-size:84px;line-height:1}
+.times .title .btn{margin-top:22px;background:var(--rust);color:var(--bone)}
+.times .tl{position:absolute;left:80px;top:80px;width:400px;font-size:19px;line-height:1.6}
+/* section 3: mission as cross of four */
+.mission{background:var(--deep);color:var(--bone);position:relative;height:1240px;overflow:hidden}
+.mission .center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:440px;height:440px;border-radius:50%;border:1px solid rgba(239,227,208,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:50px}
+.mission .center .am{color:var(--sand);font-size:22px}
+.mission .center p{font-family:'Gloock';font-size:27px;line-height:1.3;margin-top:14px}
+.mission .ring{position:absolute;left:50%;top:50%;width:820px;height:820px;transform:translate(-50%,-50%);border-radius:50%;border:1px dashed rgba(239,227,208,.2)}
+.arm{position:absolute;width:300px;text-align:center}
+.arm .n{font-family:'Gloock';font-size:20px;color:var(--sand)}
+.arm h4{font-family:'Gloock';font-weight:400;font-size:34px;line-height:1.05;margin:8px 0}
+.arm .am{color:var(--sand);font-size:15px}
+.arm p{opacity:.75;line-height:1.55;margin-top:8px}
+.a-n{left:50%;top:60px;transform:translateX(-50%)}
+.a-s{left:50%;bottom:60px;transform:translateX(-50%)}
+.a-w{left:90px;top:50%;transform:translateY(-50%);text-align:left}
+.a-e{right:90px;top:50%;transform:translateY(-50%);text-align:right}
+.mission .lbl{position:absolute;left:60px;top:60px}
+.mission .lbl h2{font-family:'Gloock';font-weight:400;font-size:64px;line-height:1;margin-top:10px}
+/* section 4: events as stones + contact tablet */
+.end{position:relative;height:1120px;background:var(--sky);overflow:hidden}
+.stone{position:absolute;background:var(--bone);padding:30px;border-radius:40px 8px 40px 8px;box-shadow:0 30px 50px -25px rgba(42,20,11,.4)}
+.stone .d{font-family:'Gloock';font-size:64px;line-height:1;color:var(--rust)}
+.stone .d small{font-family:'Syne';font-size:13px;letter-spacing:.2em;margin-left:8px;font-weight:700}
+.stone h5{font-family:'Gloock';font-weight:400;font-size:28px;margin-top:14px}
+.stone p{margin-top:6px;opacity:.7}
+.s1{left:60px;top:200px;width:360px;transform:rotate(-3deg)}
+.s2{left:330px;top:470px;width:360px;transform:rotate(2deg)}
+.s3{left:80px;top:740px;width:390px;transform:rotate(-1deg)}
+.end .lbl{position:absolute;left:60px;top:70px}
+.end .lbl h2{font-family:'Gloock';font-weight:400;font-size:64px;line-height:1}
+.end .lbl .am{color:var(--rust);font-size:22px}
+.tablet{position:absolute;right:60px;top:70px;width:620px;height:980px;background:var(--rust);color:var(--bone);border-radius:310px 310px 24px 24px;padding:140px 60px 60px;display:flex;flex-direction:column;text-align:center}
+.tablet .am{color:var(--sand);font-size:24px}
+.tablet h3{font-family:'Gloock';font-weight:400;font-size:52px;line-height:1.05;margin:16px 0 30px}
+.tablet .row{border-top:1px solid rgba(239,227,208,.25);padding:18px 0;font-size:19px}
+.tablet .row .cap{display:block;opacity:.6;margin-bottom:6px;font-size:11px}
+.tablet .row .gl{font-size:28px}
+.tablet .btn{justify-content:center;margin-top:auto}
+.foot{position:absolute;left:60px;bottom:40px;font-size:13px;letter-spacing:.2em;text-transform:uppercase;font-weight:600;opacity:.7}
+</style></head><body>
+<section class="hero">
+ <svg class="cross" width="760" height="760" viewBox="-380 -380 760 760">
+  <defs>
+   <linearGradient id="dep" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4a200e"/><stop offset="1" stop-color="#8e4a26"/></linearGradient>
+   <linearGradient id="top" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2a676"/><stop offset="1" stop-color="#b06636"/></linearGradient>
+   <filter id="sh"><feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#2a0f05" flood-opacity=".55"/></filter>
+  </defs>
+  <!-- trench -->
+  <rect x="-370" y="-370" width="740" height="740" rx="60" fill="url(#dep)" opacity=".85"/>
+  <!-- stepped greek cross: three tiers -->
+  <g filter="url(#sh)">
+   <path fill="#a75d32" d="M-110 -330H110V-110H330V110H110V330H-110V110H-330V-110H-110Z"/>
+   <path fill="#bb6f40" d="M-90 -300H90V-90H300V90H90V300H-90V90H-300V-90H-90Z"/>
+   <path fill="url(#top)" d="M-70 -270H70V-70H270V70H70V270H-70V70H-270V-70H-70Z"/>
+   <path fill="none" stroke="#7a321c" stroke-width="3" d="M-40 -240H40V-40H240V40H40V240H-40V40H-240V-40H-40Z"/>
+   <path fill="none" stroke="#7a321c" stroke-width="2" d="M-14 -210H14V-14H210V14H14V210H-14V14H-210V-14H-14Z" opacity=".7"/>
+  </g>
+ </svg>
+ <div class="edge e-tl"><img src="logo.png"><b>EEUCC</b></div>
+ <nav class="edge e-top"><a class="on">Home</a><a>About</a><a>Sermons</a><a>Events</a><a>Ministries</a><a>Contact</a></nav>
+ <div class="edge e-tr"><a class="si">Sign in</a><a class="give">Give</a></div>
+ <div class="vert v-l">Columbus · Ohio · 1055 McNaughten Rd</div>
+ <div class="vert v-r">Amharic · English · One family</div>
+ <div class="q q-tl"><div class="am">ኢትዮጵያ አማኑኤል<br>ሕብረት ቤተክርስቲያን</div><h1>Ethiopian Emmanuel United Church of Columbus</h1></div>
+ <div class="q q-tr"><div class="cap" style="opacity:.85">Every Sunday · እሁድ</div><div class="t">2:00<small> PM</small></div></div>
+ <div class="q q-bl"><p>A Christ-centered Ethiopian church community in Columbus, Ohio — built on the Rock, open to all.</p>
+  <div class="b"><a class="btn l">Plan your visit →</a><div style="display:flex;gap:10px"><a class="btn o">▶ Watch sermons</a><a class="btn o">☏ Let us call you</a></div></div></div>
+ <div class="q q-br"><div class="cap" style="opacity:.85;margin-bottom:10px">Matthew 16:18</div><div class="gl">“On this rock I will build my church.”</div></div>
+ <div class="lang"><span>EN</span><span class="am">አማ</span></div>
+</section>
+<section class="times">
+ <p class="tl">Two rhythms hold our week together — one to worship, one to study the Word.</p>
+ <div class="diag"></div>
+ <div class="tnode n1"><div class="dot"></div><div class="cap">Sunday · <span class="am" style="letter-spacing:0">እሁድ</span></div><div class="t">2:00–4:00<br>PM</div><p>Main Worship Service</p></div>
+ <div class="tnode n2"><div class="dot"></div><div class="cap">Monday &amp; Tuesday · <span class="am" style="letter-spacing:0">ሰኞ እና ማክሰኞ</span></div><div class="t">7:00–9:00<br>PM</div><p>Bible Study</p></div>
+ <div class="title"><div class="am">የአምልኮ ሰዓቶች</div><h2>Join us<br>for worship</h2><a class="btn">Plan your visit →</a></div>
+</section>
+<section class="mission">
+ <div class="lbl"><div class="cap" style="color:var(--sand)">Our mission</div></div>
+ <div class="ring"></div>
+ <div class="center"><div class="am">ተልዕኮአችን</div><p>We exist to glorify God through worship, prayer, biblical teaching, and discipleship in our Ethiopian and broader Columbus community.</p></div>
+ <div class="arm a-n"><div class="n">I</div><h4>Spirit-Filled Worship</h4><div class="am">አምልኮ</div><p>Worshiping Jesus Christ together as a church family.</p></div>
+ <div class="arm a-e"><div class="n">II</div><h4>Biblical<br>Foundation</h4><div class="am">የእግዚአብሔር ቃል</div><p>Built on the authority of the Holy Scriptures.</p></div>
+ <div class="arm a-s"><div class="n">III</div><h4>Family Discipleship</h4><div class="am">ቤተሰብ</div><p>Growing families and children in Christian faith.</p></div>
+ <div class="arm a-w"><div class="n">IV</div><h4>Ethiopian<br>Community</h4><div class="am">ማህበረሰብ</div><p>Serving locally while connected to a global church body.</p></div>
+</section>
+<section class="end">
+ <div class="lbl"><div class="am">ዝግጅቶች</div><h2>Upcoming</h2></div>
+ <div class="stone s1"><div class="d">09<small>NOV</small></div><h5>Sunday Worship Service</h5><p>2:00 PM · Main sanctuary</p></div>
+ <div class="stone s2"><div class="d">15<small>NOV</small></div><h5>Youth Fellowship Night</h5><p>6:00 PM · Fellowship hall</p></div>
+ <div class="stone s3"><div class="d">23<small>NOV</small></div><h5>Thanksgiving Prayer Gathering</h5><p>5:00 PM · All families welcome</p></div>
+ <div class="tablet"><div class="am">ያግኙን</div><h3>Find us &amp; reach pastoral care</h3>
+  <div class="row"><span class="cap">Address</span><span class="gl">1055 McNaughten Rd</span><br>Columbus, OH 43213 · Open in Maps ↗</div>
+  <div class="row"><span class="cap">Senior Pastor</span><span class="gl">Pastor Gedlu Tsige</span></div>
+  <div class="row"><span class="cap">Phone · Email</span>(614) 999-2488 · info@eucconline.com</div>
+  <a class="btn l">Send a message</a></div>
+ <div class="foot am" style="letter-spacing:.05em">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን · eucconline.com</div>
+</section>
+</body></html>

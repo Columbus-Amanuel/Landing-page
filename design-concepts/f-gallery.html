@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Concept F — God With Us (Gallery Noir)</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter+Tight:wght@300;400;500;600&family=Noto+Serif+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bk:#0B0A09;--bk2:#15130F;--ivory:#EDE6D8;--brass:#C7A36A;--mute:#8C8577;--ember:#B5452B}
+*{box-sizing:border-box;margin:0;padding:0}a{white-space:nowrap}
+body{width:1440px;background:var(--bk);color:var(--ivory);font-family:'Inter Tight',sans-serif;font-weight:300;overflow:hidden}
+.bd{font-family:'Bodoni Moda',serif;font-weight:400}
+.am{font-family:'Noto Serif Ethiopic',serif}
+.spine{position:absolute;left:0;top:0;bottom:0;width:70px;border-right:1px solid rgba(237,230,216,.12)}
+.spine span{position:absolute;left:50%;top:60px;transform-origin:0 0;transform:rotate(90deg) translateY(-50%);white-space:nowrap;font-size:12px;letter-spacing:.5em;text-transform:uppercase;color:var(--mute)}
+.spine i{position:absolute;bottom:40px;left:0;right:0;text-align:center;font-style:normal;color:var(--brass);font-family:'Noto Serif Ethiopic';font-size:18px}
+.wrap{margin-left:70px;position:relative;overflow:hidden}
+header{display:flex;justify-content:space-between;align-items:center;padding:30px 60px;font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+header .l{display:flex;gap:14px;align-items:center}header .l img{width:38px;filter:grayscale(1) brightness(1.6)}
+header nav{display:flex;gap:34px;color:var(--mute)}header nav .on{color:var(--ivory)}
+header .r{display:flex;gap:24px;align-items:center}
+header .give{border:1px solid var(--brass);color:var(--brass);padding:11px 20px}
+/* hero */
+.hero{position:relative;height:1100px;overflow:hidden}
+.ghost{position:absolute;left:-10px;top:130px;font-family:'Bodoni Moda';font-size:330px;line-height:1;letter-spacing:-.04em;color:transparent;-webkit-text-stroke:1px rgba(237,230,216,.18);white-space:nowrap}
+.f{position:absolute;overflow:hidden}
+.f .img{position:absolute;inset:0}
+.f small{position:absolute;left:0;bottom:-30px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--mute)}
+.f1{left:640px;top:70px;width:520px;height:660px}
+.f1 .img{background:radial-gradient(circle at 40% 30%,#9c6a43,#3a2214 60%,#120b07)}
+.f2{left:1150px;top:430px;width:180px;height:240px;outline:1px solid var(--brass);outline-offset:10px}
+.f2 .img{background:linear-gradient(170deg,#6f5a3c,#211a10)}
+.f3{left:470px;top:640px;width:250px;height:190px}
+.f3 .img{background:linear-gradient(200deg,#7a3b25,#1d0f09)}
+.plabel{position:absolute;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:var(--mute)}
+.title{position:absolute;left:60px;top:300px;width:620px;z-index:3}
+.title .am{color:var(--brass);font-size:22px}
+.title h1{font-family:'Bodoni Moda';font-size:150px;line-height:.86;font-weight:400;letter-spacing:-.03em;margin-top:10px}
+.title h1 i{font-style:italic;color:var(--brass)}
+.title .ref{font-size:13px;letter-spacing:.3em;color:var(--mute);margin-top:22px;text-transform:uppercase}
+.lede{position:absolute;left:60px;top:790px;width:380px;font-size:18px;line-height:1.6;color:#cfc7b8}
+.lede b{font-weight:500;color:var(--ivory)}
+.actions{position:absolute;left:860px;top:820px;display:flex;flex-direction:column;gap:0;width:470px;border-top:1px solid rgba(237,230,216,.2)}
+.actions a{display:flex;justify-content:space-between;padding:20px 0;border-bottom:1px solid rgba(237,230,216,.2);font-size:22px;font-family:'Bodoni Moda'}
+.actions a span{font-family:'Inter Tight';font-size:12px;letter-spacing:.25em;color:var(--mute);text-transform:uppercase;align-self:center}
+.actions a.p{color:var(--brass)}
+/* placards */
+.placards{position:relative;height:560px;border-top:1px solid rgba(237,230,216,.12)}
+.pc{position:absolute;background:var(--ivory);color:var(--bk);padding:30px 32px;width:360px}
+.pc .no{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--ember)}
+.pc .h{font-family:'Bodoni Moda';font-size:54px;line-height:1;margin:14px 0 10px}
+.pc p{font-size:14px;line-height:1.6;color:#4a443a}
+.pc hr{border:0;border-top:1px solid #c9bfae;margin:16px 0}
+.pc1{left:120px;top:110px}
+.pc2{left:560px;top:230px}
+.pc3{left:1000px;top:80px;background:transparent;color:var(--ivory);border:1px solid var(--brass)}
+.pc3 p{color:#bdb5a6}.pc3 .h{font-size:40px}
+.pc3 a{display:inline-block;margin-top:14px;color:var(--brass);font-size:12px;letter-spacing:.25em;text-transform:uppercase;border-bottom:1px solid}
+.sect-label{position:absolute;left:60px;top:40px;font-size:12px;letter-spacing:.35em;text-transform:uppercase;color:var(--mute)}
+/* mission staircase */
+.mission{position:relative;padding:120px 60px 140px;background:var(--bk2)}
+.mission .q{font-family:'Bodoni Moda';font-size:58px;line-height:1.12;max-width:1050px;letter-spacing:-.01em}
+.mission .q i{color:var(--brass)}
+.stairs{position:relative;height:520px;margin-top:80px}
+.st{position:absolute;width:300px;border-top:1px solid var(--brass);padding-top:20px}
+.st .n{font-family:'Bodoni Moda';font-style:italic;font-size:64px;color:var(--brass);line-height:1}
+.st h4{font-family:'Bodoni Moda';font-size:30px;font-weight:400;margin:14px 0 6px}
+.st .am{color:var(--mute);font-size:14px}
+.st p{color:#bdb5a6;line-height:1.6;margin-top:8px;font-size:15px}
+.st1{left:0;top:0}.st2{left:330px;top:110px}.st3{left:660px;top:220px}.st4{left:990px;top:330px}
+/* events as index */
+.idx{padding:120px 60px}
+.idx .row{display:grid;grid-template-columns:220px 1fr 240px 60px;align-items:center;padding:34px 0;border-bottom:1px solid rgba(237,230,216,.15)}
+.idx .row .d{font-family:'Bodoni Moda';font-size:80px;line-height:1;color:var(--brass)}
+.idx .row .d small{font-family:'Inter Tight';font-size:12px;letter-spacing:.25em;color:var(--mute);margin-left:10px;vertical-align:middle}
+.idx .row h5{font-family:'Bodoni Moda';font-size:40px;font-weight:400}
+.idx .row .m{color:var(--mute);font-size:14px;letter-spacing:.12em;text-transform:uppercase}
+.idx .row .ar{font-size:28px;color:var(--brass);text-align:right}
+.idx .top{display:flex;justify-content:space-between;align-items:end;margin-bottom:30px}
+.idx .top h2{font-family:'Bodoni Moda';font-size:96px;font-weight:400;line-height:1}
+.idx .top h2 .am{font-size:26px;color:var(--brass);display:block;margin-bottom:10px}
+/* contact: typographic */
+.contact{position:relative;padding:120px 60px 80px;border-top:1px solid rgba(237,230,216,.12)}
+.big-phone{font-family:'Bodoni Moda';font-size:190px;line-height:.9;letter-spacing:-.04em}
+.big-phone i{color:var(--brass)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;margin-top:70px;padding-top:30px;border-top:1px solid rgba(237,230,216,.2)}
+.cgrid .k{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--mute);margin-bottom:12px}
+.cgrid .v{font-family:'Bodoni Moda';font-size:28px;line-height:1.25}
+.cgrid a{display:inline-block;margin-top:14px;color:var(--brass);font-size:12px;letter-spacing:.25em;text-transform:uppercase;border-bottom:1px solid}
+.end{display:flex;justify-content:space-between;margin-top:100px;color:var(--mute);font-size:12px;letter-spacing:.25em;text-transform:uppercase}
+</style></head><body>
+<div class="spine"><span>Ethiopian Emmanuel United Church of Columbus — est. in faith — Columbus, Ohio</span><i>ዐ</i></div>
+<div class="wrap">
+<header>
+ <div class="l"><img src="logo.png">EEUCC</div>
+ <nav><a class="on">Home</a><a>About</a><a>Sermons</a><a>Events</a><a>Ministries</a><a>Contact</a></nav>
+ <div class="r"><a>EN / <span class="am">አማ</span></a><a>Sign in</a><a class="give">Give</a></div>
+</header>
+<section class="hero">
+ <div class="ghost">Emmanuel</div>
+ <div class="f f1"><div class="img"></div></div><span class="plabel" style="left:640px;top:745px">Plate I — Sunday worship</span>
+ <div class="f f2"><div class="img"></div></div><span class="plabel" style="left:1150px;top:690px">Plate II — Choir</span>
+ <div class="f f3"><div class="img"></div></div><span class="plabel" style="left:470px;top:842px">Plate III — Fellowship</span>
+ <div class="title"><div class="am">አማኑኤል — እግዚአብሔር ከእኛ ጋር</div><h1>God<br><i>with</i> us.</h1><div class="ref">Matthew 1:23 · “Emmanuel”</div></div>
+ <p class="lede"><b>Ethiopian Emmanuel United Church of Columbus.</b> A Christ-centered Ethiopian church community in Columbus, Ohio.</p>
+ <div class="actions"><a class="p">Plan your visit <span>First time →</span></a><a>Watch sermons <span>Archive →</span></a><a>Let us call you <span>Callback →</span></a></div>
+</section>
+<section class="placards">
+ <div class="sect-label">Gatherings · የአምልኮ ሰዓቶች</div>
+ <div class="pc pc1"><div class="no">No. 01 · Sunday · <span class="am">እሁድ</span></div><div class="h bd">2:00 – 4:00 PM</div><hr><p>Main Worship Service. Prayer, praise and the Word, in Amharic and English.</p></div>
+ <div class="pc pc2"><div class="no">No. 02 · Monday &amp; Tuesday</div><div class="h bd">7:00 – 9:00 PM</div><hr><p>Bible Study. Slow reading of Scripture, together.</p></div>
+ <div class="pc pc3"><div class="no" style="color:var(--brass)">Visitor's note</div><div class="h bd">First time? Come as you are.</div><p>1055 McNaughten Rd, Columbus, OH 43213</p><a>Plan your visit →</a></div>
+</section>
+<section class="mission">
+ <div class="sect-label" style="top:60px">Our mission · ተልዕኮአችን</div>
+ <p class="q">We exist to <i>glorify God</i> through worship, prayer, biblical teaching, and discipleship — in our Ethiopian and broader <i>Columbus</i> community.</p>
+ <div class="stairs">
+  <div class="st st1"><div class="n">i.</div><h4>Spirit-Filled Worship</h4><div class="am">አምልኮ</div><p>Worshiping Jesus Christ together as a church family.</p></div>
+  <div class="st st2"><div class="n">ii.</div><h4>Biblical Foundation</h4><div class="am">የእግዚአብሔር ቃል</div><p>Built on the authority of the Holy Scriptures.</p></div>
+  <div class="st st3"><div class="n">iii.</div><h4>Family Discipleship</h4><div class="am">ቤተሰብ</div><p>Growing families and children in Christian faith.</p></div>
+  <div class="st st4"><div class="n">iv.</div><h4>Ethiopian Community</h4><div class="am">ማህበረሰብ</div><p>Serving locally while connected to a global church body.</p></div>
+ </div>
+</section>
+<section class="idx">
+ <div class="top"><h2><span class="am">ዝግጅቶች</span>Programme</h2><a style="color:var(--brass);font-size:12px;letter-spacing:.25em;text-transform:uppercase;border-bottom:1px solid">All events →</a></div>
+ <div class="row"><div class="d">09<small>NOV</small></div><h5>Sunday Worship Service</h5><div class="m">2:00 PM · Sanctuary</div><div class="ar">→</div></div>
+ <div class="row"><div class="d">15<small>NOV</small></div><h5>Youth Fellowship Night</h5><div class="m">6:00 PM · Fellowship hall</div><div class="ar">→</div></div>
+ <div class="row"><div class="d">23<small>NOV</small></div><h5>Thanksgiving Prayer Gathering</h5><div class="m">5:00 PM · All families</div><div class="ar">→</div></div>
+</section>
+<section class="contact">
+ <div class="sect-label" style="top:60px">Visit &amp; connect · ያግኙን</div>
+ <div class="big-phone">(614)<br><i>999–2488</i></div>
+ <div class="cgrid">
+  <div><div class="k">Address</div><div class="v">1055 McNaughten Rd<br>Columbus, OH 43213</div><a>Open in Google Maps →</a></div>
+  <div><div class="k">Pastoral care</div><div class="v">Pastor Gedlu Tsige<br><span style="color:var(--mute);font-size:20px">Senior Pastor</span></div></div>
+  <div><div class="k">Write to us</div><div class="v">info@eucconline.com</div><a>Send a message →</a></div>
+ </div>
+ <div class="end"><span class="am" style="letter-spacing:0;font-size:15px">ኢትዮጵያ አማኑኤል ሕብረት ቤተክርስቲያን በኮለንበስ</span><span>eucconline.com</span></div>
+</section>
+</div>
+</body></html>
