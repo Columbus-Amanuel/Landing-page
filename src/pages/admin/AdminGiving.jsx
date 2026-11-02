@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useFieldArray, useForm } from 'react-hook-form';
+import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Save, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import BilingualField from '@/components/common/BilingualField';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -55,16 +55,52 @@ export default function AdminGiving() {
         {/* Channels */}
         <Card>
           <CardContent className="space-y-5 p-6">
-            <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.channels')}</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t('admin.giving.field.onlineUrl')}><Input type="url" {...form.register('onlineGivingUrl')} /></Field>
-              <Field label={t('admin.giving.field.checksPayableTo')}><Input {...form.register('checksPayableTo')} /></Field>
-              <Field label={t('admin.giving.field.textNumber')}><Input {...form.register('textToGiveNumber')} /></Field>
-              <Field label={t('admin.giving.field.textKeyword')}><Input {...form.register('textToGiveKeyword')} /></Field>
+            <div>
+              <h2 className="font-display text-lg font-semibold text-primary">{t('admin.giving.channels')}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t('admin.giving.channelsHelp')}</p>
             </div>
-            <Field label={t('admin.giving.field.mailAddress')}>
-              <Textarea rows={3} {...form.register('mailAddress')} />
-            </Field>
+
+            <Channel title={t('give.check')} enabledName="checkEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.checksPayableTo')}>
+                <Input {...form.register('checksPayableTo')} placeholder="EUCC" />
+              </Field>
+            </Channel>
+
+            <Channel title={t('give.cashApp')} enabledName="cashAppEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.cashAppTag')}>
+                <Input {...form.register('cashAppCashtag')} placeholder="EmmanuelUnitedCbus" />
+              </Field>
+              <Field label={t('admin.giving.field.cashApp')}>
+                <Input {...form.register('cashAppNumber')} placeholder="614-999-2488" />
+              </Field>
+            </Channel>
+
+            <Channel title={t('give.zelle')} enabledName="zelleEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.zelle')}>
+                <Input {...form.register('zelleNumber')} placeholder="614-999-2488" />
+              </Field>
+              <Field label={t('admin.giving.field.zelleName')}>
+                <Input {...form.register('zelleName')} placeholder="EMMANUEL UNITED CHURCH OF COLUMBUS" />
+              </Field>
+            </Channel>
+
+            <Channel title={t('give.venmo')} enabledName="venmoEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.venmo')}>
+                <Input {...form.register('venmoUsername')} placeholder="YourVenmoName" />
+              </Field>
+            </Channel>
+
+            <Channel title={t('give.paypal')} enabledName="paypalEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.paypal')}>
+                <Input {...form.register('paypalHandle')} placeholder="YourPayPalName" />
+              </Field>
+            </Channel>
+
+            <Channel title={t('give.giveOnline')} enabledName="onlineGivingEnabled" control={form.control} showLabel={t('admin.giving.field.showOnPage')}>
+              <Field label={t('admin.giving.field.onlineUrl')}>
+                <Input type="url" {...form.register('onlineGivingUrl')} placeholder="https://" />
+              </Field>
+            </Channel>
           </CardContent>
         </Card>
 
@@ -121,6 +157,32 @@ export default function AdminGiving() {
         </div>
       </form>
     </>
+  );
+}
+
+function Channel({ title, enabledName, control, showLabel, children }) {
+  return (
+    <div className="rounded-md border border-border p-4">
+      <div className="flex items-center justify-between gap-4">
+        <h3 className="font-semibold text-foreground">{title}</h3>
+        <div className="flex items-center gap-2">
+          <Label htmlFor={enabledName} className="text-xs text-muted-foreground">{showLabel}</Label>
+          <Controller
+            name={enabledName}
+            control={control}
+            render={({ field }) => (
+              <Switch
+                id={enabledName}
+                type="button"
+                checked={field.value !== false}
+                onCheckedChange={field.onChange}
+              />
+            )}
+          />
+        </div>
+      </div>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2">{children}</div>
+    </div>
   );
 }
 

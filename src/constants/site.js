@@ -5,8 +5,8 @@
  */
 
 export const SITE = {
-  name: 'Ethiopian Emmanuel United Church of Columbus',
-  shortName: 'EEUCC',
+  name: 'Emmanuel United Church of Columbus',
+  shortName: 'EUCC',
   tagline: 'A Christ-centered community in Columbus, Ohio.',
   taglineAm: 'በኮሎምበስ ኦሃዮ የክርስቶስ ማዕከል የሆነ ማህበረሰብ።',
   address: '1055 McNaughten Rd',

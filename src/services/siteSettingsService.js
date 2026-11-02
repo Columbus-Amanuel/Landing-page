@@ -52,11 +52,20 @@ export const DEFAULT_CHURCH_INFO = {
 };
 
 export const DEFAULT_GIVING_SETTINGS = {
+  checkEnabled: true,
+  checksPayableTo: 'EUCC',
+  cashAppEnabled: true,
+  cashAppCashtag: 'EmmanuelUnitedCbus',
+  cashAppNumber: '614-999-2488',
+  zelleEnabled: true,
+  zelleNumber: '614-999-2488',
+  zelleName: 'EMMANUEL UNITED CHURCH OF COLUMBUS',
+  venmoEnabled: false,
+  venmoUsername: '',
+  paypalEnabled: false,
+  paypalHandle: '',
+  onlineGivingEnabled: false,
   onlineGivingUrl: '',
-  textToGiveNumber: '',
-  textToGiveKeyword: 'GIVE',
-  mailAddress: `${SITE.name}\n${SITE.address}\n${SITE.city}, ${SITE.state} ${SITE.zip}`,
-  checksPayableTo: SITE.shortName,
   scriptureText:
     'Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver.',
   scriptureTextAm:

@@ -182,9 +182,13 @@ Home hero **Let us call you** submits here too: `email` may be the placeholder `
 ```
 {
   funds: Array<{ id, label, desc }>,
-  onlineGivingUrl?: string,
-  mailPayableTo?: string, mailAddress?: string,
-  textNumber?: string, textKeyword?: string,
+  checkEnabled?: boolean, checksPayableTo?: string,
+  cashAppEnabled?: boolean, cashAppCashtag?: string, cashAppNumber?: string,
+  zelleEnabled?: boolean, zelleNumber?: string, zelleName?: string,
+  venmoEnabled?: boolean, venmoUsername?: string,
+  paypalEnabled?: boolean, paypalHandle?: string,
+  onlineGivingEnabled?: boolean, onlineGivingUrl?: string,
+  plannedGivingText?: string,
   scriptureText?: string, scriptureCite?: string,
   updatedAt: Timestamp
 }

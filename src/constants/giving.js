@@ -1,16 +1,7 @@
 /**
- * Default options for the Give page. The actual fund list and giving URL are
- * sourced from `siteSettings.giving` in Firestore, but these are the safe
- * fallbacks if the admin hasn't configured them yet.
+ * Fallback fund list for the Give page. The live list comes from
+ * `siteSettings.giving` in Firestore when an admin has saved one.
  */
-
-export const AMOUNT_PRESETS = [25, 50, 100, 250, 500, 1000];
-
-export const FREQUENCIES = [
-  { id: 'oneTime', labelKey: 'give.oneTime' },
-  { id: 'weekly', labelKey: 'give.weekly' },
-  { id: 'monthly', labelKey: 'give.monthly' },
-];
 
 export const FUNDS_FALLBACK = [
   {
